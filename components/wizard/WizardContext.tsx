@@ -39,12 +39,12 @@ export function WizardProvider({ children }: { children: ReactNode }) {
 
   const goNext = useCallback(() => {
     setCurrentStep(s => Math.min(s + 1, totalSteps))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 2, behavior: 'smooth' })
   }, [totalSteps])
 
   const goBack = useCallback(() => {
     setCurrentStep(s => Math.max(s - 1, 1))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 2, behavior: 'smooth' })
   }, [])
 
   return (
