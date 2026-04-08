@@ -6,6 +6,7 @@ import {
   AddOnRow, UploadZone, InfoBox, StepHeader, Divider,
 } from './WizardUI'
 import { ADD_ONS, SOCIAL_OPTIONS, PAGE_OPTIONS, FEATURE_OPTIONS } from '../../types'
+import { useState } from 'react'
 
 // ── Step 1: Starting point ─────────────────────────────────────────────────
 
@@ -82,6 +83,45 @@ export function Step1() {
 
 export function Step2() {
   const { data, update, currentStep, totalSteps } = useWizard()
+  const [checking, setChecking] = useState(false)
+  const [results, setResults] = useState<{ tld: string; domain: string; available: boolean; price?: number }[]>([])
+  const [searched, setSearched] = useState(false)
+
+  const tlds = ['.com.au', '.net.au', '.com', '.net', '.co', '.io']
+
+  const checkAvailability = async () => {
+    if (!data.domainIdeas.trim()) return
+    setChecking(true)
+    setSearched(false)
+    setResults([])
+    update({ domainName: '', domainExtension: '' })
+
+    try {
+      const checks = await Promise.all(
+        tlds.map(async tld => {
+          const res = await fetch(
+            `/api/domains/check?domain=${encodeURIComponent(data.domainIdeas.trim())}&tld=${encodeURIComponent(tld)}`
+          )
+          const json = await res.json()
+          const domainResult = Array.isArray(json.data) ? json.data[0] : json.data
+          return {
+            tld,
+            domain: domainResult?.domain_name ?? `${data.domainIdeas.trim()}${tld}`,
+            available: domainResult?.is_available === true,
+            price: domainResult?.register_price,
+          }
+        })
+      )
+      setResults(checks)
+    } catch {
+      setResults([])
+    } finally {
+      setChecking(false)
+      setSearched(true)
+    }
+  }
+
+  const selectedDomain = data.domainName
 
   return (
     <div>
@@ -123,7 +163,7 @@ export function Step2() {
               <Input
                 value={data.domainName}
                 onChange={e => update({ domainName: e.target.value })}
-                placeholder="yourbusiness.com"
+                placeholder="yourbusiness.com.au"
               />
             </Field>
             <Field label="Domain registrar" hint="(where it's registered)">
@@ -141,23 +181,105 @@ export function Step2() {
         <>
           <Divider />
           <div className="flex flex-col gap-4">
-            <Field label="Preferred domain ideas" hint="(we'll check availability)">
-              <Input
-                value={data.domainIdeas}
-                onChange={e => update({ domainIdeas: e.target.value })}
-                placeholder="yourbusiness, mybrand, acme..."
-              />
+            <Field label="What name would you like to search for?">
+              <div className="flex gap-2">
+                <Input
+                  value={data.domainIdeas}
+                  onChange={e => update({ domainIdeas: e.target.value })}
+                  placeholder="yourbusiness"
+                  className="flex-1"
+                  onKeyDown={e => e.key === 'Enter' && checkAvailability()}
+                />
+                <button
+                  type="button"
+                  onClick={checkAvailability}
+                  disabled={checking || !data.domainIdeas.trim()}
+                  className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo-500 disabled:opacity-40"
+                >
+                  {checking ? 'Checking...' : 'Check'}
+                </button>
+              </div>
             </Field>
-            <Field label="Preferred extension">
-              <Select
-                value={data.domainExtension}
-                onChange={e => update({ domainExtension: e.target.value })}
-              >
-                {['.com', '.com.au', '.co', '.net', '.io', '.co.nz', 'Other'].map(ext => (
-                  <option key={ext} value={ext}>{ext}</option>
-                ))}
-              </Select>
-            </Field>
+
+            {checking && (
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <span className="animate-spin inline-block">⟳</span>
+                Checking availability across extensions...
+              </div>
+            )}
+
+            {searched && results.length > 0 && (
+              <>
+                <p className="text-xs text-slate-500">
+                  {results.filter(r => r.available).length > 0
+                    ? 'Select your preferred domain to continue.'
+                    : 'No available domains found. Try a different name.'}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {results.map(r => (
+                    <button
+                      key={r.tld}
+                      type="button"
+                      disabled={!r.available}
+                      onClick={() => r.available && update({ domainName: r.domain, domainExtension: r.tld })}
+                      className={`flex items-center justify-between rounded-lg border px-4 py-3 text-left transition-all duration-150 ${
+                        !r.available
+                          ? 'cursor-not-allowed border-slate-800 bg-slate-900/40 opacity-50'
+                          : selectedDomain === r.domain
+                          ? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500/30'
+                          : 'border-slate-700 bg-slate-800/40 hover:border-slate-500 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {r.available && (
+                          <span className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border text-xs transition-colors ${
+                            selectedDomain === r.domain
+                              ? 'border-indigo-500 bg-indigo-500 text-white'
+                              : 'border-slate-600'
+                          }`}>
+                            {selectedDomain === r.domain ? '✓' : ''}
+                          </span>
+                        )}
+                        <span className={`font-medium text-sm ${
+                          selectedDomain === r.domain ? 'text-indigo-200' : 'text-white'
+                        }`}>
+                          {r.domain}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        {r.available && r.price && (
+                          <span className={`text-xs ${
+                            selectedDomain === r.domain ? 'text-indigo-400' : 'text-slate-400'
+                          }`}>
+                            ${r.price.toFixed(2)}/yr
+                          </span>
+                        )}
+                        {r.available ? (
+                          <span className="text-xs font-medium text-emerald-400">Available</span>
+                        ) : (
+                          <span className="text-xs text-slate-600">Taken</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {selectedDomain && (
+                  <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 px-4 py-3">
+                    <p className="text-sm text-indigo-300">
+                      Selected: <span className="font-semibold text-white">{selectedDomain}</span>
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Click Continue to proceed with this domain.
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {searched && results.length === 0 && (
+              <InfoBox>Could not retrieve results. Please try again.</InfoBox>
+            )}
           </div>
         </>
       )}

@@ -12,7 +12,7 @@ export function WizardNav() {
       <button
         type="button"
         onClick={goBack}
-        disabled={currentStep === 1}
+        disabled={currentStep === 1 || undefined}
         className={cn(
           'rounded-xl border border-slate-700 px-6 py-3 text-sm font-medium text-slate-300 transition-all duration-150',
           'hover:border-slate-500 hover:text-white active:scale-[0.98]',
@@ -36,9 +36,7 @@ export function WizardNav() {
         </button>
       )}
 
-      {isLast && (
-        <div className="w-28" /> // spacer so Back button doesn't shift
-      )}
+      {isLast && <div className="w-28" />}
     </div>
   )
 }
