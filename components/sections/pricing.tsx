@@ -2,48 +2,50 @@
 
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
+import { HostingPricing } from '@/components/sections/HostingPricing'
 
 const plans = [
   {
-    name: 'Starter',
-    price: '$499',
-    description: 'Perfect for freelancers and small projects',
+    name: 'Trades & local business',
+    price: 'From $1,800',
+    description: 'A professional website built around your trade or local service — designed to generate enquiries and rank locally.',
     features: [
-      'AI Brief Analysis',
-      'Execution Plan',
-      'Basic Asset Generation',
-      '5 Revisions',
-      'Email Support',
+      'Custom design — no templates',
+      'Mobile-first and fast-loading',
+      'Contact form and click-to-call',
+      'Google Business Profile setup',
+      'Basic on-page SEO included',
+      'Domain and hosting setup',
     ],
+    cta: 'Get a quote',
   },
   {
-    name: 'Professional',
-    price: '$1,299',
-    description: 'For growing agencies and complex projects',
+    name: 'Ecommerce & Shopify',
+    price: 'From $3,500',
+    description: 'A Shopify store built to sell — product pages, collections, cart, and checkout configured and ready to go.',
     features: [
-      'Everything in Starter',
-      'Strategic Recommendations',
-      'Advanced Asset Generation',
-      'Unlimited Revisions',
-      'Priority Support',
-      'Team Collaboration',
-      'Custom Branding',
+      'Shopify store setup and configuration',
+      'Custom theme or theme customisation',
+      'Product catalogue setup',
+      'Payment gateway integration',
+      'Shipping and tax configuration',
+      'SEO-ready product and collection pages',
     ],
-    highlighted: true,
+    cta: 'Get a quote',
   },
   {
-    name: 'Enterprise',
-    price: 'Custom',
-    description: 'For large teams and custom needs',
+    name: 'Shopify Hydrogen',
+    price: 'From $8,000',
+    description: 'A fully custom headless Shopify frontend — built in React/Hydrogen for speed, flexibility, and a storefront that looks nothing like a theme.',
     features: [
-      'Everything in Professional',
-      'Dedicated Account Manager',
-      'Custom Integrations',
-      'White-label Options',
-      '24/7 Phone Support',
-      'SLA Guarantee',
-      'Custom Workflows',
+      'Custom React/Hydrogen frontend',
+      'Shopify Storefront API integration',
+      'Purpose-built product and collection pages',
+      'PageSpeed 95+ performance target',
+      'No theme limitations or app conflicts',
+      'Scalable for high-volume stores',
     ],
+    cta: 'Get a quote',
   },
 ]
 
@@ -72,15 +74,14 @@ export function PricingSection() {
     <section id="pricing" className="py-24 px-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          animate={{
-            opacity: [0.1, 0.2, 0.1],
-          }}
+          animate={{ opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 8, repeat: Infinity }}
           className="absolute top-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
         />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -89,16 +90,17 @@ export function PricingSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-sm font-medium text-accent mb-3">Pricing</p>
+          <p className="text-sm font-medium text-accent mb-3">Investment</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-balance">
-            Plans for every team
+            Straightforward pricing for real projects.
           </h2>
           <p className="text-lg text-foreground/60 max-w-2xl mx-auto text-balance">
-            Start with what you need, upgrade as you grow. No hidden fees.
+            Every project is scoped individually — these are starting points, not hard limits.
+            Tell us what you need and we'll come back with a fixed quote.
           </p>
         </motion.div>
 
-        {/* Plans Grid */}
+        {/* Three-column grid — no card is highlighted by default, hover reveals the accent */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -110,50 +112,55 @@ export function PricingSection() {
             <motion.div
               key={plan.name}
               variants={cardVariants}
-              className={`rounded-lg border transition-all ${
-                plan.highlighted
-                  ? 'bg-primary/5 border-primary/50 md:scale-105 md:shadow-xl md:shadow-primary/20'
-                  : 'bg-card/50 border-border hover:bg-card'
-              } p-8 flex flex-col`}
+              className="group rounded-lg border border-border bg-card/50 p-8 flex flex-col transition-all duration-300 hover:border-primary/50 hover:bg-primary/5 hover:shadow-xl hover:shadow-primary/10"
             >
-              {plan.highlighted && (
-                <div className="mb-4 inline-block">
-                  <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-semibold">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-
-              <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-              <p className="text-foreground/60 text-sm mb-6">{plan.description}</p>
+              <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                {plan.name}
+              </h3>
+              <p className="text-foreground/60 text-sm mb-5 leading-relaxed">
+                {plan.description}
+              </p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold">{plan.price}</span>
-                {plan.price !== 'Custom' && <span className="text-foreground/60">/project</span>}
+                <span className="text-3xl font-bold">{plan.price}</span>
               </div>
 
               <a
                 href="#brief"
-                className={`w-full py-3 rounded-lg font-semibold text-center mb-8 transition-all ${
-                  plan.highlighted
-                    ? 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/50'
-                    : 'border border-border text-foreground hover:bg-secondary'
-                }`}
+                className="w-full py-3 rounded-lg font-semibold text-center mb-8 text-sm border border-border text-foreground transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary group-hover:shadow-lg group-hover:shadow-primary/40"
               >
-                Get Started
+                {plan.cta} →
               </a>
 
-              <div className="space-y-4 flex-grow">
+              <div className="space-y-3 flex-grow">
                 {plan.features.map((feature) => (
-                  <div key={feature} className="flex items-center gap-3">
-                    <Check size={18} className="text-accent flex-shrink-0" />
-                    <span className="text-foreground/80 text-sm">{feature}</span>
+                  <div key={feature} className="flex items-start gap-3">
+                    <Check
+                      size={16}
+                      className="text-foreground/40 group-hover:text-accent flex-shrink-0 mt-0.5 transition-colors duration-300"
+                    />
+                    <span className="text-foreground/75 text-sm leading-snug">{feature}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Bottom note */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="text-center text-sm text-foreground/40 mt-10 max-w-xl mx-auto"
+        >
+          Not sure which applies to you? Start the discovery wizard and we'll work it out together.
+        </motion.p>
+
+        {/* Live hosting, domain, SSL and email pricing */}
+        <HostingPricing />
+
       </div>
     </section>
   )

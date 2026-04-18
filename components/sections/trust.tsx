@@ -1,32 +1,26 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { TrendingUp, Clock, CheckCircle, Users } from 'lucide-react'
+import { MapPin, FileText, DollarSign } from 'lucide-react'
 
-const stats = [
+const reasons = [
   {
-    icon: TrendingUp,
-    number: '10x',
-    label: 'Faster execution',
-    description: 'From brief to launch in days, not months',
+    icon: FileText,
+    number: 'Better questions.',
+    description:
+      'Our discovery wizard is a structured process that forces clarity before any work begins. A better brief means a better site — and far fewer surprises along the way.',
   },
   {
-    icon: Clock,
-    number: '80%',
-    label: 'Time saved',
-    description: 'Automated brief analysis and planning',
+    icon: DollarSign,
+    number: 'Built for your needs.',
+    description:
+      'No upselling features you don\'t need. No bloated page builders. Clean, fast, maintainable websites built to suit your business — not the agency\'s preferred workflow.',
   },
   {
-    icon: CheckCircle,
-    number: '100%',
-    label: 'Scope clarity',
-    description: 'No more hidden requirements or scope creep',
-  },
-  {
-    icon: Users,
-    number: '50+',
-    label: 'Teams served',
-    description: 'From startups to enterprise agencies',
+    icon: MapPin,
+    number: 'We\'re not going anywhere.',
+    description:
+      'We\'re a small local agency based in Central Victoria, not an offshore churn operation. When something needs fixing, you\'re not lodging a support ticket into a queue.',
   },
 ]
 
@@ -36,34 +30,33 @@ export function TrustSection() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: 0.15,
         delayChildren: 0.2,
       },
     },
   }
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      scale: 1,
+      y: 0,
       transition: { duration: 0.6 },
     },
   }
 
   return (
     <section className="py-24 px-4 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          animate={{
-            opacity: [0.1, 0.2, 0.1],
-          }}
+          animate={{ opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 8, repeat: Infinity }}
           className="absolute top-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
         />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -72,38 +65,41 @@ export function TrustSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-sm font-medium text-accent mb-3">Why Teams Choose Web F5</p>
+          <p className="text-sm font-medium text-accent mb-3">Why Web F5</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-balance">
-            Results that speak for themselves
+            Why businesses choose us over a bigger agency.
           </h2>
+          <p className="text-lg text-foreground/60 max-w-2xl mx-auto text-balance">
+            Size isn't the advantage it used to be. Here's what actually matters.
+          </p>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Three reasons */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid md:grid-cols-3 gap-6"
         >
-          {stats.map((stat) => {
-            const Icon = stat.icon
+          {reasons.map((reason) => {
+            const Icon = reason.icon
             return (
               <motion.div
-                key={stat.label}
+                key={reason.number}
                 variants={cardVariants}
-                className="p-6 rounded-lg border border-border bg-card/50 hover:bg-card transition-colors"
+                className="p-8 rounded-lg border border-border bg-card/50 hover:bg-card transition-colors flex flex-col gap-4"
               >
-                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
-                  <Icon size={24} className="text-accent" />
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Icon size={22} className="text-primary" />
                 </div>
-                <div className="text-3xl font-bold mb-1 text-primary">{stat.number}</div>
-                <h3 className="text-sm font-semibold mb-2">{stat.label}</h3>
-                <p className="text-sm text-foreground/60">{stat.description}</p>
+                <h3 className="text-xl font-bold">{reason.number}</h3>
+                <p className="text-foreground/60 leading-relaxed text-sm">{reason.description}</p>
               </motion.div>
             )
           })}
         </motion.div>
+
       </div>
     </section>
   )

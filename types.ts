@@ -13,6 +13,9 @@ export interface WizardData {
   domainExtension: string
 
   // Step 3 - Business info
+  contactName: string
+  bizEmail: string
+  bizPhone: string
   bizName: string
   bizTagline: string
   bizReg: string
@@ -20,7 +23,7 @@ export interface WizardData {
   bizDesc: string
   bizUsp: string
   bizAudience: string
-
+  
   // Step 4 - Location
   bizAddress: string
   serviceReach: 'local' | 'national' | 'international' | ''
@@ -33,9 +36,7 @@ export interface WizardData {
   socialMedia: string[]
   crm: string
   adAccounts: string
-  bizEmail: string
-  bizPhone: string
-
+  
   // Step 6 - Branding
   designStyle: string
   brandColours: string
@@ -86,6 +87,7 @@ export const defaultWizardData: WizardData = {
   domainRegistrar: '',
   domainIdeas: '',
   domainExtension: '.com',
+  contactName: '',
   bizName: '',
   bizTagline: '',
   bizReg: '',

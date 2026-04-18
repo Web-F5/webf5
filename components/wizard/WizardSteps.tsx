@@ -19,7 +19,7 @@ export function Step1() {
       <StepHeader
         step={currentStep}
         total={totalSteps}
-        title="Let's get started"
+        title="Let's understand where you're starting from."
         description="Tell us about your current situation so we can tailor this process for you."
       />
       <div className="flex flex-col gap-3">
@@ -287,10 +287,17 @@ export function Step2() {
   )
 }
 
+
 // ── Step 3: Business info ──────────────────────────────────────────────────
+// Changes to steps 3 & 5: fields with errors get a red border + inline error message
+// clearError() is called onChange so the red clears as soon as the user types
+
+//      Added bizEmail and bizPhone fields at the bottom (required).
+//         clearError() called on every onChange so red clears as user types.
+//
 
 export function Step3() {
-  const { data, update, currentStep, totalSteps } = useWizard()
+  const { data, update, currentStep, totalSteps, stepErrors, clearError } = useWizard()
 
   return (
     <div>
@@ -301,20 +308,95 @@ export function Step3() {
         description="Help us understand what makes your business unique. This shapes every design and copy decision."
       />
       <div className="flex flex-col gap-4">
-        <Field label="Business name">
-          <Input value={data.bizName} onChange={e => update({ bizName: e.target.value })} placeholder="e.g. Acme Solutions" />
+
+        {/* ── Contact details — top of form ── */}
+        <p className="text-xs font-medium uppercase tracking-widest text-indigo-400">
+          Your contact details
+        </p>
+        <p className="text-xs text-slate-500 -mt-2">
+          So we can follow up with your quote. These stay private.
+        </p>
+
+        <Field label="Contact name" required>
+          <Input
+            value={data.contactName ?? ''}
+            onChange={e => { update({ contactName: e.target.value }); clearError('contactName') }}
+            placeholder="e.g. Josh Smith"
+            error={stepErrors['contactName']}
+          />
+          {stepErrors['contactName'] && (
+            <p className="mt-1 text-xs text-red-400">{stepErrors['contactName']}</p>
+          )}
         </Field>
-        <Field label="Tagline or slogan" hint="(optional)">
-          <Input value={data.bizTagline} onChange={e => update({ bizTagline: e.target.value })} placeholder="e.g. Building tomorrow, today" />
-        </Field>
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Business registration" hint="(optional)">
-            <Input value={data.bizReg} onChange={e => update({ bizReg: e.target.value })} placeholder="ABN, ACN..." />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Business email" required>
+            <Input
+              type="email"
+              value={data.bizEmail}
+              onChange={e => { update({ bizEmail: e.target.value }); clearError('bizEmail') }}
+              placeholder="hello@yourbusiness.com"
+              error={stepErrors['bizEmail']}
+            />
+            {stepErrors['bizEmail'] && (
+              <p className="mt-1 text-xs text-red-400">{stepErrors['bizEmail']}</p>
+            )}
           </Field>
-          <Field label="Year established">
-            <Input value={data.bizYear} onChange={e => update({ bizYear: e.target.value })} placeholder="e.g. 2018" />
+
+          <Field label="Business phone" required>
+            <Input
+              type="tel"
+              value={data.bizPhone}
+              onChange={e => { update({ bizPhone: e.target.value }); clearError('bizPhone') }}
+              placeholder="+61 4xx xxx xxx"
+              error={stepErrors['bizPhone']}
+            />
+            {stepErrors['bizPhone'] && (
+              <p className="mt-1 text-xs text-red-400">{stepErrors['bizPhone']}</p>
+            )}
           </Field>
         </div>
+
+        <Divider />
+
+        {/* ── Business info ── */}
+        <Field label="Business name" required>
+          <Input
+            value={data.bizName}
+            onChange={e => { update({ bizName: e.target.value }); clearError('bizName') }}
+            placeholder="e.g. Acme Solutions"
+            error={stepErrors['bizName']}
+          />
+          {stepErrors['bizName'] && (
+            <p className="mt-1 text-xs text-red-400">{stepErrors['bizName']}</p>
+          )}
+        </Field>
+
+        <Field label="Tagline or slogan" hint="(optional)">
+          <Input
+            value={data.bizTagline}
+            onChange={e => update({ bizTagline: e.target.value })}
+            placeholder="e.g. Building tomorrow, today"
+          />
+        </Field>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Business registration" hint="(optional)">
+            <Input
+              value={data.bizReg}
+              onChange={e => update({ bizReg: e.target.value })}
+              placeholder="ABN, ACN..."
+            />
+          </Field>
+          <Field label="Year established">
+            <Input
+              value={data.bizYear}
+              onChange={e => update({ bizYear: e.target.value })}
+              placeholder="e.g. 2018"
+            />
+          </Field>
+        </div>
+
         <Field label="What does your business do?" hint="(elevator pitch)">
           <Textarea
             value={data.bizDesc}
@@ -322,6 +404,7 @@ export function Step3() {
             placeholder="Describe your product or service in 2–3 sentences..."
           />
         </Field>
+
         <Field label="What makes you different from competitors?">
           <Textarea
             value={data.bizUsp}
@@ -329,13 +412,15 @@ export function Step3() {
             placeholder="Your unique selling proposition..."
           />
         </Field>
+
         <Field label="Who is your ideal customer?">
           <Textarea
             value={data.bizAudience}
             onChange={e => update({ bizAudience: e.target.value })}
-            placeholder="e.g. Small business owners aged 30–50 in Sydney who need..."
+            placeholder="e.g. Small business owners aged 30–50 in regional Victoria who need..."
           />
         </Field>
+
       </div>
     </div>
   )
@@ -397,10 +482,12 @@ export function Step4() {
 }
 
 // ── Step 5: Digital presence ───────────────────────────────────────────────
+// Step 5: bizEmail and bizPhone removed — captured earlier in Step 3.
+//         adAccounts field retained. Layout otherwise unchanged.
 
 export function Step5() {
   const { data, update, toggleArray, currentStep, totalSteps } = useWizard()
-
+ 
   return (
     <div>
       <StepHeader
@@ -410,15 +497,19 @@ export function Step5() {
         description="Tell us where you currently exist online so we can connect everything together seamlessly."
       />
       <div className="flex flex-col gap-4">
+ 
         <Field label="Google Business Profile">
-          <Select value={data.googleBusiness} onChange={e => update({ googleBusiness: e.target.value })}>
+          <Select
+            value={data.googleBusiness}
+            onChange={e => update({ googleBusiness: e.target.value })}
+          >
             <option value="">Select...</option>
             <option>Yes, I have one</option>
             <option>No, I'd like one set up</option>
             <option>Not sure</option>
           </Select>
         </Field>
-
+ 
         <Field label="Social media accounts" hint="(select all that apply)">
           <div className="flex flex-col gap-2">
             {SOCIAL_OPTIONS.map(s => (
@@ -431,34 +522,34 @@ export function Step5() {
             ))}
           </div>
         </Field>
-
+ 
         <Divider />
-
+ 
         <Field label="Do you have existing email lists or CRM data?">
-          <Select value={data.crm} onChange={e => update({ crm: e.target.value })}>
+          <Select
+            value={data.crm}
+            onChange={e => update({ crm: e.target.value })}
+          >
             <option value="">Select...</option>
             <option>Yes</option>
             <option>No</option>
             <option>Not sure</option>
           </Select>
         </Field>
-
+ 
         <Field label="Existing advertising accounts" hint="(optional)">
-          <Input value={data.adAccounts} onChange={e => update({ adAccounts: e.target.value })} placeholder="e.g. Google Ads, Meta Ads..." />
+          <Input
+            value={data.adAccounts}
+            onChange={e => update({ adAccounts: e.target.value })}
+            placeholder="e.g. Google Ads, Meta Ads..."
+          />
         </Field>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Business email">
-            <Input type="email" value={data.bizEmail} onChange={e => update({ bizEmail: e.target.value })} placeholder="hello@yourbusiness.com" />
-          </Field>
-          <Field label="Business phone">
-            <Input type="tel" value={data.bizPhone} onChange={e => update({ bizPhone: e.target.value })} placeholder="+61 4xx xxx xxx" />
-          </Field>
-        </div>
+ 
       </div>
     </div>
   )
 }
+ 
 
 // ── Step 6: Branding & design ──────────────────────────────────────────────
 
@@ -810,6 +901,13 @@ export function Step10() {
 }
 
 // ── Step 11: Summary & submit ──────────────────────────────────────────────
+// Replace the Step11 export in WizardSteps.tsx with this version.
+//
+// Changes from original:
+//  - Pre-submit validation checks bizName + bizEmail before fetch
+//  - Inline error state replaces alert()
+//  - Submitting state disables button and shows loading label
+//  - Client confirmation email copy matches Path A positioning
 
 interface SummaryRowProps { label: string; value: string }
 
@@ -836,25 +934,56 @@ function SummarySection({ title, children }: SummarySectionProps) {
 
 export function Step11() {
   const { data, currentStep, totalSteps, setIsSubmitted } = useWizard()
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const selectedAddOns = ADD_ONS.filter(a => data.addOns.includes(a.id))
 
-  const handleSubmit = async () => {
-  try {
-      const res = await fetch('/api/brief', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (res.ok) {
-        setIsSubmitted(true)
-      } else {
-        alert('Something went wrong. Please try again.')
-      }
-    } catch {
-      alert('Network error. Please check your connection.')
-    }
+  // Check required fields before attempting fetch
+  const getMissingFields = () => {
+    const missing: string[] = []
+    if (!data.bizName?.trim()) missing.push('business name (Step 3)')
+    if (!data.bizEmail?.trim()) missing.push('email address (Step 5)')
+    return missing
   }
 
+  const handleSubmit = async () => {
+  setError(null)
+
+  const missing = getMissingFields()
+  if (missing.length > 0) {
+    setError(`Please go back and complete the following before submitting: ${missing.join(' and ')}.`)
+    return
+  }
+
+  setSubmitting(true)
+  try {
+    const res = await fetch('/api/brief', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+
+    if (res.ok) {
+      // Scroll the brief section into view before swapping content
+      document.getElementById('brief')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+      // Small delay so the scroll completes before the DOM swap
+      setTimeout(() => setIsSubmitted(true), 400)
+    } else {
+      const body = await res.json().catch(() => null)
+      setError(
+        body?.error ??
+        'Something went wrong. Please try again, or email us at contact@webf5.au'
+      )
+    }
+  } catch {
+    setError('Could not reach the server — please check your connection and try again.')
+  } finally {
+    setSubmitting(false)
+  }
+}
 
   return (
     <div>
@@ -865,6 +994,7 @@ export function Step11() {
         description="Here's a summary of everything you've told us. Take a moment to review before submitting."
       />
       <div className="flex flex-col gap-4">
+
         <SummarySection title="Starting point">
           <SummaryRow label="Project type" value={data.startType} />
           <SummaryRow label="Current URL" value={data.existingUrl} />
@@ -932,16 +1062,25 @@ export function Step11() {
           <SummaryRow label="Notes" value={data.extraNotes} />
         </SummarySection>
 
+        {/* Inline error message */}
+        {error && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3">
+            <p className="text-sm text-red-300">{error}</p>
+          </div>
+        )}
+
         <button
           onClick={handleSubmit}
-          className="mt-2 w-full rounded-xl bg-indigo-600 px-6 py-4 text-base font-semibold text-white transition-all duration-150 hover:bg-indigo-500 active:scale-[0.98]"
+          disabled={submitting}
+          className="mt-2 w-full rounded-xl bg-indigo-600 px-6 py-4 text-base font-semibold text-white transition-all duration-150 hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit my brief →
+          {submitting ? 'Submitting…' : 'Submit my brief →'}
         </button>
 
         <p className="text-center text-xs text-slate-500">
           We'll review your brief within 1 business day and reach out with your personalised recommendation.
         </p>
+
       </div>
     </div>
   )

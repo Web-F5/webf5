@@ -8,15 +8,17 @@ import { cn } from '@/lib/utils'
 interface FieldProps {
   label: string
   hint?: string
+  required?: boolean
   children: ReactNode
   className?: string
 }
 
-export function Field({ label, hint, children, className }: FieldProps) {
+export function Field({ label, hint, required, children, className }: FieldProps) {
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <label className="text-sm font-medium text-slate-300">
         {label}
+        {required && <span className="ml-1 text-red-400">*</span>}
         {hint && <span className="ml-1.5 font-normal text-slate-500">{hint}</span>}
       </label>
       {children}
@@ -26,12 +28,19 @@ export function Field({ label, hint, children, className }: FieldProps) {
 
 // ── Text input ───────────────────────────────────────────────────────────────
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  error?: string
+}
+
+export function Input({ className, error, ...props }: InputProps) {
   return (
     <input
       className={cn(
-        'w-full rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-500',
-        'transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/40',
+        'w-full rounded-lg border bg-slate-800/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-500',
+        'transition-colors focus:outline-none focus:ring-1',
+        error
+          ? 'border-red-500/70 focus:border-red-500 focus:ring-red-500/20'
+          : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500/40',
         className
       )}
       {...props}
