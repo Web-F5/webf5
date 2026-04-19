@@ -1,7 +1,7 @@
 // components/sections/HostingPricing.tsx
 //
 // Displays live hosting, SSL, email, and domain prices pulled from
-// the Dreamscape API via /api/hosting/prices.
+// the Dreamscape API via /api/hosting/pricing.
 //
 // Falls back to static prices if the API is unavailable so the page
 // never shows a broken state to a prospective client.
