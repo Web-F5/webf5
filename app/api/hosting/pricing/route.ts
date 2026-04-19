@@ -1,4 +1,4 @@
-// app/api/hosting/prices/route.ts
+// app/api/hosting/pricing/route.ts
 //
 // Returns live pricing for the products displayed on the hosting component.
 // Cached for 1 hour via Next.js fetch cache — prices don't change frequently

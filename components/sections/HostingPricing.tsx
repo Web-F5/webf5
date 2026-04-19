@@ -123,7 +123,7 @@ export function HostingPricing() {
   const [error, setError]   = useState(false)
 
   useEffect(() => {
-    fetch('/api/hosting/prices')
+    fetch('/api/hosting/pricing')
       .then(r => r.json())
       .then(json => {
         // If the API returned data in the expected shape, use it.
