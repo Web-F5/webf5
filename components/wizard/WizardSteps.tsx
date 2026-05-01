@@ -104,11 +104,12 @@ export function Step2() {
           )
           const json = await res.json()
           const domainResult = Array.isArray(json.data) ? json.data[0] : json.data
+          const wholesale = domainResult?.register_price
           return {
             tld,
             domain: domainResult?.domain_name ?? `${data.domainIdeas.trim()}${tld}`,
             available: domainResult?.is_available === true,
-            price: domainResult?.register_price,
+            price: wholesale ? Math.ceil(wholesale * 1.2) : undefined,
           }
         })
       )
