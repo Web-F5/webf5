@@ -29,13 +29,16 @@ export async function POST(req: NextRequest) {
     }
 
     const summary = buildBriefSummary(data)
+    const logoLinks = data.logoUrls?.map(u => `Logo: ${u}`).join('\n') ?? 'None uploaded'
+    const photoLinks = data.photoUrls?.map(u => `Photo: ${u}`).join('\n') ?? 'None uploaded'
+
 
     // ── Notify you ────────────────────────────────────────────────────────
     await resend.emails.send({
       from: FROM_ADDRESS,
       to: NOTIFY_TO,
       subject: `New brief — ${data.bizName.trim()}`,
-      text: summary,
+      text: `${summary}\n\nFiles:\n${logoLinks}\n${photoLinks}`
     })
 
     // ── Confirm to client ─────────────────────────────────────────────────
