@@ -556,6 +556,29 @@ export function Step5() {
 
 export function Step6() {
   const { data, update, currentStep, totalSteps } = useWizard()
+  const [uploading, setUploading] = useState(false)
+  const handleUpload = async (files: File[], field: 'logo' | 'photos') => {
+  setUploading(true)
+  try {
+    const form = new FormData()
+    files.forEach(f => form.append(field, f))
+    
+    const res = await fetch('/api/upload', { method: 'POST', body: form })
+    const json = await res.json()
+    const urls = json.uploads.map((u: { url: string }) => u.url)
+    
+    if (field === 'logo') {
+      update({ logoFiles: files, logoUrls: urls })
+    } else {
+      update({ photoFiles: files, photoUrls: urls })
+    }
+  } catch (err) {
+    console.error('Upload failed:', err)
+    alert('Something went wrong uploading your files. Please try again.')
+  } finally {
+    setUploading(false)
+  }
+}
 
   return (
     <div>
@@ -563,18 +586,23 @@ export function Step6() {
         step={currentStep}
         total={totalSteps}
         title="Branding & design"
-        description="Upload your brand assets and tell us about your visual style. The more detail, the better we can match your vision."
+        description="Upload your brand assets and tell us about your visual style."
       />
       <div className="flex flex-col gap-5">
         <Field label="Business logo">
           <UploadZone
             id="logo-upload"
-            label="Click to upload your logo"
+            label={uploading ? "Uploading..." : "Click to upload your logo"}
             sublabel="SVG, PNG, AI, EPS or PDF — any size"
             accept="image/*,.svg,.pdf,.ai,.eps"
             files={data.logoFiles}
-            onFiles={files => update({ logoFiles: files })}
+            onFiles={files => handleUpload(files, 'logo')}
           />
+          {data.logoUrls?.length > 0 && (
+            <p className="text-xs text-emerald-400 mt-1">
+              ✓ {data.logoUrls.length} file(s) uploaded successfully
+            </p>
+          )}
           {data.logoFiles.length === 0 && (
             <InfoBox>No logo yet? We can design one — add Logo Design in the add-ons step.</InfoBox>
           )}
@@ -583,13 +611,18 @@ export function Step6() {
         <Field label="Photos & images for your website">
           <UploadZone
             id="photos-upload"
-            label="Click to upload photos"
+            label={uploading ? "Uploading..." : "Click to upload photos"}
             sublabel="JPG, PNG, WEBP — multiple files accepted"
             accept="image/*"
             multiple
             files={data.photoFiles}
-            onFiles={files => update({ photoFiles: files })}
+            onFiles={files => handleUpload(files, 'photos')}
           />
+          {data.photoUrls?.length > 0 && (
+            <p className="text-xs text-emerald-400 mt-1">
+              ✓ {data.photoUrls.length} file(s) uploaded successfully
+            </p>
+          )}
         </Field>
 
         <Field label="Design style preference">
