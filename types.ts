@@ -44,6 +44,8 @@ export interface WizardData {
   sitesDislike: string
   logoFiles: File[]
   photoFiles: File[]
+  logoUrls: string[]
+  photoUrls: string[]
 
   // Step 7 - Pages & content
   pages: string[]
@@ -112,6 +114,8 @@ export const defaultWizardData: WizardData = {
   sitesDislike: '',
   logoFiles: [],
   photoFiles: [],
+  logoUrls: [],
+  photoUrls: [],
   pages: ['home'],
   contentAuthor: '',
   existingCopy: '',
