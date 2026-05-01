@@ -557,11 +557,18 @@ export function Step5() {
 export function Step6() {
   const { data, update, currentStep, totalSteps } = useWizard()
   const [uploading, setUploading] = useState(false)
-  const handleUpload = async (files: File[], field: 'logo' | 'photos') => {
+  
+const handleUpload = async (files: File[], field: 'logo' | 'photos') => {
   setUploading(true)
   try {
     const form = new FormData()
     files.forEach(f => form.append(field, f))
+    
+    // Pass business name for folder organisation
+    const folderName = data.bizName.trim()
+      ? data.bizName.trim().toLowerCase().replace(/[^a-z0-9]/g, '-')
+      : 'unknown-business'
+    form.append('folder', folderName)
     
     const res = await fetch('/api/upload', { method: 'POST', body: form })
     const json = await res.json()
