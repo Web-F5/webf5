@@ -17,12 +17,12 @@ import { Server, Shield, Mail, Globe } from 'lucide-react'
 
 const FALLBACK = {
   hosting: [
-    { name: 'Basic',    price: 9.08,  period: 'month', features: ['1 website', '10GB storage', 'Free SSL'] },
-    { name: 'Standard', price: 12.50, period: 'month', features: ['5 websites', '50GB storage', 'Free SSL', 'Daily backups'] },
-    { name: 'Business', price: 18.00, period: 'month', features: ['Unlimited websites', '100GB storage', 'Free SSL', 'Priority support'] },
+    { name: 'Basic',    price: 9.15,  period: 'month', features: ['1 website', '10GB storage', '100 Email Accounts', '10 Databases'] },
+    { name: 'Standard', price: 14.54, period: 'month', features: ['10 websites', '500GB storage', '500 Email Accounts', '50 Databases'] },
+    { name: 'Business', price: 18.70, period: 'month', features: ['Unlimited websites', 'Unlimited storage', 'Unlimited Email Accounts', 'Unlimited Databases'] },
   ],
-  ssl:   { name: 'Standard SSL', price: 84,  period: 'year' },
-  email: { name: 'Email Hosting', price: 3.50, period: 'month' },
+  ssl:   { name: 'Standard SSL From', price: 6.87,  period: 'month' },
+  email: { name: 'Email Hosting From', price: 3.52, period: 'month' },
   domains: [
     { tld: '.com.au', price: 23, period: 'year' },
     { tld: '.net.au', price: 23, period: 'year' },
