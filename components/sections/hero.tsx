@@ -54,7 +54,7 @@ export function HeroSection() {
 
   const screenshots = [
     {
-      src: '/images/Screenshot_Outright_Electrical.png',
+      src: '/images/Outright-Electrical-Heathcote-Victoria.webp',
       alt: 'Outright Electrical website',
       url: 'https://outrightelectrical.com.au',
       rotate: '-2deg',
@@ -76,7 +76,7 @@ export function HeroSection() {
       originY: '0%',
     },
     {
-      src: '/images/Screenshot_Horse_Hay.png',
+      src: '/images/Horse-Hay-Invergordan-Victoria.webp',
       alt: 'Horse Hay website',
       url: 'https://horsehay.com.au',
       rotate: '2deg',
@@ -87,9 +87,9 @@ export function HeroSection() {
       originY: '100%',
     },
     {
-      src: '/images/Screenshot_LKF_Contracting.png',
-      alt: 'LKF Contracting website',
-      url: 'https://webf5.com.au/demos/LKF-Contracting/',
+      src: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',
+      alt: 'Australian Trenching and Excavations website',
+      url: 'https://austrenching.com.au',
       rotate: '-1.5deg',
       x: '3%',
       delay: 0.85,
