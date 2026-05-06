@@ -65,7 +65,7 @@ export function HeroSection() {
       originY: '0%',
     },
     {
-      src: '/images/Screenshot_Valley_Feeds.png',
+      src: '/images/Valley-Feeds-Katandra-West-Victoria.webp',
       alt: 'Valley Feeds & General website',
       url: 'https://valleyfeeds.com.au',
       rotate: '1.5deg',
