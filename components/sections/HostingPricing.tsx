@@ -24,8 +24,8 @@ const FALLBACK = {
   ssl:   { name: 'Standard SSL From', price: 6.87,  period: 'month' },
   email: { name: 'Email Hosting From', price: 3.52, period: 'month' },
   domains: [
-    { tld: '.com.au', price: 23, period: 'year' },
-    { tld: '.net.au', price: 23, period: 'year' },
+    { tld: '.com.au', price: 15.96, period: 'year' },
+    { tld: '.net.au', price: 15.96, period: 'year' },
     { tld: '.com',    price: 18, period: 'year' },
     { tld: '.net',    price: 18, period: 'year' },
   ],
@@ -140,12 +140,12 @@ export function HostingPricing() {
               features: FALLBACK.hosting[i]?.features ?? [],
             })),
             ssl: {
-              name:   'Standard SSL',
+              name:   'Standard SSL from',
               price:  Number((json.ssl?.[0] as Record<string, unknown>)?.price ?? FALLBACK.ssl.price),
               period: 'year',
             },
             email: {
-              name:   'Business email hosting',
+              name:   'Email hosting from',
               price:  Number((json.email?.[0] as Record<string, unknown>)?.price ?? FALLBACK.email.price),
               period: 'month',
             },
