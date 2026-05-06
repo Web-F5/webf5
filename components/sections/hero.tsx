@@ -45,9 +45,9 @@ export function HeroSection() {
       logoClass: 'h-10',
     },
     {
-      name: 'LKF Contracting',
-      logo: '/images/LKF-logo.webp',
-      url: 'https://webf5.com.au/demos/LKF-Contracting/',
+      name: 'Australian trenching and Excavations',
+      logo: '/images/ATE-logo.webp',
+      url: 'https://austrenching.com.au',
       logoClass: 'h-12',
     },
   ]
