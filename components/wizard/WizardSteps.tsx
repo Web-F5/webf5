@@ -581,49 +581,54 @@ export function Step5() {
 }
 
 // ── Pre-set palettes per design style ─────────────────────────────────────
+// Each palette defines 6 base colours; hover variants are computed via
+// lightenHex at apply time so they always match.
 
 interface Palette {
-  label: string
-  colours: {
-    brandPrimary: string
-    brandLightBg: string
-    brandDarkBg: string
-    brandBtnPrimary: string
-    brandBtnHover: string
-    brandAccent: string
-    brandAccentHover: string
-    brandDarkText: string
-  }
+  name: string
+  brandPrimary: string
+  brandLightBg: string
+  brandDarkBg: string
+  brandBtnPrimary: string
+  brandAccent: string
+  brandDarkText: string
 }
 
-const STYLE_PALETTES: Record<string, [Palette, Palette]> = {
+const STYLE_PALETTES: Record<string, Palette[]> = {
   'Modern & minimal': [
-    { label: 'Light', colours: { brandPrimary: '#1a1a2e', brandLightBg: '#f8f9fa', brandDarkBg: '#1a1a2e', brandBtnPrimary: '#6366f1', brandBtnHover: '#818cf8', brandAccent: '#06b6d4', brandAccentHover: '#22d3ee', brandDarkText: '#111827' } },
-    { label: 'Dark',  colours: { brandPrimary: '#818cf8', brandLightBg: '#0f172a', brandDarkBg: '#020617', brandBtnPrimary: '#6366f1', brandBtnHover: '#818cf8', brandAccent: '#22d3ee', brandAccentHover: '#67e8f9', brandDarkText: '#f1f5f9' } },
+    { name: 'Summer Ocean Breeze',  brandPrimary: '#457b9d', brandLightBg: '#f1faee', brandDarkBg: '#1d3557', brandBtnPrimary: '#457b9d', brandAccent: '#e63946', brandDarkText: '#1d3557' },
+    { name: 'Black & Gold Elegance', brandPrimary: '#fca311', brandLightBg: '#e5e5e5', brandDarkBg: '#000000', brandBtnPrimary: '#fca311', brandAccent: '#14213d', brandDarkText: '#14213d' },
+    { name: 'Deep Sea',              brandPrimary: '#415a77', brandLightBg: '#e0e1dd', brandDarkBg: '#0d1b2a', brandBtnPrimary: '#415a77', brandAccent: '#778da9', brandDarkText: '#1b263b' },
+    { name: 'Minimalist Elegance',   brandPrimary: '#4f5d75', brandLightBg: '#ffffff', brandDarkBg: '#2d3142', brandBtnPrimary: '#ef8354', brandAccent: '#4f5d75', brandDarkText: '#2d3142' },
   ],
   'Bold & vibrant': [
-    { label: 'Light', colours: { brandPrimary: '#dc2626', brandLightBg: '#fff7ed', brandDarkBg: '#1c1917', brandBtnPrimary: '#dc2626', brandBtnHover: '#ef4444', brandAccent: '#f59e0b', brandAccentHover: '#fbbf24', brandDarkText: '#1c1917' } },
-    { label: 'Dark',  colours: { brandPrimary: '#f87171', brandLightBg: '#1c1917', brandDarkBg: '#0c0a09', brandBtnPrimary: '#dc2626', brandBtnHover: '#ef4444', brandAccent: '#f59e0b', brandAccentHover: '#fbbf24', brandDarkText: '#fef2f2' } },
+    { name: 'Refreshing Summer Fun', brandPrimary: '#219ebc', brandLightBg: '#8ecae6', brandDarkBg: '#023047', brandBtnPrimary: '#fb8500', brandAccent: '#ffb703', brandDarkText: '#023047' },
+    { name: 'Warm Autumn Glow',      brandPrimary: '#d62828', brandLightBg: '#eae2b7', brandDarkBg: '#003049', brandBtnPrimary: '#f77f00', brandAccent: '#fcbf49', brandDarkText: '#003049' },
+    { name: 'Ocean Sunset',          brandPrimary: '#0a9396', brandLightBg: '#e9d8a6', brandDarkBg: '#001219', brandBtnPrimary: '#ee9b00', brandAccent: '#94d2bd', brandDarkText: '#001219' },
   ],
   'Corporate & professional': [
-    { label: 'Light', colours: { brandPrimary: '#1e40af', brandLightBg: '#f0f4ff', brandDarkBg: '#1e3a8a', brandBtnPrimary: '#1e40af', brandBtnHover: '#2563eb', brandAccent: '#0ea5e9', brandAccentHover: '#38bdf8', brandDarkText: '#0f172a' } },
-    { label: 'Dark',  colours: { brandPrimary: '#3b82f6', brandLightBg: '#0f172a', brandDarkBg: '#0a0f1e', brandBtnPrimary: '#1d4ed8', brandBtnHover: '#3b82f6', brandAccent: '#0ea5e9', brandAccentHover: '#38bdf8', brandDarkText: '#e2e8f0' } },
+    { name: 'Ocean Breeze',          brandPrimary: '#58a4b0', brandLightBg: '#d8dbe2', brandDarkBg: '#1b1b1e', brandBtnPrimary: '#58a4b0', brandAccent: '#373f51', brandDarkText: '#1b1b1e' },
+    { name: 'Gentle Sea Breeze',     brandPrimary: '#1f7a8c', brandLightBg: '#e1e5f2', brandDarkBg: '#022b3a', brandBtnPrimary: '#1f7a8c', brandAccent: '#bfdbf7', brandDarkText: '#022b3a' },
+    { name: 'Monochrome Beach',      brandPrimary: '#3c6e71', brandLightBg: '#ffffff', brandDarkBg: '#353535', brandBtnPrimary: '#284b63', brandAccent: '#3c6e71', brandDarkText: '#353535' },
+    { name: 'Deep Sea',              brandPrimary: '#415a77', brandLightBg: '#e0e1dd', brandDarkBg: '#0d1b2a', brandBtnPrimary: '#415a77', brandAccent: '#778da9', brandDarkText: '#1b263b' },
   ],
   'Warm & friendly': [
-    { label: 'Light', colours: { brandPrimary: '#d97706', brandLightBg: '#fffbeb', brandDarkBg: '#292524', brandBtnPrimary: '#d97706', brandBtnHover: '#f59e0b', brandAccent: '#16a34a', brandAccentHover: '#22c55e', brandDarkText: '#292524' } },
-    { label: 'Dark',  colours: { brandPrimary: '#fbbf24', brandLightBg: '#1c1917', brandDarkBg: '#0c0a09', brandBtnPrimary: '#d97706', brandBtnHover: '#f59e0b', brandAccent: '#16a34a', brandAccentHover: '#22c55e', brandDarkText: '#fef3c7' } },
+    { name: 'Earthy Warmth',         brandPrimary: '#cb997e', brandLightBg: '#ffe8d6', brandDarkBg: '#6b705c', brandBtnPrimary: '#cb997e', brandAccent: '#a5a58d', brandDarkText: '#6b705c' },
+    { name: 'Golden Summer Fields',  brandPrimary: '#d4a373', brandLightBg: '#fefae0', brandDarkBg: '#5c4a2a', brandBtnPrimary: '#d4a373', brandAccent: '#ccd5ae', brandDarkText: '#5c4a2a' },
+    { name: 'Ocean Serenity',        brandPrimary: '#598392', brandLightBg: '#eff6e0', brandDarkBg: '#01161e', brandBtnPrimary: '#124559', brandAccent: '#aec3b0', brandDarkText: '#01161e' },
   ],
   'Luxury & premium': [
-    { label: 'Light', colours: { brandPrimary: '#92400e', brandLightBg: '#fdf8f0', brandDarkBg: '#1c1008', brandBtnPrimary: '#b45309', brandBtnHover: '#d97706', brandAccent: '#7c3aed', brandAccentHover: '#8b5cf6', brandDarkText: '#1c1008' } },
-    { label: 'Dark',  colours: { brandPrimary: '#d4af37', brandLightBg: '#1a1209', brandDarkBg: '#0d0a05', brandBtnPrimary: '#b45309', brandBtnHover: '#d97706', brandAccent: '#7c3aed', brandAccentHover: '#8b5cf6', brandDarkText: '#fef3c7' } },
+    { name: 'Monochrome Chic',       brandPrimary: '#cca43b', brandLightBg: '#e5e5e5', brandDarkBg: '#242f40', brandBtnPrimary: '#cca43b', brandAccent: '#363636', brandDarkText: '#242f40' },
+    { name: 'Monochrome Beach',      brandPrimary: '#3c6e71', brandLightBg: '#ffffff', brandDarkBg: '#284b63', brandBtnPrimary: '#3c6e71', brandAccent: '#353535', brandDarkText: '#353535' },
+    { name: 'Sunlit Harvest',        brandPrimary: '#a59132', brandLightBg: '#fffbdb', brandDarkBg: '#30362f', brandBtnPrimary: '#da7422', brandAccent: '#a59132', brandDarkText: '#30362f' },
   ],
   'Playful & creative': [
-    { label: 'Light', colours: { brandPrimary: '#7c3aed', brandLightBg: '#fdf4ff', brandDarkBg: '#2e1065', brandBtnPrimary: '#7c3aed', brandBtnHover: '#8b5cf6', brandAccent: '#ec4899', brandAccentHover: '#f472b6', brandDarkText: '#1e1b4b' } },
-    { label: 'Dark',  colours: { brandPrimary: '#a78bfa', brandLightBg: '#1e1b4b', brandDarkBg: '#0f0a2e', brandBtnPrimary: '#7c3aed', brandBtnHover: '#8b5cf6', brandAccent: '#ec4899', brandAccentHover: '#f472b6', brandDarkText: '#f3e8ff' } },
+    { name: 'Sunshine Bliss',        brandPrimary: '#06aed5', brandLightBg: '#fff1d0', brandDarkBg: '#086788', brandBtnPrimary: '#dd1c1a', brandAccent: '#f0c808', brandDarkText: '#086788' },
+    { name: 'Fiery Ocean',           brandPrimary: '#f71735', brandLightBg: '#fdfffc', brandDarkBg: '#011627', brandBtnPrimary: '#f71735', brandAccent: '#41ead4', brandDarkText: '#011627' },
+    { name: 'Artsy Owl Escape',      brandPrimary: '#4c546c', brandLightBg: '#dfedf5', brandDarkBg: '#000000', brandBtnPrimary: '#fc7a57', brandAccent: '#646536', brandDarkText: '#000000' },
   ],
   'Industrial & technical': [
-    { label: 'Light', colours: { brandPrimary: '#374151', brandLightBg: '#f3f4f6', brandDarkBg: '#111827', brandBtnPrimary: '#374151', brandBtnHover: '#4b5563', brandAccent: '#ef4444', brandAccentHover: '#f87171', brandDarkText: '#111827' } },
-    { label: 'Dark',  colours: { brandPrimary: '#9ca3af', brandLightBg: '#111827', brandDarkBg: '#030712', brandBtnPrimary: '#374151', brandBtnHover: '#4b5563', brandAccent: '#ef4444', brandAccentHover: '#f87171', brandDarkText: '#f9fafb' } },
+    { name: 'Silent Waters',         brandPrimary: '#5c6b73', brandLightBg: '#e0fbfc', brandDarkBg: '#253237', brandBtnPrimary: '#5c6b73', brandAccent: '#9db4c0', brandDarkText: '#253237' },
   ],
 }
 
@@ -710,58 +715,73 @@ export function Step6() {
         {STYLE_PALETTES[data.designStyle] && (
           <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col gap-3">
             <p className="text-xs font-medium uppercase tracking-widest text-indigo-400">Suggested palettes</p>
-            <p className="text-xs text-slate-500 -mt-1">Choose a starting point — you can customise any colour below.</p>
-            <div className="flex flex-col gap-2">
+            <p className="text-xs text-slate-500 -mt-1">Choose a starting point — you can fine-tune any colour below.</p>
+            <div className="flex flex-col gap-3">
               {STYLE_PALETTES[data.designStyle].map((palette) => {
-                const dots = [
-                  palette.colours.brandPrimary,
-                  palette.colours.brandLightBg,
-                  palette.colours.brandDarkBg,
-                  palette.colours.brandBtnPrimary,
-                  palette.colours.brandAccent,
-                  palette.colours.brandDarkText,
+                const swatches = [
+                  { hex: palette.brandPrimary,    title: 'Primary' },
+                  { hex: palette.brandLightBg,    title: 'Light Bg' },
+                  { hex: palette.brandDarkBg,     title: 'Dark Bg' },
+                  { hex: palette.brandBtnPrimary, title: 'Button' },
+                  { hex: palette.brandAccent,     title: 'Accent' },
+                  { hex: palette.brandDarkText,   title: 'Text' },
                 ]
                 const isApplied =
-                  data.brandPrimary    === palette.colours.brandPrimary &&
-                  data.brandDarkBg     === palette.colours.brandDarkBg &&
-                  data.brandBtnPrimary === palette.colours.brandBtnPrimary
+                  data.brandPrimary    === palette.brandPrimary &&
+                  data.brandDarkBg     === palette.brandDarkBg &&
+                  data.brandBtnPrimary === palette.brandBtnPrimary
+
+                const applyPalette = () => update({
+                  brandPrimary:      palette.brandPrimary,
+                  brandLightBg:      palette.brandLightBg,
+                  brandDarkBg:       palette.brandDarkBg,
+                  brandBtnPrimary:   palette.brandBtnPrimary,
+                  brandBtnHover:     lightenHex(palette.brandBtnPrimary, 15),
+                  brandAccent:       palette.brandAccent,
+                  brandAccentHover:  lightenHex(palette.brandAccent, 15),
+                  brandDarkText:     palette.brandDarkText,
+                })
 
                 return (
-                  <div
-                    key={palette.label}
-                    className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all ${
-                      isApplied
-                        ? 'border-indigo-500/50 bg-indigo-500/10'
-                        : 'border-slate-700 bg-slate-800/40 hover:border-slate-500'
-                    }`}
-                  >
-                    {/* Label */}
-                    <span className="text-xs font-medium text-slate-400 w-8 flex-shrink-0">{palette.label}</span>
+                  <div key={palette.name} className="flex flex-col gap-1.5">
+                    {/* Palette name + apply button */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-slate-300">{palette.name}</span>
+                      <button
+                        type="button"
+                        onClick={applyPalette}
+                        className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                          isApplied
+                            ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-slate-700 text-slate-200 hover:bg-indigo-600 hover:text-white border border-slate-600 hover:border-indigo-500'
+                        }`}
+                      >
+                        {isApplied ? '✓ Applied' : 'Apply'}
+                      </button>
+                    </div>
 
-                    {/* Colour dots */}
-                    <div className="flex gap-1.5 flex-1">
-                      {dots.map((colour, i) => (
+                    {/* Colour bar — mimics "Your palette" style */}
+                    <div className={`flex h-9 w-full overflow-hidden rounded-lg border transition-all ${
+                      isApplied ? 'border-indigo-500/50 ring-1 ring-indigo-500/20' : 'border-slate-700/60'
+                    }`}>
+                      {swatches.map((s, i) => (
                         <div
                           key={i}
-                          className="h-6 w-6 rounded-full border border-white/10 flex-shrink-0 shadow-sm"
-                          style={{ backgroundColor: colour }}
-                          title={colour}
+                          className="flex-1 h-full"
+                          style={{ backgroundColor: s.hex }}
+                          title={`${s.title}: ${s.hex}`}
                         />
                       ))}
                     </div>
 
-                    {/* Apply button */}
-                    <button
-                      type="button"
-                      onClick={() => update({ ...palette.colours })}
-                      className={`rounded-md px-3 py-1 text-xs font-medium transition-all flex-shrink-0 ${
-                        isApplied
-                          ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-indigo-600 text-white hover:bg-indigo-500'
-                      }`}
-                    >
-                      {isApplied ? '✓ Applied' : 'Apply'}
-                    </button>
+                    {/* Hex labels beneath the bar */}
+                    <div className="flex">
+                      {swatches.map((s, i) => (
+                        <div key={i} className="flex-1 text-center">
+                          <span className="text-[9px] text-slate-600 font-mono leading-none">{s.hex}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )
               })}
