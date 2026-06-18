@@ -388,35 +388,34 @@ function AddressAutocomplete() {
 export function Step4() {
   const { data, update, currentStep, totalSteps, stepErrors, clearError } = useWizard()
   const [fetchingTowns, setFetchingTowns] = useState(false)
-  // Draft state for towns textarea — committed to wizard data only on Save
-  const [townsDraft, setTownsDraft]       = useState(data.serviceRadiusTowns)
-  const [townsSaved, setTownsSaved]       = useState(false)
+  const [townsMsg, setTownsMsg]           = useState<{ type: 'ok' | 'empty' | 'error'; text: string } | null>(null)
 
-  const town = data.bizAddressTown || 'your area'
+  const town    = data.bizAddressTown || 'your area'
   const isLocal = data.serviceReach === 'local'
 
   const findTowns = async () => {
     if (!data.bizAddressLat || !data.bizAddressLng || !data.serviceRadiusKm) return
     setFetchingTowns(true)
-    setTownsSaved(false)
+    setTownsMsg(null)
     try {
-      const res   = await fetch(`/api/address/towns?lat=${data.bizAddressLat}&lng=${data.bizAddressLng}&km=${data.serviceRadiusKm}`)
+      const res = await fetch(
+        `/api/address/towns?lat=${data.bizAddressLat}&lng=${data.bizAddressLng}&km=${data.serviceRadiusKm}`
+      )
+      if (!res.ok) throw new Error(`Server error ${res.status}`)
       const towns = await res.json() as string[]
-      const joined = towns.join(', ')
-      setTownsDraft(joined)
-      update({ serviceRadiusTowns: joined })
-    } catch { /* silent */ }
-    finally { setFetchingTowns(false) }
+      if (towns.length === 0) {
+        setTownsMsg({ type: 'empty', text: `No places found within ${data.serviceRadiusKm} km. Try a larger radius, or type your service area manually below.` })
+      } else {
+        update({ serviceRadiusTowns: towns.join(', ') })
+        setTownsMsg({ type: 'ok', text: `✓ ${towns.length} place${towns.length === 1 ? '' : 's'} found` })
+        setTimeout(() => setTownsMsg(null), 3000)
+      }
+    } catch (err) {
+      setTownsMsg({ type: 'error', text: 'Could not reach the lookup service. Please enter your service area manually.' })
+    } finally {
+      setFetchingTowns(false)
+    }
   }
-
-  const saveTowns = () => {
-    update({ serviceRadiusTowns: townsDraft })
-    setTownsSaved(true)
-    setTimeout(() => setTownsSaved(false), 2000)
-  }
-
-  const hasTowns = townsDraft.trim().length > 0
-  const townsChanged = townsDraft !== data.serviceRadiusTowns
 
   return (
     <div>
@@ -477,36 +476,24 @@ export function Step4() {
                   {fetchingTowns ? 'Finding…' : 'Find towns'}
                 </button>
               </div>
+              {townsMsg && (
+                <p className={`mt-1.5 text-xs ${
+                  townsMsg.type === 'ok'    ? 'text-emerald-400' :
+                  townsMsg.type === 'empty' ? 'text-amber-400'   : 'text-red-400'
+                }`}>{townsMsg.text}</p>
+              )}
             </Field>
 
-            <Field label={hasTowns ? 'Towns & suburbs within your service radius' : 'Service area'}>
+            <Field label="Service area">
               <Textarea
-                value={townsDraft}
-                onChange={e => { setTownsDraft(e.target.value); setTownsSaved(false) }}
+                value={data.serviceRadiusTowns}
+                onChange={e => update({ serviceRadiusTowns: e.target.value })}
                 rows={4}
-                placeholder="Click 'Find towns' to auto-populate from your radius, or type towns manually…"
+                placeholder="Click 'Find towns' to auto-populate, or type towns manually — e.g. Seymour, Kilmore, Broadford…"
               />
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-slate-500">
-                  {hasTowns
-                    ? 'Remove towns that don\'t apply, or add any that are missing.'
-                    : 'Towns will appear here after lookup. You can also type them manually.'}
-                </p>
-                <button
-                  type="button"
-                  onClick={saveTowns}
-                  disabled={!townsChanged && !townsSaved}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                    townsSaved
-                      ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
-                      : townsChanged
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                      : 'bg-slate-800 text-slate-600 border border-slate-700 cursor-not-allowed'
-                  }`}
-                >
-                  {townsSaved ? '✓ Saved' : 'Save changes'}
-                </button>
-              </div>
+              {data.serviceRadiusTowns && (
+                <p className="text-xs text-slate-500 mt-1">Remove any that don't apply, or add towns that are missing.</p>
+              )}
             </Field>
           </div>
         )}
@@ -629,6 +616,8 @@ const STYLE_PALETTES: Record<string, Palette[]> = {
   ],
   'Industrial & technical': [
     { name: 'Silent Waters',         brandPrimary: '#5c6b73', brandLightBg: '#e0fbfc', brandDarkBg: '#253237', brandBtnPrimary: '#5c6b73', brandAccent: '#9db4c0', brandDarkText: '#253237' },
+    { name: 'Industrial Blue',       brandPrimary: '#1985a1', brandLightBg: '#dcdcdd', brandDarkBg: '#46494c', brandBtnPrimary: '#1985a1', brandAccent: '#4c5c68', brandDarkText: '#46494c' },
+    { name: 'Ocean Breeze',          brandPrimary: '#7c98b3', brandLightBg: '#cee5f2', brandDarkBg: '#536b78', brandBtnPrimary: '#637081', brandAccent: '#accbe1', brandDarkText: '#536b78' },
   ],
 }
 
