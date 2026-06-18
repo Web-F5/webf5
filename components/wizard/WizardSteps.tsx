@@ -402,11 +402,9 @@ export function Step4() {
         `/api/address/towns?lat=${data.bizAddressLat}&lng=${data.bizAddressLng}&km=${data.serviceRadiusKm}`
       )
       if (!res.ok) throw new Error(`Server error ${res.status}`)
-      const json = await res.json() as { towns: string[]; debug?: unknown }
-      const towns = json.towns ?? []
+      const towns = await res.json() as string[]
       if (towns.length === 0) {
-        const debugStr = JSON.stringify(json.debug, null, 2)
-        setTownsMsg({ type: 'empty', text: `No places found. Debug info:\n${debugStr}` })
+        setTownsMsg({ type: 'empty', text: `No places found within ${data.serviceRadiusKm} km. Try a larger radius, or enter your service area manually below.` })
       } else {
         update({ serviceRadiusTowns: towns.join(', ') })
         setTownsMsg({ type: 'ok', text: `✓ ${towns.length} place${towns.length === 1 ? '' : 's'} found` })
@@ -482,7 +480,7 @@ export function Step4() {
                 <p className={`mt-1.5 text-xs ${
                   townsMsg.type === 'ok'    ? 'text-emerald-400' :
                   townsMsg.type === 'empty' ? 'text-amber-400'   : 'text-red-400'
-                }`} style={{ whiteSpace: 'pre-wrap' }}>{townsMsg.text}</p>
+                }`}>{townsMsg.text}</p>
               )}
             </Field>
 
@@ -493,9 +491,11 @@ export function Step4() {
                 rows={4}
                 placeholder="Click 'Find towns' to auto-populate, or type towns manually — e.g. Seymour, Kilmore, Broadford…"
               />
-              {data.serviceRadiusTowns && (
-                <p className="text-xs text-slate-500 mt-1">Remove any that don't apply, or add towns that are missing.</p>
-              )}
+              <p className="text-xs text-slate-500 mt-1">
+                {data.serviceRadiusTowns
+                  ? 'Edit this list down to the 20 areas most relevant to your business — remove towns you don\'t service and add any that are missing.'
+                  : 'Towns will appear here after lookup, sorted closest first. You can also type them manually.'}
+              </p>
             </Field>
           </div>
         )}

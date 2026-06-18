@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-const ADMIN_PLACES = new Set([
-  'country', 'state', 'state_district', 'region',
-  'county', 'district', 'island', 'archipelago',
+// Included: named settlements a business would actually service
+// Excluded: suburb/neighbourhood (urban sub-areas of existing cities)
+const INCLUDE_TYPES = new Set([
+  'city', 'town', 'village', 'hamlet', 'locality',
 ])
 
 const ENDPOINTS = [
@@ -14,19 +15,29 @@ const ENDPOINTS = [
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 ]
 
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R    = 6371
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a    = Math.sin(dLat / 2) ** 2 +
+               Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+               Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
 export async function GET(req: NextRequest) {
   const lat = req.nextUrl.searchParams.get('lat')
   const lng  = req.nextUrl.searchParams.get('lng')
   const km   = req.nextUrl.searchParams.get('km')
 
-  if (!lat || !lng || !km) {
-    return NextResponse.json({ towns: [], debug: 'missing params' })
-  }
+  if (!lat || !lng || !km) return NextResponse.json([])
 
-  const radiusM = Math.min(parseFloat(km) * 1000, 300_000)
-  const query   = `[out:json][timeout:25];node["place"]["name"](around:${radiusM},${lat},${lng});out tags;`
+  const radiusM  = Math.min(parseFloat(km) * 1000, 300_000)
+  const originLat = parseFloat(lat)
+  const originLng = parseFloat(lng)
 
-  const attempts: string[] = []
+  // Use 'out body' (not 'out tags') so we get lat/lon for distance sorting
+  const query = `[out:json][timeout:25];node["place"]["name"](around:${radiusM},${lat},${lng});out body;`
 
   for (const endpoint of ENDPOINTS) {
     const controller = new AbortController()
@@ -42,44 +53,30 @@ export async function GET(req: NextRequest) {
       })
       clearTimeout(timer)
 
+      if (!res.ok) continue
+
       const body = await res.text()
-
-      if (!res.ok) {
-        attempts.push(`${endpoint} → HTTP ${res.status}: ${body.slice(0, 120)}`)
-        continue
-      }
-
-      let json: { elements?: Array<{ tags?: { name?: string; place?: string } }> }
-      try {
-        json = JSON.parse(body)
-      } catch {
-        attempts.push(`${endpoint} → JSON parse failed. Body: ${body.slice(0, 120)}`)
-        continue
-      }
+      let json: { elements?: Array<{ lat?: number; lon?: number; tags?: { name?: string; place?: string } }> }
+      try { json = JSON.parse(body) } catch { continue }
 
       const elements = json?.elements
-      if (!elements?.length) {
-        attempts.push(`${endpoint} → OK but 0 elements returned`)
-        continue
-      }
+      if (!elements?.length) continue
 
-      const towns: string[] = Array.from(
-        new Set<string>(
-          elements
-            .filter(e => e.tags?.name && !ADMIN_PLACES.has(e.tags.place ?? ''))
-            .map(e => e.tags!.name!)
-        )
-      ).sort()
+      const towns = elements
+        .filter(e => e.tags?.name && INCLUDE_TYPES.has(e.tags.place ?? '') && e.lat != null && e.lon != null)
+        .map(e => ({
+          name: e.tags!.name!,
+          dist: haversineKm(originLat, originLng, e.lat!, e.lon!),
+        }))
+        .sort((a, b) => a.dist - b.dist)
+        .slice(0, 30)
+        .map(t => t.name)
 
-      return NextResponse.json({
-        towns,
-        debug: { endpoint, rawCount: elements.length, filteredCount: towns.length },
-      })
-    } catch (err) {
+      return NextResponse.json(towns)
+    } catch {
       clearTimeout(timer)
-      attempts.push(`${endpoint} → fetch threw: ${err instanceof Error ? err.message : String(err)}`)
     }
   }
 
-  return NextResponse.json({ towns: [], debug: { failed: true, attempts } })
+  return NextResponse.json([])
 }
