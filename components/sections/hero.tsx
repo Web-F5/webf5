@@ -50,6 +50,13 @@ export function HeroSection() {
       url: 'https://austrenching.com.au',
       logoClass: 'h-12',
     },
+    {
+      name: 'Chuck E Electrical',
+      logo: '/images/logo-chuckelec2.webp',
+      url: 'https://chuckelec.com',
+      logoClass: 'h-12',
+    },
+
   ]
 
   const screenshots = [
@@ -178,7 +185,7 @@ export function HeroSection() {
               <ArrowRight size={16} />
             </a>
             <a
-              href="#work"
+              href="/work"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 border border-border text-foreground rounded-full font-semibold text-sm hover:bg-card transition-all"
             >
               See our work

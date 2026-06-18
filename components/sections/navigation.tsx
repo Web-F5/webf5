@@ -10,6 +10,7 @@ export function Navigation() {
 
   const navItems = [
     { label: 'Solutions', href: '#solutions' },
+    { label: 'Work', href: '/work' },
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },

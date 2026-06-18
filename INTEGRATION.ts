@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
     // import { Resend } from 'resend'
     // const resend = new Resend(process.env.RESEND_API_KEY)
     // await resend.emails.send({
-    //   from: 'briefs@webcraft.com.au',
-    //   to: 'hello@webcraft.com.au',
+    //   from: 'briefs@webf5.com.au',
+    //   to: 'hello@webf5.com.au',
     //   subject: `New brief — ${data.bizName}`,
     //   html: buildEmailHtml(data),
     // })
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     // ── 4. Send client confirmation email ────────────────────────────────────
     // await resend.emails.send({
-    //   from: 'hello@webcraft.com.au',
+    //   from: 'hello@webf5.com.au',
     //   to: data.bizEmail,
     //   subject: 'We've received your brief!',
     //   html: confirmationEmailHtml(data),
