@@ -404,12 +404,9 @@ export function Step4() {
       if (!res.ok) throw new Error(`Server error ${res.status}`)
       const json = await res.json() as { towns: string[]; debug?: unknown }
       const towns = json.towns ?? []
-      // Temporary: log debug info to console so we can diagnose API issues
-      if (json.debug) console.log('[Find towns debug]', json.debug)
       if (towns.length === 0) {
-        const debugStr = JSON.stringify(json.debug)
-        setTownsMsg({ type: 'empty', text: `No places found within ${data.serviceRadiusKm} km — check the browser console for debug info. Try entering towns manually below.` })
-        console.warn('[Find towns] Zero results. Debug:', debugStr)
+        const debugStr = JSON.stringify(json.debug, null, 2)
+        setTownsMsg({ type: 'empty', text: `No places found. Debug info:\n${debugStr}` })
       } else {
         update({ serviceRadiusTowns: towns.join(', ') })
         setTownsMsg({ type: 'ok', text: `✓ ${towns.length} place${towns.length === 1 ? '' : 's'} found` })
@@ -485,7 +482,7 @@ export function Step4() {
                 <p className={`mt-1.5 text-xs ${
                   townsMsg.type === 'ok'    ? 'text-emerald-400' :
                   townsMsg.type === 'empty' ? 'text-amber-400'   : 'text-red-400'
-                }`}>{townsMsg.text}</p>
+                }`} style={{ whiteSpace: 'pre-wrap' }}>{townsMsg.text}</p>
               )}
             </Field>
 

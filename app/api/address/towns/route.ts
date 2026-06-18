@@ -10,6 +10,8 @@ const ADMIN_PLACES = new Set([
 const ENDPOINTS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.openstreetmap.ru/cgi/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 ]
 
 export async function GET(req: NextRequest) {
@@ -17,40 +19,47 @@ export async function GET(req: NextRequest) {
   const lng  = req.nextUrl.searchParams.get('lng')
   const km   = req.nextUrl.searchParams.get('km')
 
-  if (!lat || !lng || !km) return NextResponse.json({ towns: [], debug: 'missing params' })
+  if (!lat || !lng || !km) {
+    return NextResponse.json({ towns: [], debug: 'missing params' })
+  }
 
   const radiusM = Math.min(parseFloat(km) * 1000, 300_000)
+  const query   = `[out:json][timeout:25];node["place"]["name"](around:${radiusM},${lat},${lng});out tags;`
 
-  // Broad query — all named place nodes. Filter admin levels server-side.
-  const query = `[out:json][timeout:25];node["place"]["name"](around:${radiusM},${lat},${lng});out tags;`
-
-  const errors: string[] = []
+  const attempts: string[] = []
 
   for (const endpoint of ENDPOINTS) {
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 26_000)
+    const timer      = setTimeout(() => controller.abort(), 26_000)
 
     try {
       const res = await fetch(endpoint, {
-        method: 'POST',
-        body: query,
+        method:  'POST',
+        body:    query,
         headers: { 'Content-Type': 'text/plain' },
-        signal: controller.signal,
-        cache: 'no-store',
+        signal:  controller.signal,
+        cache:   'no-store',
       })
-
       clearTimeout(timer)
 
+      const body = await res.text()
+
       if (!res.ok) {
-        errors.push(`${endpoint}: HTTP ${res.status}`)
+        attempts.push(`${endpoint} → HTTP ${res.status}: ${body.slice(0, 120)}`)
         continue
       }
 
-      const json = await res.json()
-      const elements = json?.elements as Array<{ tags?: { name?: string; place?: string } }> | undefined
+      let json: { elements?: Array<{ tags?: { name?: string; place?: string } }> }
+      try {
+        json = JSON.parse(body)
+      } catch {
+        attempts.push(`${endpoint} → JSON parse failed. Body: ${body.slice(0, 120)}`)
+        continue
+      }
 
-      if (!elements) {
-        errors.push(`${endpoint}: no elements field in response`)
+      const elements = json?.elements
+      if (!elements?.length) {
+        attempts.push(`${endpoint} → OK but 0 elements returned`)
         continue
       }
 
@@ -62,13 +71,15 @@ export async function GET(req: NextRequest) {
         )
       ).sort()
 
-      // Return towns + debug info so we can see what's happening
-      return NextResponse.json({ towns, debug: { endpoint, total: elements.length, filtered: towns.length } })
+      return NextResponse.json({
+        towns,
+        debug: { endpoint, rawCount: elements.length, filteredCount: towns.length },
+      })
     } catch (err) {
       clearTimeout(timer)
-      errors.push(`${endpoint}: ${err instanceof Error ? err.message : String(err)}`)
+      attempts.push(`${endpoint} → fetch threw: ${err instanceof Error ? err.message : String(err)}`)
     }
   }
 
-  return NextResponse.json({ towns: [], debug: { errors } })
+  return NextResponse.json({ towns: [], debug: { failed: true, attempts } })
 }
