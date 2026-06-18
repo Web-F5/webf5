@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, MapPin } from 'lucide-react'
 import Image from 'next/image'
@@ -45,7 +45,7 @@ export function HeroSection() {
     },
     {
       name: 'Valley Feeds & General',
-      logo: '/images/vfg-logo.png',
+      logo: '/images/valley-feeds-logo.png',
       url: 'https://valleyfeeds.com.au',
       logoClass: 'h-8',
     },
@@ -56,7 +56,7 @@ export function HeroSection() {
       logoClass: 'h-10',
     },
     {
-      name: 'Australian trenching and Excavations',
+      name: 'Australian Trenching and Excavations',
       logo: '/images/ATE-logo.webp',
       url: 'https://austrenching.com.au',
       logoClass: 'h-12',
@@ -67,7 +67,36 @@ export function HeroSection() {
       url: 'https://chuckelec.com',
       logoClass: 'h-12',
     },
-
+    {
+      name: 'F.S.M. Recycling and Demolitions',
+      logo: '/images/fsm-logo.webp',
+      url: 'https://fsmrecycle.com.au',
+      logoClass: 'h-10',
+    },
+    {
+      name: 'Appti',
+      logo: '/images/Appti-logo.png',
+      url: 'https://appti.net',
+      logoClass: 'h-8',
+    },
+    {
+      name: 'Speechless Electrical',
+      logo: '/images/logo-speechless-electrical.jpg',
+      url: 'https://speechlesselec.com',
+      logoClass: 'h-10',
+    },
+    {
+      name: "Let's Get Trowled",
+      logo: '/images/logo-lets-get-trowled.webp',
+      url: 'https://letsgettrowled.com.au',
+      logoClass: 'h-10',
+    },
+    {
+      name: 'LKF Contracting',
+      logo: '/images/LKF-logo.webp',
+      url: 'https://lkfcontracting.com.au',
+      logoClass: 'h-10',
+    },
   ]
 
   const layout = [
@@ -77,14 +106,19 @@ export function HeroSection() {
     { rotate: '-1.5deg',x: '3%',  delay: 0.85, originX: '100%', originY: '100%' },
   ]
 
-  const picked = useMemo(() => pickFour(projects), [])
+  const buildScreenshots = (picked: typeof projects) =>
+    picked.map((p, i) => ({
+      src: p.image,
+      alt: `${p.name} website`,
+      url: p.url || '#',
+      ...layout[i],
+    }))
 
-  const screenshots = picked.map((p, i) => ({
-    src: p.image,
-    alt: `${p.name} website`,
-    url: p.url,
-    ...layout[i],
-  }))
+  const [screenshots, setScreenshots] = useState(() => buildScreenshots(projects.slice(0, 4)))
+
+  useEffect(() => {
+    setScreenshots(buildScreenshots(pickFour(projects)))
+  }, [])
 
   return (
     <section className="min-h-screen flex items-center justify-center pt-20 px-4 relative overflow-hidden">
