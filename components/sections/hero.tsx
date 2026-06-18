@@ -1,8 +1,19 @@
 'use client'
 
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, MapPin } from 'lucide-react'
 import Image from 'next/image'
+import { projects } from '@/lib/portfolio'
+
+function pickFour<T>(arr: T[]): T[] {
+  const copy = [...arr]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy.slice(0, 4)
+}
 
 export function HeroSection() {
   const containerVariants = {
@@ -59,52 +70,21 @@ export function HeroSection() {
 
   ]
 
-  const screenshots = [
-    {
-      src: '/images/Outright-Electrical-Heathcote-Victoria.webp',
-      alt: 'Outright Electrical website',
-      url: 'https://outrightelectrical.com.au',
-      rotate: '-2deg',
-      x: '-4%',
-      delay: 0.4,
-      // top-left card expands down-right
-      originX: '0%',
-      originY: '0%',
-    },
-    {
-      src: '/images/Valley-Feeds-Katandra-West-Victoria.webp',
-      alt: 'Valley Feeds & General website',
-      url: 'https://valleyfeeds.com.au',
-      rotate: '1.5deg',
-      x: '4%',
-      delay: 0.55,
-      // top-right card expands down-left
-      originX: '100%',
-      originY: '0%',
-    },
-    {
-      src: '/images/Horse-Hay-Invergordan-Victoria.webp',
-      alt: 'Horse Hay website',
-      url: 'https://horsehay.com.au',
-      rotate: '2deg',
-      x: '-3%',
-      delay: 0.7,
-      // bottom-left card expands up-right
-      originX: '0%',
-      originY: '100%',
-    },
-    {
-      src: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',
-      alt: 'Australian Trenching and Excavations website',
-      url: 'https://austrenching.com.au',
-      rotate: '-1.5deg',
-      x: '3%',
-      delay: 0.85,
-      // bottom-right card expands up-left
-      originX: '100%',
-      originY: '100%',
-    },
+  const layout = [
+    { rotate: '-2deg',  x: '-4%', delay: 0.4,  originX: '0%',   originY: '0%'   },
+    { rotate: '1.5deg', x: '4%',  delay: 0.55, originX: '100%', originY: '0%'   },
+    { rotate: '2deg',   x: '-3%', delay: 0.7,  originX: '0%',   originY: '100%' },
+    { rotate: '-1.5deg',x: '3%',  delay: 0.85, originX: '100%', originY: '100%' },
   ]
+
+  const picked = useMemo(() => pickFour(projects), [])
+
+  const screenshots = picked.map((p, i) => ({
+    src: p.image,
+    alt: `${p.name} website`,
+    url: p.url,
+    ...layout[i],
+  }))
 
   return (
     <section className="min-h-screen flex items-center justify-center pt-20 px-4 relative overflow-hidden">
@@ -245,7 +225,7 @@ export function HeroSection() {
             {screenshots.slice(0, 2).map((shot) => (
               <motion.a
                 key={shot.src}
-                href={shot.url}
+                href={shot.url || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 40 }}
@@ -303,7 +283,7 @@ export function HeroSection() {
             {screenshots.slice(2, 4).map((shot) => (
               <motion.a
                 key={shot.src}
-                href={shot.url}
+                href={shot.url || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 40 }}

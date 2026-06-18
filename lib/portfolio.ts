@@ -106,7 +106,7 @@ export const projects = [
     description:
       'Agricultural and civil contracting business with full SEO targeting, location funnels, and Sanity CMS blog.',
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Formspree'],
-    url: '',
+    url: 'https://lkfcontracting.com.au',
     image: '/images/LKF-Contracting-Agricultural-and- -Civil-Contractors-Invergordon.webp',
   },
 ]

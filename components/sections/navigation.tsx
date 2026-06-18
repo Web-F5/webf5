@@ -1,19 +1,24 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
+  const isHome = pathname === '/'
+
+  const anchor = (hash: string) => (isHome ? hash : `/${hash}`)
 
   const navItems = [
-    { label: 'Solutions', href: '#solutions' },
+    { label: 'Solutions', href: anchor('#solutions') },
     { label: 'Work', href: '/work' },
-    { label: 'Process', href: '#process' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'FAQ', href: '#faq' },
+    { label: 'Process', href: anchor('#process') },
+    { label: 'Pricing', href: anchor('#pricing') },
+    { label: 'FAQ', href: anchor('#faq') },
   ]
 
   return (
@@ -53,7 +58,7 @@ export function Navigation() {
 
         {/* CTA Button Desktop */}
         <motion.a
-          href="#brief"
+          href={anchor('#brief')}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
@@ -94,7 +99,7 @@ export function Navigation() {
                 </a>
               ))}
               <a
-                href="#brief"
+                href={anchor('#brief')}
                 className="block w-full mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold text-center"
                 onClick={() => setIsOpen(false)}
               >

@@ -10,6 +10,28 @@ export const metadata: Metadata = {
   title: 'Web F5 - Brief to Execution in Minutes',
   description: 'Transform your brief into a fully executed web presence with AI-powered guidance.',
   generator: 'v0.app',
+  openGraph: {
+    title: 'Web F5 - Brief to Execution in Minutes',
+    description: 'Transform your brief into a fully executed web presence with AI-powered guidance.',
+    url: 'https://webf5.com.au',
+    siteName: 'Web F5',
+    images: [
+      {
+        url: '/images/Web-F5-brief-to-execution-in-minutes.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Web F5 - Brief to Execution in Minutes',
+      },
+    ],
+    locale: 'en_AU',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Web F5 - Brief to Execution in Minutes',
+    description: 'Transform your brief into a fully executed web presence with AI-powered guidance.',
+    images: ['/images/Web-F5-brief-to-execution-in-minutes.webp'],
+  },
   icons: {
     icon: [
       {
