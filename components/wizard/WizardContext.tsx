@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react'
 import { WizardData, defaultWizardData } from '../../types'
 
 // ── Validation config ────────────────────────────────────────────────────────
@@ -104,18 +104,27 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     step: number,
     currentData: WizardData
   ): StepErrors => {
-    const required = STEP_REQUIRED[step]
-    if (!required) return {}
-
     const errors: StepErrors = {}
-    for (const { field, label } of required) {
-      const value = (currentData[field] as string) ?? ''
-      if (!value.trim()) {
-        errors[field as string] = `${label} is required`
-      } else if (field === 'bizEmail' && !isValidEmail(value)) {
-        errors[field as string] = 'Please enter a valid email address'
+
+    const required = STEP_REQUIRED[step]
+    if (required) {
+      for (const { field, label } of required) {
+        const value = (currentData[field] as string) ?? ''
+        if (!value.trim()) {
+          errors[field as string] = `${label} is required`
+        } else if (field === 'bizEmail' && !isValidEmail(value)) {
+          errors[field as string] = 'Please enter a valid email address'
+        }
       }
     }
+
+    // Step 4: address is required when service reach is local/regional
+    if (step === 4 && currentData.serviceReach === 'local') {
+      if (!currentData.bizAddress.trim()) {
+        errors['bizAddress'] = 'Please enter your business address so we can calculate your service area'
+      }
+    }
+
     return errors
   }, [])
 
@@ -132,20 +141,25 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     return hasBottomError ? 'end' : 'start'
   }, [])
 
-  const scrollToBrief = (block: ScrollLogicalPosition = 'start') => {
-    document.getElementById('brief')?.scrollIntoView({
-      behavior: 'smooth',
-      block,
-    })
-  }
+  // pendingScroll is set synchronously during goNext/goBack, then consumed
+  // by a useEffect that fires after React commits the new step's DOM.
+  // This prevents smooth-scroll animations from being disrupted by layout
+  // changes caused by the new step rendering.
+  const pendingScroll = useRef<ScrollLogicalPosition | null>(null)
+
+  useEffect(() => {
+    if (pendingScroll.current === null) return
+    const block = pendingScroll.current
+    pendingScroll.current = null
+    document.getElementById('brief')?.scrollIntoView({ behavior: 'smooth', block })
+  }, [currentStep, stepErrors])
 
   const goNext = useCallback(() => {
     const errors = validateStep(currentStep, data)
 
     if (Object.keys(errors).length > 0) {
       setStepErrors(errors)
-      const block = getErrorScrollPosition(currentStep, errors)
-      scrollToBrief(block)
+      pendingScroll.current = getErrorScrollPosition(currentStep, errors)
       return
     }
 
@@ -157,14 +171,14 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       firePartialCapture(data)
     }
 
+    pendingScroll.current = 'start'
     setCurrentStep(s => Math.min(s + 1, totalSteps))
-    scrollToBrief('start')
   }, [currentStep, data, totalSteps, validateStep, getErrorScrollPosition, partialSent])
 
   const goBack = useCallback(() => {
     setStepErrors({})
+    pendingScroll.current = 'start'
     setCurrentStep(s => Math.max(s - 1, 1))
-    scrollToBrief('start')
   }, [])
 
   return (

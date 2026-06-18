@@ -386,50 +386,78 @@ function AddressAutocomplete() {
 // ── Step 4: Location & reach ───────────────────────────────────────────────
 
 export function Step4() {
-  const { data, update, currentStep, totalSteps } = useWizard()
+  const { data, update, currentStep, totalSteps, stepErrors, clearError } = useWizard()
   const [fetchingTowns, setFetchingTowns] = useState(false)
+  // Draft state for towns textarea — committed to wizard data only on Save
+  const [townsDraft, setTownsDraft]       = useState(data.serviceRadiusTowns)
+  const [townsSaved, setTownsSaved]       = useState(false)
 
   const town = data.bizAddressTown || 'your area'
+  const isLocal = data.serviceReach === 'local'
 
   const findTowns = async () => {
     if (!data.bizAddressLat || !data.bizAddressLng || !data.serviceRadiusKm) return
     setFetchingTowns(true)
+    setTownsSaved(false)
     try {
       const res   = await fetch(`/api/address/towns?lat=${data.bizAddressLat}&lng=${data.bizAddressLng}&km=${data.serviceRadiusKm}`)
       const towns = await res.json() as string[]
-      update({ serviceRadiusTowns: towns.join(', ') })
+      const joined = towns.join(', ')
+      setTownsDraft(joined)
+      update({ serviceRadiusTowns: joined })
     } catch { /* silent */ }
     finally { setFetchingTowns(false) }
   }
+
+  const saveTowns = () => {
+    update({ serviceRadiusTowns: townsDraft })
+    setTownsSaved(true)
+    setTimeout(() => setTownsSaved(false), 2000)
+  }
+
+  const hasTowns = townsDraft.trim().length > 0
+  const townsChanged = townsDraft !== data.serviceRadiusTowns
 
   return (
     <div>
       <StepHeader step={currentStep} total={totalSteps} title="Location & service area" description="Where do you operate and who do you serve? This informs your SEO strategy and content." />
       <div className="flex flex-col gap-4">
 
-        <Field label="Business address" hint="(leave blank if home-based or virtual)">
+        <Field
+          label="Business address"
+          hint={isLocal ? undefined : '(leave blank if home-based or virtual)'}
+          required={isLocal}
+        >
           <AddressAutocomplete />
           {data.bizAddressTown && (
             <p className="text-xs text-emerald-400 mt-1">✓ Suburb/town identified: <strong>{data.bizAddressTown}</strong></p>
+          )}
+          {stepErrors['bizAddress'] && (
+            <p className="mt-1 text-xs text-red-400">{stepErrors['bizAddress']}</p>
           )}
         </Field>
 
         <Field label="Service reach">
           <div className="flex flex-col gap-2">
-            <OptionCard selected={data.serviceReach === 'local'}         onClick={() => update({ serviceReach: 'local' })}         title="Local / regional"    subtitle="Serving a specific area or city" />
+            <OptionCard selected={data.serviceReach === 'local'}         onClick={() => { update({ serviceReach: 'local' }); clearError('bizAddress') }}         title="Local / regional"    subtitle="Serving a specific area or city" />
             <OptionCard selected={data.serviceReach === 'national'}      onClick={() => update({ serviceReach: 'national' })}      title="National"            subtitle="Serving across the country" />
             <OptionCard selected={data.serviceReach === 'international'} onClick={() => update({ serviceReach: 'international' })} title="International"       subtitle="Serving customers globally" />
           </div>
         </Field>
 
-        {data.serviceReach === 'local' && (
+        {isLocal && (
           <div className="rounded-xl border border-slate-700 bg-slate-800/30 p-4 flex flex-col gap-4">
-            <p className="text-sm text-slate-300">
-              Does your business service a particular area?{' '}
-              <span className="text-slate-500">e.g. Within 130 km of <strong className="text-white">{town}</strong></span>
-            </p>
+            {!data.bizAddressLat && (
+              <InfoBox>Enter your business address above first — we need it to calculate which towns fall within your service radius.</InfoBox>
+            )}
 
-            <Field label="Radius from your address (km)">
+            {data.bizAddressLat && (
+              <p className="text-sm text-slate-300">
+                How far from <strong className="text-white">{town}</strong> does your business service?
+              </p>
+            )}
+
+            <Field label="Service radius (km)">
               <div className="flex gap-2">
                 <Input
                   type="number"
@@ -449,28 +477,37 @@ export function Step4() {
                   {fetchingTowns ? 'Finding…' : 'Find towns'}
                 </button>
               </div>
-              {!data.bizAddressLat && (
-                <p className="text-xs text-slate-500 mt-1">Select your address above first to enable town lookup.</p>
-              )}
             </Field>
 
-            {data.serviceRadiusTowns && (
-              <Field label="Towns & suburbs within your service radius">
-                <Textarea
-                  value={data.serviceRadiusTowns}
-                  onChange={e => update({ serviceRadiusTowns: e.target.value })}
-                  rows={3}
-                  placeholder="Towns will appear here after lookup, or enter manually…"
-                />
-                <p className="text-xs text-slate-500 mt-1">You can edit this list — remove any that don't apply.</p>
-              </Field>
-            )}
-
-            {!data.serviceRadiusTowns && (
-              <Field label="Or enter your service area manually">
-                <Input value={data.localArea} onChange={e => update({ localArea: e.target.value })} placeholder="e.g. Seymour, Kilmore, Broadford, Wallan…" />
-              </Field>
-            )}
+            <Field label={hasTowns ? 'Towns & suburbs within your service radius' : 'Service area'}>
+              <Textarea
+                value={townsDraft}
+                onChange={e => { setTownsDraft(e.target.value); setTownsSaved(false) }}
+                rows={4}
+                placeholder="Click 'Find towns' to auto-populate from your radius, or type towns manually…"
+              />
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-slate-500">
+                  {hasTowns
+                    ? 'Remove towns that don\'t apply, or add any that are missing.'
+                    : 'Towns will appear here after lookup. You can also type them manually.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={saveTowns}
+                  disabled={!townsChanged && !townsSaved}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                    townsSaved
+                      ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                      : townsChanged
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                      : 'bg-slate-800 text-slate-600 border border-slate-700 cursor-not-allowed'
+                  }`}
+                >
+                  {townsSaved ? '✓ Saved' : 'Save changes'}
+                </button>
+              </div>
+            </Field>
           </div>
         )}
 
@@ -541,6 +578,53 @@ export function Step5() {
       </div>
     </div>
   )
+}
+
+// ── Pre-set palettes per design style ─────────────────────────────────────
+
+interface Palette {
+  label: string
+  colours: {
+    brandPrimary: string
+    brandLightBg: string
+    brandDarkBg: string
+    brandBtnPrimary: string
+    brandBtnHover: string
+    brandAccent: string
+    brandAccentHover: string
+    brandDarkText: string
+  }
+}
+
+const STYLE_PALETTES: Record<string, [Palette, Palette]> = {
+  'Modern & minimal': [
+    { label: 'Light', colours: { brandPrimary: '#1a1a2e', brandLightBg: '#f8f9fa', brandDarkBg: '#1a1a2e', brandBtnPrimary: '#6366f1', brandBtnHover: '#818cf8', brandAccent: '#06b6d4', brandAccentHover: '#22d3ee', brandDarkText: '#111827' } },
+    { label: 'Dark',  colours: { brandPrimary: '#818cf8', brandLightBg: '#0f172a', brandDarkBg: '#020617', brandBtnPrimary: '#6366f1', brandBtnHover: '#818cf8', brandAccent: '#22d3ee', brandAccentHover: '#67e8f9', brandDarkText: '#f1f5f9' } },
+  ],
+  'Bold & vibrant': [
+    { label: 'Light', colours: { brandPrimary: '#dc2626', brandLightBg: '#fff7ed', brandDarkBg: '#1c1917', brandBtnPrimary: '#dc2626', brandBtnHover: '#ef4444', brandAccent: '#f59e0b', brandAccentHover: '#fbbf24', brandDarkText: '#1c1917' } },
+    { label: 'Dark',  colours: { brandPrimary: '#f87171', brandLightBg: '#1c1917', brandDarkBg: '#0c0a09', brandBtnPrimary: '#dc2626', brandBtnHover: '#ef4444', brandAccent: '#f59e0b', brandAccentHover: '#fbbf24', brandDarkText: '#fef2f2' } },
+  ],
+  'Corporate & professional': [
+    { label: 'Light', colours: { brandPrimary: '#1e40af', brandLightBg: '#f0f4ff', brandDarkBg: '#1e3a8a', brandBtnPrimary: '#1e40af', brandBtnHover: '#2563eb', brandAccent: '#0ea5e9', brandAccentHover: '#38bdf8', brandDarkText: '#0f172a' } },
+    { label: 'Dark',  colours: { brandPrimary: '#3b82f6', brandLightBg: '#0f172a', brandDarkBg: '#0a0f1e', brandBtnPrimary: '#1d4ed8', brandBtnHover: '#3b82f6', brandAccent: '#0ea5e9', brandAccentHover: '#38bdf8', brandDarkText: '#e2e8f0' } },
+  ],
+  'Warm & friendly': [
+    { label: 'Light', colours: { brandPrimary: '#d97706', brandLightBg: '#fffbeb', brandDarkBg: '#292524', brandBtnPrimary: '#d97706', brandBtnHover: '#f59e0b', brandAccent: '#16a34a', brandAccentHover: '#22c55e', brandDarkText: '#292524' } },
+    { label: 'Dark',  colours: { brandPrimary: '#fbbf24', brandLightBg: '#1c1917', brandDarkBg: '#0c0a09', brandBtnPrimary: '#d97706', brandBtnHover: '#f59e0b', brandAccent: '#16a34a', brandAccentHover: '#22c55e', brandDarkText: '#fef3c7' } },
+  ],
+  'Luxury & premium': [
+    { label: 'Light', colours: { brandPrimary: '#92400e', brandLightBg: '#fdf8f0', brandDarkBg: '#1c1008', brandBtnPrimary: '#b45309', brandBtnHover: '#d97706', brandAccent: '#7c3aed', brandAccentHover: '#8b5cf6', brandDarkText: '#1c1008' } },
+    { label: 'Dark',  colours: { brandPrimary: '#d4af37', brandLightBg: '#1a1209', brandDarkBg: '#0d0a05', brandBtnPrimary: '#b45309', brandBtnHover: '#d97706', brandAccent: '#7c3aed', brandAccentHover: '#8b5cf6', brandDarkText: '#fef3c7' } },
+  ],
+  'Playful & creative': [
+    { label: 'Light', colours: { brandPrimary: '#7c3aed', brandLightBg: '#fdf4ff', brandDarkBg: '#2e1065', brandBtnPrimary: '#7c3aed', brandBtnHover: '#8b5cf6', brandAccent: '#ec4899', brandAccentHover: '#f472b6', brandDarkText: '#1e1b4b' } },
+    { label: 'Dark',  colours: { brandPrimary: '#a78bfa', brandLightBg: '#1e1b4b', brandDarkBg: '#0f0a2e', brandBtnPrimary: '#7c3aed', brandBtnHover: '#8b5cf6', brandAccent: '#ec4899', brandAccentHover: '#f472b6', brandDarkText: '#f3e8ff' } },
+  ],
+  'Industrial & technical': [
+    { label: 'Light', colours: { brandPrimary: '#374151', brandLightBg: '#f3f4f6', brandDarkBg: '#111827', brandBtnPrimary: '#374151', brandBtnHover: '#4b5563', brandAccent: '#ef4444', brandAccentHover: '#f87171', brandDarkText: '#111827' } },
+    { label: 'Dark',  colours: { brandPrimary: '#9ca3af', brandLightBg: '#111827', brandDarkBg: '#030712', brandBtnPrimary: '#374151', brandBtnHover: '#4b5563', brandAccent: '#ef4444', brandAccentHover: '#f87171', brandDarkText: '#f9fafb' } },
+  ],
 }
 
 // ── Font suggestions per design style ─────────────────────────────────────
@@ -621,6 +705,69 @@ export function Step6() {
             <option>Not sure — I'd like suggestions</option>
           </Select>
         </Field>
+
+        {/* Palette presets */}
+        {STYLE_PALETTES[data.designStyle] && (
+          <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col gap-3">
+            <p className="text-xs font-medium uppercase tracking-widest text-indigo-400">Suggested palettes</p>
+            <p className="text-xs text-slate-500 -mt-1">Choose a starting point — you can customise any colour below.</p>
+            <div className="flex flex-col gap-2">
+              {STYLE_PALETTES[data.designStyle].map((palette) => {
+                const dots = [
+                  palette.colours.brandPrimary,
+                  palette.colours.brandLightBg,
+                  palette.colours.brandDarkBg,
+                  palette.colours.brandBtnPrimary,
+                  palette.colours.brandAccent,
+                  palette.colours.brandDarkText,
+                ]
+                const isApplied =
+                  data.brandPrimary    === palette.colours.brandPrimary &&
+                  data.brandDarkBg     === palette.colours.brandDarkBg &&
+                  data.brandBtnPrimary === palette.colours.brandBtnPrimary
+
+                return (
+                  <div
+                    key={palette.label}
+                    className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all ${
+                      isApplied
+                        ? 'border-indigo-500/50 bg-indigo-500/10'
+                        : 'border-slate-700 bg-slate-800/40 hover:border-slate-500'
+                    }`}
+                  >
+                    {/* Label */}
+                    <span className="text-xs font-medium text-slate-400 w-8 flex-shrink-0">{palette.label}</span>
+
+                    {/* Colour dots */}
+                    <div className="flex gap-1.5 flex-1">
+                      {dots.map((colour, i) => (
+                        <div
+                          key={i}
+                          className="h-6 w-6 rounded-full border border-white/10 flex-shrink-0 shadow-sm"
+                          style={{ backgroundColor: colour }}
+                          title={colour}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Apply button */}
+                    <button
+                      type="button"
+                      onClick={() => update({ ...palette.colours })}
+                      className={`rounded-md px-3 py-1 text-xs font-medium transition-all flex-shrink-0 ${
+                        isApplied
+                          ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                      }`}
+                    >
+                      {isApplied ? '✓ Applied' : 'Apply'}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         <Divider />
 
@@ -740,27 +887,11 @@ export function Step7() {
     return arr.filter((_, i) => i !== idx)
   }
 
-  return (
-    <div>
-      <StepHeader
-        step={currentStep}
-        total={totalSteps}
-        title="Pages & content"
-        description="Select the pages you need. Content fields will appear for each page you choose."
-      />
-      <div className="flex flex-col gap-5">
-
-        {/* Page selector */}
-        <Field label="Which pages do you need?" hint="(select all that apply)">
-          <div className="flex flex-col gap-2">
-            {PAGE_OPTIONS.map(p => (
-              <CheckRow key={p.value} checked={data.pages.includes(p.value)} onChange={() => toggleArray('pages', p.value)} label={p.label} />
-            ))}
-          </div>
-        </Field>
-
-        {/* ── Home ── */}
-        {data.pages.includes('home') && (
+  // Render inline content panel for each page type
+  const renderPageContent = (pageValue: string) => {
+    switch (pageValue) {
+      case 'home':
+        return (
           <PageCard>
             <SectionHeading>Home page content</SectionHeading>
             <p className="text-xs text-slate-500 -mt-2">These images will be used in a hero carousel or similar display at the top of your homepage.</p>
@@ -803,14 +934,14 @@ export function Step7() {
               {data.heroPortraitUrls.length > 0 && <p className="text-xs text-emerald-400 mt-1">✓ {data.heroPortraitUrls.length} image(s) uploaded</p>}
             </Field>
           </PageCard>
-        )}
+        )
 
-        {/* ── About us ── */}
-        {data.pages.includes('about') && (
+      case 'about':
+        return (
           <PageCard>
             <SectionHeading>About us content</SectionHeading>
 
-            <Field label="About us description" hint="(1–2 sentences)*">
+            <Field label="About us description" hint="(1–2 sentences)">
               <Textarea value={data.aboutDesc} onChange={e => update({ aboutDesc: e.target.value })} placeholder="A brief description of your business story, values, or what drives you…" />
             </Field>
 
@@ -838,16 +969,15 @@ export function Step7() {
               )}
             </Field>
           </PageCard>
-        )}
+        )
 
-        {/* ── Services ── */}
-        {data.pages.includes('services') && (
+      case 'services':
+        return (
           <PageCard>
             <SectionHeading>Services</SectionHeading>
             {data.pageServices.length === 0 && (
               <p className="text-xs text-slate-500">Add the services you offer. Each gets its own section on your services page.</p>
             )}
-
             {data.pageServices.map((svc, idx) => (
               <ItemCard key={idx} label={`Service ${idx + 1}`} onRemove={() => update({ pageServices: delItem(data.pageServices, idx) })}>
                 <Field label="Service name" required>
@@ -879,19 +1009,14 @@ export function Step7() {
                 </Field>
               </ItemCard>
             ))}
-
-            <AddButton
-              label="Add a service"
-              onClick={() => update({ pageServices: [...data.pageServices, { name: '', desc: '', imageUrl: '' }] })}
-            />
+            <AddButton label="Add a service" onClick={() => update({ pageServices: [...data.pageServices, { name: '', desc: '', imageUrl: '' }] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── Portfolio / Gallery ── */}
-        {data.pages.includes('portfolio') && (
+      case 'portfolio':
+        return (
           <PageCard>
             <SectionHeading>Portfolio / gallery</SectionHeading>
-
             {data.pageGallery.map((item, idx) => (
               <ItemCard key={idx} label={`Image ${idx + 1}`} onRemove={() => update({ pageGallery: delItem(data.pageGallery, idx) })}>
                 <Field label="Name" required>
@@ -923,16 +1048,14 @@ export function Step7() {
                 </Field>
               </ItemCard>
             ))}
-
             <AddButton label="Add a gallery image" onClick={() => update({ pageGallery: [...data.pageGallery, { name: '', desc: '', imageUrl: '' }] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── Team / Staff ── */}
-        {data.pages.includes('team') && (
+      case 'team':
+        return (
           <PageCard>
             <SectionHeading>Team / staff</SectionHeading>
-
             {data.pageTeam.map((member, idx) => (
               <ItemCard key={idx} label={`Staff member ${idx + 1}`} onRemove={() => update({ pageTeam: delItem(data.pageTeam, idx) })}>
                 <div className="grid grid-cols-2 gap-3">
@@ -969,17 +1092,15 @@ export function Step7() {
                 </Field>
               </ItemCard>
             ))}
-
             <AddButton label="Add a staff member" onClick={() => update({ pageTeam: [...data.pageTeam, { name: '', role: '', info: '', imageUrl: '' }] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── Blog / News ── */}
-        {data.pages.includes('blog') && (
+      case 'blog':
+        return (
           <PageCard>
             <SectionHeading>Blog / news</SectionHeading>
             <p className="text-xs text-slate-500 -mt-2">Suggest topics you'd like to write about or have us create content for.</p>
-
             {data.blogTopics.map((topic, idx) => (
               <div key={idx} className="flex gap-2">
                 <Input
@@ -991,17 +1112,15 @@ export function Step7() {
                 <button type="button" onClick={() => update({ blogTopics: data.blogTopics.filter((_, i) => i !== idx) })} className="text-xs text-slate-600 hover:text-red-400 px-2 transition-colors">×</button>
               </div>
             ))}
-
             <AddButton label="Add a blog topic" onClick={() => update({ blogTopics: [...data.blogTopics, ''] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── FAQ ── */}
-        {data.pages.includes('faq') && (
+      case 'faq':
+        return (
           <PageCard>
             <SectionHeading>FAQ</SectionHeading>
             <p className="text-xs text-slate-500 -mt-2">We can populate general FAQs for your industry, but real examples from your customers are always best.</p>
-
             {data.faqItems.map((item, idx) => (
               <ItemCard key={idx} label={`FAQ ${idx + 1}`} onRemove={() => update({ faqItems: delItem(data.faqItems, idx) })}>
                 <Field label="Question">
@@ -1012,17 +1131,15 @@ export function Step7() {
                 </Field>
               </ItemCard>
             ))}
-
             <AddButton label="Add a FAQ" onClick={() => update({ faqItems: [...data.faqItems, { question: '', answer: '' }] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── Testimonials ── */}
-        {data.pages.includes('testimonials') && (
+      case 'testimonials':
+        return (
           <PageCard>
             <SectionHeading>Testimonials / reviews</SectionHeading>
             <InfoBox>We can pull reviews directly from your Google Business Profile. Add any additional testimonials below.</InfoBox>
-
             {data.testimonials.map((t, idx) => (
               <ItemCard key={idx} label={`Testimonial ${idx + 1}`} onRemove={() => update({ testimonials: delItem(data.testimonials, idx) })}>
                 <div className="grid grid-cols-2 gap-3">
@@ -1032,9 +1149,7 @@ export function Step7() {
                   <Field label="Stars">
                     <div className="flex gap-1 pt-2">
                       {[1,2,3,4,5].map(star => (
-                        <button
-                          key={star}
-                          type="button"
+                        <button key={star} type="button"
                           onClick={() => update({ testimonials: updItem(data.testimonials, idx, { stars: star }) })}
                           className={`text-xl transition-colors ${star <= t.stars ? 'text-yellow-400' : 'text-slate-700 hover:text-yellow-400/50'}`}
                         >★</button>
@@ -1047,21 +1162,18 @@ export function Step7() {
                 </Field>
               </ItemCard>
             ))}
-
             <AddButton label="Add a testimonial" onClick={() => update({ testimonials: [...data.testimonials, { name: '', review: '', stars: 5 }] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── Contact ── */}
-        {data.pages.includes('contact') && (
+      case 'contact':
+        return (
           <PageCard>
             <SectionHeading>Contact form</SectionHeading>
             <InfoBox>Your form will include: name, email, phone, preferred contact method, service interested in, and notes. Add any extra fields below.</InfoBox>
-
             <Field label="Contact form intro message" hint="(optional)">
-              <Input value={data.contactFormIntro} onChange={e => update({ contactFormIntro: e.target.value })} placeholder={`e.g. Get in touch for a free quote`} />
+              <Input value={data.contactFormIntro} onChange={e => update({ contactFormIntro: e.target.value })} placeholder="e.g. Get in touch for a free quote" />
             </Field>
-
             {data.contactFormFields.length > 0 && (
               <div className="flex flex-col gap-3">
                 <p className="text-xs text-slate-500">Additional fields:</p>
@@ -1076,16 +1188,14 @@ export function Step7() {
                 ))}
               </div>
             )}
-
             <AddButton label="Add a field" onClick={() => update({ contactFormFields: [...data.contactFormFields, { name: '', desc: '' }] })} />
           </PageCard>
-        )}
+        )
 
-        {/* ── Careers ── */}
-        {data.pages.includes('careers') && (
+      case 'careers':
+        return (
           <PageCard>
             <SectionHeading>Careers page</SectionHeading>
-
             <Field label="Careers page heading">
               <Input value={data.careersTitle} onChange={e => update({ careersTitle: e.target.value })} placeholder="e.g. Are you interested in joining our team?" />
             </Field>
@@ -1093,7 +1203,43 @@ export function Step7() {
               <Textarea value={data.careersDesc} onChange={e => update({ careersDesc: e.target.value })} placeholder="What you're looking for in team members, your culture, or current opportunities…" />
             </Field>
           </PageCard>
-        )}
+        )
+
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div>
+      <StepHeader
+        step={currentStep}
+        total={totalSteps}
+        title="Pages & content"
+        description="Select the pages you need. Content fields will appear for each page you choose."
+      />
+      <div className="flex flex-col gap-5">
+
+        {/* Page list — each checkbox is followed by its inline content panel */}
+        <Field label="Which pages do you need?" hint="(select all that apply)">
+          <div className="flex flex-col gap-0">
+            {PAGE_OPTIONS.map(p => {
+              const isChecked = data.pages.includes(p.value)
+              return (
+                <div key={p.value}>
+                  <div className="py-1">
+                    <CheckRow checked={isChecked} onChange={() => toggleArray('pages', p.value)} label={p.label} />
+                  </div>
+                  {isChecked && (
+                    <div className="mb-2 ml-7">
+                      {renderPageContent(p.value)}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </Field>
 
         <Divider />
 
