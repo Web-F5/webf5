@@ -37,7 +37,7 @@ export function Navigation() {
           transition={{ delay: 0.1 }}
           className="flex items-center gap-2"
         >
-          <Image src="./images/logo.webp" alt="Web F5 Logo" width={60} height={60} className="h-10 w-auto" priority />
+          <Image src="/images/logo.webp" alt="Web F5 Logo" width={60} height={60} className="h-10 w-auto" priority />
         </motion.a>
 
         {/* Desktop Navigation */}
