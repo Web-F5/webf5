@@ -402,16 +402,21 @@ export function Step4() {
         `/api/address/towns?lat=${data.bizAddressLat}&lng=${data.bizAddressLng}&km=${data.serviceRadiusKm}`
       )
       if (!res.ok) throw new Error(`Server error ${res.status}`)
-      const towns = await res.json() as string[]
+      const json = await res.json() as { towns: string[]; debug?: unknown }
+      const towns = json.towns ?? []
+      // Temporary: log debug info to console so we can diagnose API issues
+      if (json.debug) console.log('[Find towns debug]', json.debug)
       if (towns.length === 0) {
-        setTownsMsg({ type: 'empty', text: `No places found within ${data.serviceRadiusKm} km. Try a larger radius, or type your service area manually below.` })
+        const debugStr = JSON.stringify(json.debug)
+        setTownsMsg({ type: 'empty', text: `No places found within ${data.serviceRadiusKm} km — check the browser console for debug info. Try entering towns manually below.` })
+        console.warn('[Find towns] Zero results. Debug:', debugStr)
       } else {
         update({ serviceRadiusTowns: towns.join(', ') })
         setTownsMsg({ type: 'ok', text: `✓ ${towns.length} place${towns.length === 1 ? '' : 's'} found` })
         setTimeout(() => setTownsMsg(null), 3000)
       }
     } catch (err) {
-      setTownsMsg({ type: 'error', text: 'Could not reach the lookup service. Please enter your service area manually.' })
+      setTownsMsg({ type: 'error', text: `Could not reach the lookup service (${err instanceof Error ? err.message : 'unknown error'}). Enter towns manually below.` })
     } finally {
       setFetchingTowns(false)
     }
