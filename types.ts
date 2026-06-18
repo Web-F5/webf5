@@ -1,3 +1,42 @@
+// ── Structured content types for Step 7 ─────────────────────────────────────
+
+export interface PageService {
+  name: string
+  desc: string
+  imageUrl: string
+}
+
+export interface GalleryItem {
+  name: string
+  desc: string
+  imageUrl: string
+}
+
+export interface TeamMember {
+  name: string
+  role: string
+  info: string
+  imageUrl: string
+}
+
+export interface FaqItem {
+  question: string
+  answer: string
+}
+
+export interface Testimonial {
+  name: string
+  review: string
+  stars: number
+}
+
+export interface ContactField {
+  name: string
+  desc: string
+}
+
+// ── Wizard data ───────────────────────────────────────────────────────────────
+
 export interface WizardData {
   // Step 1 - Starting point
   startType: 'fresh' | 'rebuild' | 'refresh' | ''
@@ -21,12 +60,23 @@ export interface WizardData {
   bizReg: string
   bizYear: string
   bizDesc: string
+  bizHoursMF: string
+  bizHoursSat: string
+  bizHoursSun: string
   bizUsp: string
   bizAudience: string
-  
+  bizQualifications: string
+  bizMemberships: string
+  bizGuarantees: string
+
   // Step 4 - Location
   bizAddress: string
+  bizAddressLat: string
+  bizAddressLng: string
+  bizAddressTown: string
   serviceReach: 'local' | 'national' | 'international' | ''
+  serviceRadiusKm: string
+  serviceRadiusTowns: string
   localArea: string
   visitType: string
   onlineServices: string
@@ -36,23 +86,50 @@ export interface WizardData {
   socialMedia: string[]
   crm: string
   adAccounts: string
-  
+
   // Step 6 - Branding
+  logoFiles: File[]
+  logoUrls: string[]
   designStyle: string
-  brandColours: string
+  brandPrimary: string
+  brandLightBg: string
+  brandDarkBg: string
+  brandBtnPrimary: string
+  brandBtnHover: string
+  brandAccent: string
+  brandAccentHover: string
+  brandDarkText: string
+  displayFont: string
+  bodyFont: string
   sitesLove: string
   sitesDislike: string
-  logoFiles: File[]
-  photoFiles: File[]
-  logoUrls: string[]
-  photoUrls: string[]
+  brandColours: string   // kept for backwards compat / brief summary
 
   // Step 7 - Pages & content
   pages: string[]
+  heroLandscapeFiles: File[]
+  heroLandscapeUrls: string[]
+  heroPortraitFiles: File[]
+  heroPortraitUrls: string[]
+  aboutDesc: string
+  aboutImageFile: File | null
+  aboutImageUrl: string
+  pageServices: PageService[]
+  pageGallery: GalleryItem[]
+  pageTeam: TeamMember[]
+  blogTopics: string[]
+  faqItems: FaqItem[]
+  testimonials: Testimonial[]
+  contactFormIntro: string
+  contactFormFields: ContactField[]
+  careersTitle: string
+  careersDesc: string
   contentAuthor: string
   existingCopy: string
   multilingual: string
   languages: string
+  photoFiles: File[]
+  photoUrls: string[]
 
   // Step 8 - Features
   hasEcommerce: boolean
@@ -90,15 +167,28 @@ export const defaultWizardData: WizardData = {
   domainIdeas: '',
   domainExtension: '.com',
   contactName: '',
+  bizEmail: '',
+  bizPhone: '',
   bizName: '',
   bizTagline: '',
   bizReg: '',
   bizYear: '',
   bizDesc: '',
+  bizHoursMF: '',
+  bizHoursSat: '',
+  bizHoursSun: '',
   bizUsp: '',
   bizAudience: '',
+  bizQualifications: '',
+  bizMemberships: '',
+  bizGuarantees: '',
   bizAddress: '',
+  bizAddressLat: '',
+  bizAddressLng: '',
+  bizAddressTown: '',
   serviceReach: '',
+  serviceRadiusKm: '',
+  serviceRadiusTowns: '',
   localArea: '',
   visitType: '',
   onlineServices: '',
@@ -106,21 +196,46 @@ export const defaultWizardData: WizardData = {
   socialMedia: [],
   crm: '',
   adAccounts: '',
-  bizEmail: '',
-  bizPhone: '',
+  logoFiles: [],
+  logoUrls: [],
   designStyle: '',
-  brandColours: '',
+  brandPrimary: '',
+  brandLightBg: '',
+  brandDarkBg: '',
+  brandBtnPrimary: '',
+  brandBtnHover: '',
+  brandAccent: '',
+  brandAccentHover: '',
+  brandDarkText: '',
+  displayFont: '',
+  bodyFont: '',
   sitesLove: '',
   sitesDislike: '',
-  logoFiles: [],
-  photoFiles: [],
-  logoUrls: [],
-  photoUrls: [],
+  brandColours: '',
   pages: ['home'],
+  heroLandscapeFiles: [],
+  heroLandscapeUrls: [],
+  heroPortraitFiles: [],
+  heroPortraitUrls: [],
+  aboutDesc: '',
+  aboutImageFile: null,
+  aboutImageUrl: '',
+  pageServices: [],
+  pageGallery: [],
+  pageTeam: [],
+  blogTopics: [],
+  faqItems: [],
+  testimonials: [],
+  contactFormIntro: '',
+  contactFormFields: [],
+  careersTitle: '',
+  careersDesc: '',
   contentAuthor: '',
   existingCopy: '',
   multilingual: '',
   languages: '',
+  photoFiles: [],
+  photoUrls: [],
   hasEcommerce: false,
   productType: '',
   productCount: '',
@@ -166,24 +281,24 @@ export const SOCIAL_OPTIONS = [
 ]
 
 export const PAGE_OPTIONS = [
-  { value: 'home', label: 'Home' },
-  { value: 'about', label: 'About us' },
-  { value: 'services', label: 'Services' },
-  { value: 'portfolio', label: 'Portfolio / gallery' },
-  { value: 'team', label: 'Team / staff' },
-  { value: 'blog', label: 'Blog / news' },
-  { value: 'faq', label: 'FAQ' },
-  { value: 'testimonials', label: 'Testimonials' },
-  { value: 'contact', label: 'Contact' },
-  { value: 'careers', label: 'Careers' },
+  { value: 'home',         label: 'Home' },
+  { value: 'about',        label: 'About us' },
+  { value: 'services',     label: 'Services' },
+  { value: 'portfolio',    label: 'Portfolio / gallery' },
+  { value: 'team',         label: 'Team / staff' },
+  { value: 'blog',         label: 'Blog / news' },
+  { value: 'faq',          label: 'FAQ' },
+  { value: 'testimonials', label: 'Testimonials / reviews' },
+  { value: 'contact',      label: 'Contact' },
+  { value: 'careers',      label: 'Careers' },
 ]
 
 export const FEATURE_OPTIONS = [
   { value: 'newsletter', label: 'Email newsletter signup' },
-  { value: 'livechat', label: 'Live chat or chatbot' },
-  { value: 'popup', label: 'Pop-ups / lead magnets' },
-  { value: 'whatsapp', label: 'WhatsApp / SMS integration' },
-  { value: 'referral', label: 'Referral or loyalty program' },
-  { value: 'members', label: 'Members area / login portal' },
-  { value: 'multiloc', label: 'Multiple locations' },
+  { value: 'livechat',   label: 'Live chat or chatbot' },
+  { value: 'popup',      label: 'Pop-ups / lead magnets' },
+  { value: 'whatsapp',   label: 'WhatsApp / SMS integration' },
+  { value: 'referral',   label: 'Referral or loyalty program' },
+  { value: 'members',    label: 'Members area / login portal' },
+  { value: 'multiloc',   label: 'Multiple locations' },
 ]
