@@ -4,12 +4,14 @@ export interface PageService {
   name: string
   desc: string
   imageUrl: string
+  imageName?: string
 }
 
 export interface GalleryItem {
   name: string
   desc: string
   imageUrl: string
+  imageName?: string
 }
 
 export interface TeamMember {
@@ -126,6 +128,8 @@ export interface WizardData {
   careersDesc: string
   contentAuthor: string
   existingCopy: string
+  existingCopyFiles: File[]
+  existingCopyUrls: string[]
   multilingual: string
   languages: string
   photoFiles: File[]
@@ -153,6 +157,9 @@ export interface WizardData {
   deadlineReason: string
   buildApproach: string
   internalResources: string
+  internalContactName: string
+  internalContactEmail: string
+  internalContactPhone: string
   extraNotes: string
 }
 
@@ -232,6 +239,8 @@ export const defaultWizardData: WizardData = {
   careersDesc: '',
   contentAuthor: '',
   existingCopy: '',
+  existingCopyFiles: [],
+  existingCopyUrls: [],
   multilingual: '',
   languages: '',
   photoFiles: [],
@@ -253,6 +262,9 @@ export const defaultWizardData: WizardData = {
   deadlineReason: '',
   buildApproach: '',
   internalResources: '',
+  internalContactName: '',
+  internalContactEmail: '',
+  internalContactPhone: '',
   extraNotes: '',
 }
 

@@ -908,41 +908,69 @@ export function Step7() {
             <p className="text-xs text-slate-500 -mt-2">These images will be used in a hero carousel or similar display at the top of your homepage.</p>
 
             <Field label="Desktop hero images — landscape (up to 3)">
-              <UploadZone
-                id="hero-landscape"
-                label={uploading === 'heroLandscape' ? 'Uploading…' : 'Upload landscape photos'}
-                sublabel="Recommended: 1920×1080 · JPG or WEBP · Up to 3 images"
-                accept="image/*"
-                multiple
-                files={data.heroLandscapeFiles}
-                onFiles={async files => {
-                  const limited = files.slice(0, 3)
-                  setUploading('heroLandscape')
-                  const urls = await uploadFiles(limited, 'hero/landscape')
-                  update({ heroLandscapeFiles: limited, heroLandscapeUrls: urls })
-                  setUploading(null)
-                }}
-              />
-              {data.heroLandscapeUrls.length > 0 && <p className="text-xs text-emerald-400 mt-1">✓ {data.heroLandscapeUrls.length} image(s) uploaded</p>}
+              {data.heroLandscapeUrls.length < 3 && (
+                <UploadZone
+                  id="hero-landscape"
+                  label={uploading === 'heroLandscape' ? 'Uploading…' : 'Upload landscape photos'}
+                  sublabel="Recommended: 1920×1080 · JPG or WEBP · Up to 3 images"
+                  accept="image/*"
+                  multiple
+                  files={[]}
+                  onFiles={async files => {
+                    const remaining = 3 - data.heroLandscapeFiles.length
+                    const newFiles = files.slice(0, remaining)
+                    setUploading('heroLandscape')
+                    const newUrls = await uploadFiles(newFiles, 'hero/landscape')
+                    update({
+                      heroLandscapeFiles: [...data.heroLandscapeFiles, ...newFiles],
+                      heroLandscapeUrls: [...data.heroLandscapeUrls, ...newUrls],
+                    })
+                    setUploading(null)
+                  }}
+                />
+              )}
+              {data.heroLandscapeFiles.map((file, idx) => (
+                <div key={idx} className="flex items-center justify-between mt-1">
+                  <p className="text-xs text-emerald-400 truncate max-w-[80%]">✓ {file.name}</p>
+                  <button type="button" onClick={() => update({
+                    heroLandscapeFiles: data.heroLandscapeFiles.filter((_, i) => i !== idx),
+                    heroLandscapeUrls: data.heroLandscapeUrls.filter((_, i) => i !== idx),
+                  })} className="text-xs text-slate-500 hover:text-red-400 ml-2">Remove</button>
+                </div>
+              ))}
             </Field>
 
             <Field label="Mobile hero images — portrait (up to 3)">
-              <UploadZone
-                id="hero-portrait"
-                label={uploading === 'heroPortrait' ? 'Uploading…' : 'Upload portrait photos'}
-                sublabel="Recommended: 1080×1920 · JPG or WEBP · Up to 3 images"
-                accept="image/*"
-                multiple
-                files={data.heroPortraitFiles}
-                onFiles={async files => {
-                  const limited = files.slice(0, 3)
-                  setUploading('heroPortrait')
-                  const urls = await uploadFiles(limited, 'hero/portrait')
-                  update({ heroPortraitFiles: limited, heroPortraitUrls: urls })
-                  setUploading(null)
-                }}
-              />
-              {data.heroPortraitUrls.length > 0 && <p className="text-xs text-emerald-400 mt-1">✓ {data.heroPortraitUrls.length} image(s) uploaded</p>}
+              {data.heroPortraitUrls.length < 3 && (
+                <UploadZone
+                  id="hero-portrait"
+                  label={uploading === 'heroPortrait' ? 'Uploading…' : 'Upload portrait photos'}
+                  sublabel="Recommended: 1080×1920 · JPG or WEBP · Up to 3 images"
+                  accept="image/*"
+                  multiple
+                  files={[]}
+                  onFiles={async files => {
+                    const remaining = 3 - data.heroPortraitFiles.length
+                    const newFiles = files.slice(0, remaining)
+                    setUploading('heroPortrait')
+                    const newUrls = await uploadFiles(newFiles, 'hero/portrait')
+                    update({
+                      heroPortraitFiles: [...data.heroPortraitFiles, ...newFiles],
+                      heroPortraitUrls: [...data.heroPortraitUrls, ...newUrls],
+                    })
+                    setUploading(null)
+                  }}
+                />
+              )}
+              {data.heroPortraitFiles.map((file, idx) => (
+                <div key={idx} className="flex items-center justify-between mt-1">
+                  <p className="text-xs text-emerald-400 truncate max-w-[80%]">✓ {file.name}</p>
+                  <button type="button" onClick={() => update({
+                    heroPortraitFiles: data.heroPortraitFiles.filter((_, i) => i !== idx),
+                    heroPortraitUrls: data.heroPortraitUrls.filter((_, i) => i !== idx),
+                  })} className="text-xs text-slate-500 hover:text-red-400 ml-2">Remove</button>
+                </div>
+              ))}
             </Field>
           </PageCard>
         )
@@ -959,7 +987,7 @@ export function Step7() {
             <Field label="Team or about us image" hint="(optional)">
               {data.aboutImageUrl ? (
                 <div className="flex items-center gap-3">
-                  <p className="text-xs text-emerald-400">✓ Image uploaded</p>
+                  <p className="text-xs text-emerald-400 truncate max-w-[70%]">✓ {data.aboutImageFile?.name ?? 'Image uploaded'}</p>
                   <button type="button" onClick={() => update({ aboutImageFile: null, aboutImageUrl: '' })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
                 </div>
               ) : (
@@ -1000,8 +1028,8 @@ export function Step7() {
                 <Field label="Service image" hint="(optional)">
                   {svc.imageUrl ? (
                     <div className="flex items-center gap-3">
-                      <p className="text-xs text-emerald-400">✓ Image uploaded</p>
-                      <button type="button" onClick={() => update({ pageServices: updItem(data.pageServices, idx, { imageUrl: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
+                      <p className="text-xs text-emerald-400 truncate max-w-[70%]">✓ {svc.imageName ?? 'Image uploaded'}</p>
+                      <button type="button" onClick={() => update({ pageServices: updItem(data.pageServices, idx, { imageUrl: '', imageName: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
                     </div>
                   ) : (
                     <label className="flex items-center gap-3 cursor-pointer text-sm text-slate-400 border border-dashed border-slate-700 rounded-lg px-4 py-2.5 hover:border-indigo-500/60 transition-colors">
@@ -1011,7 +1039,7 @@ export function Step7() {
                         if (!file) return
                         setUploading(`service-${idx}`)
                         const url = await uploadFile(file, 'services')
-                        update({ pageServices: updItem(data.pageServices, idx, { imageUrl: url }) })
+                        update({ pageServices: updItem(data.pageServices, idx, { imageUrl: url, imageName: file.name }) })
                         setUploading(null)
                       }} />
                       {uploading === `service-${idx}` && <span className="text-xs text-indigo-400 animate-pulse">Uploading…</span>}
@@ -1039,8 +1067,8 @@ export function Step7() {
                 <Field label="Image" required>
                   {item.imageUrl ? (
                     <div className="flex items-center gap-3">
-                      <p className="text-xs text-emerald-400">✓ Image uploaded</p>
-                      <button type="button" onClick={() => update({ pageGallery: updItem(data.pageGallery, idx, { imageUrl: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
+                      <p className="text-xs text-emerald-400 truncate max-w-[70%]">✓ {item.imageName ?? 'Image uploaded'}</p>
+                      <button type="button" onClick={() => update({ pageGallery: updItem(data.pageGallery, idx, { imageUrl: '', imageName: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
                     </div>
                   ) : (
                     <label className="flex items-center gap-3 cursor-pointer text-sm text-slate-400 border border-dashed border-slate-700 rounded-lg px-4 py-2.5 hover:border-indigo-500/60 transition-colors">
@@ -1050,7 +1078,7 @@ export function Step7() {
                         if (!file) return
                         setUploading(`gallery-${idx}`)
                         const url = await uploadFile(file, 'gallery')
-                        update({ pageGallery: updItem(data.pageGallery, idx, { imageUrl: url }) })
+                        update({ pageGallery: updItem(data.pageGallery, idx, { imageUrl: url, imageName: file.name }) })
                         setUploading(null)
                       }} />
                       {uploading === `gallery-${idx}` && <span className="text-xs text-indigo-400 animate-pulse">Uploading…</span>}
@@ -1272,6 +1300,38 @@ export function Step7() {
           </Select>
         </Field>
 
+        {data.existingCopy === "Yes, I'll provide it" && (
+          <div className="ml-4 flex flex-col gap-2">
+            <UploadZone
+              id="existing-copy"
+              label={uploading === 'existingCopy' ? 'Uploading…' : 'Upload content'}
+              sublabel="Docs, PDFs, text files — anything you have"
+              accept=".pdf,.doc,.docx,.txt,.rtf,image/*"
+              multiple
+              files={data.existingCopyFiles}
+              onFiles={async files => {
+                setUploading('existingCopy')
+                const newUrls = await uploadFiles(files, 'copy')
+                update({
+                  existingCopyFiles: [...data.existingCopyFiles, ...files],
+                  existingCopyUrls: [...data.existingCopyUrls, ...newUrls],
+                })
+                setUploading(null)
+              }}
+            />
+            {data.existingCopyFiles.map((file, idx) => (
+              <div key={idx} className="flex items-center justify-between">
+                <p className="text-xs text-emerald-400 truncate max-w-[80%]">✓ {file.name}</p>
+                <button type="button" onClick={() => update({
+                  existingCopyFiles: data.existingCopyFiles.filter((_, i) => i !== idx),
+                  existingCopyUrls: data.existingCopyUrls.filter((_, i) => i !== idx),
+                })} className="text-xs text-slate-500 hover:text-red-400 ml-2">Remove</button>
+              </div>
+            ))}
+            <p className="text-xs text-slate-500">Or send us an email to <span className="text-indigo-400">contact@webf5.au</span></p>
+          </div>
+        )}
+
         <Field label="Do you need multilingual support?">
           <Select value={data.multilingual} onChange={e => update({ multilingual: e.target.value })}>
             <option value="">Select…</option>
@@ -1455,6 +1515,20 @@ export function Step10() {
             <option>Maybe — depends on scope</option>
           </Select>
         </Field>
+
+        {data.internalResources === 'Yes' && (
+          <div className="ml-4 grid grid-cols-2 gap-3">
+            <Field label="Contact person name">
+              <Input value={data.internalContactName} onChange={e => update({ internalContactName: e.target.value })} placeholder="e.g. Sarah Jones" />
+            </Field>
+            <Field label="Contact person email">
+              <Input type="email" value={data.internalContactEmail} onChange={e => update({ internalContactEmail: e.target.value })} placeholder="e.g. sarah@yourbusiness.com.au" />
+            </Field>
+            <Field label="Contact person phone">
+              <Input type="tel" value={data.internalContactPhone} onChange={e => update({ internalContactPhone: e.target.value })} placeholder="e.g. 0400 000 000" />
+            </Field>
+          </div>
+        )}
 
         <Field label="Anything else you'd like us to know?">
           <Textarea rows={4} value={data.extraNotes} onChange={e => update({ extraNotes: e.target.value })} placeholder="Special requirements, concerns, questions, or anything that didn't fit above…" />
