@@ -471,9 +471,15 @@ export function Step4() {
                   type="button"
                   onClick={findTowns}
                   disabled={fetchingTowns || !data.bizAddressLat || !data.serviceRadiusKm}
-                  className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo-500 disabled:opacity-40 whitespace-nowrap"
+                  className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo-500 disabled:opacity-40 whitespace-nowrap"
                 >
-                  {fetchingTowns ? 'Finding…' : 'Find towns'}
+                  {fetchingTowns && (
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                  )}
+                  {fetchingTowns ? 'Finding towns…' : 'Find towns'}
                 </button>
               </div>
               {townsMsg && (
@@ -559,6 +565,11 @@ export function Step5() {
             <option>No</option>
             <option>Not sure</option>
           </Select>
+          {data.crm === 'Yes' && (
+            <p className="mt-2 text-xs text-emerald-400 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
+              We will contact you to organise this transfer.
+            </p>
+          )}
         </Field>
 
         <Field label="Existing advertising accounts" hint="(optional)">
@@ -649,7 +660,7 @@ export function Step6() {
       const form = new FormData()
       files.forEach(f => form.append('logo', f))
       const slug = (data.bizName || 'unknown').trim().toLowerCase().replace(/[^a-z0-9]/g, '-')
-      form.append('folder', slug)
+      form.append('folder', `${slug}/logo`)
       const res  = await fetch('/api/upload', { method: 'POST', body: form })
       const json = await res.json()
       const urls = json.uploads.map((u: { url: string }) => u.url)

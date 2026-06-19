@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import type { WizardData } from '@/components/wizard'
-import { buildBriefSummary } from '@/INTEGRATION'
+import { buildBriefSummary, buildFileLinks } from '@/INTEGRATION'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -29,16 +29,14 @@ export async function POST(req: NextRequest) {
     }
 
     const summary = buildBriefSummary(data)
-    const logoLinks = data.logoUrls?.map(u => `Logo: ${u}`).join('\n') ?? 'None uploaded'
-    const photoLinks = data.photoUrls?.map(u => `Photo: ${u}`).join('\n') ?? 'None uploaded'
-
+    const fileLinks = buildFileLinks(data)
 
     // ── Notify you ────────────────────────────────────────────────────────
     await resend.emails.send({
       from: FROM_ADDRESS,
       to: NOTIFY_TO,
       subject: `New brief — ${data.bizName.trim()}`,
-      text: `${summary}\n\nFiles:\n${logoLinks}\n${photoLinks}`
+      text: `${summary}\n\n── Uploaded files ───────────────────────────────────────\n${fileLinks}`
     })
 
     // ── Confirm to client ─────────────────────────────────────────────────
