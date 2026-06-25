@@ -1309,6 +1309,12 @@ export function Step7() {
             <option>Yes, I'll provide it</option>
             <option>No, starting from scratch</option>
           </Select>
+          {data.existingCopy === 'No, starting from scratch' &&
+           (data.contentAuthor === "I'll provide all content" || data.contentAuthor === "A mix — I'll provide some, you fill in the rest") && (
+            <p className="mt-2 text-xs text-emerald-400 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
+              We will contact you to organise this content.
+            </p>
+          )}
         </Field>
 
         {data.existingCopy === "Yes, I'll provide it" && (
@@ -1602,6 +1608,13 @@ export function Step11() {
         body: JSON.stringify(data),
       })
       if (res.ok) {
+        // Push conversion event to GTM dataLayer
+        window.dataLayer = window.dataLayer || []
+        window.dataLayer.push({
+          event: 'brief_submitted',
+          biz_name: data.bizName,
+          biz_email: data.bizEmail,
+        })
         document.getElementById('brief')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         setTimeout(() => setIsSubmitted(true), 400)
       } else {

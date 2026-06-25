@@ -320,6 +320,36 @@ export function buildBriefSummary(data: WizardData): string {
     `Extra notes:          ${val(data.extraNotes)}`,
   ]
 
+  // ── Follow-up reminders ───────────────────────────────────────────────────
+  const followUpItems: string[] = []
+
+  if (data.crm === 'Yes') {
+    followUpItems.push('Email list / CRM transfer')
+  }
+
+  const needsContentChase =
+    data.existingCopy === 'No, starting from scratch' &&
+    (data.contentAuthor === "I'll provide all content" ||
+     data.contentAuthor === "A mix — I'll provide some, you fill in the rest")
+
+  if (needsContentChase) {
+    followUpItems.push('Website content (client indicated they will provide copy but have none yet)')
+  }
+
+  if (followUpItems.length > 0) {
+    const contactId = [
+      val(data.contactName || data.bizName),
+      data.bizEmail ? `<${data.bizEmail}>` : '',
+      data.bizPhone || '',
+    ].filter(s => s && s !== '—').join('  ')
+
+    lines.push(
+      '',
+      `!! FOLLOW-UP REQUIRED !! ── Contact ${contactId} regarding:`,
+      ...followUpItems.map(item => `  • ${item}`),
+    )
+  }
+
   return lines.join('\n')
 }
 
