@@ -30,7 +30,7 @@ export default function WorkPage() {
           </h1>
           <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto">
             Every project below started with a conversation about what the business actually needed.
-            No templates, no guesswork — just sites built to perform.
+            No templates, no guesswork; just sites built to perform.
           </p>
         </motion.div>
       </section>

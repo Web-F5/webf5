@@ -3,10 +3,21 @@
 import { motion } from 'framer-motion'
 
 const footerLinks = {
-  Product: ['Features', 'Pricing', 'Security', 'Roadmap'],
-  Company: ['About', 'Blog', 'Careers', 'Contact'],
-  Resources: ['Docs', 'Community', 'Support', 'Status'],
-  Legal: ['Privacy', 'Terms', 'Cookie Policy', 'Compliance'],
+  Services: [
+    { label: 'Web Design',       href: '/#solutions' },
+    { label: 'Web Development',  href: '/#solutions' },
+    { label: 'SEO Setup',        href: '/#pricing' },
+    { label: 'Care Plans',       href: '/#pricing' },
+  ],
+  Company: [
+    { label: 'Our Work',   href: '/work' },
+    { label: 'Pricing',    href: '/#pricing' },
+    { label: 'Process',    href: '/#process' },
+    { label: 'Contact',    href: 'mailto:contact@webf5.au' },
+  ],
+  Legal: [
+    { label: 'Privacy Policy', href: '/privacy' },
+  ],
 }
 
 export function Footer() {
@@ -56,9 +67,9 @@ export function Footer() {
               <h4 className="font-semibold mb-4">{category}</h4>
               <ul className="space-y-2">
                 {links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-foreground/60 hover:text-foreground text-sm transition-colors">
-                      {link}
+                  <li key={link.label}>
+                    <a href={link.href} className="text-foreground/60 hover:text-foreground text-sm transition-colors">
+                      {link.label}
                     </a>
                   </li>
                 ))}
@@ -76,18 +87,10 @@ export function Footer() {
           className="border-t border-border pt-8"
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-foreground/60">
-            <p>&copy; 2024 Web F5. All rights reserved.</p>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-foreground transition-colors">
-                Twitter
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                LinkedIn
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                GitHub
-              </a>
-            </div>
+            <p>&copy; {new Date().getFullYear()} Web F5. All rights reserved.</p>
+            <a href="mailto:contact@webf5.au" className="hover:text-foreground transition-colors">
+              contact@webf5.au
+            </a>
           </div>
         </motion.div>
       </div>
