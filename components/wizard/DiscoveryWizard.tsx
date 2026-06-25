@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { WizardProvider, useWizard } from './WizardContext'
 import { WizardProgress } from './WizardProgress'
 import { WizardNav } from './WizardNav'
@@ -12,8 +13,24 @@ import {
 const STEPS = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9, Step10, Step11]
 
 function WizardInner() {
-  const { currentStep, isSubmitted } = useWizard()
+  const { currentStep, isSubmitted, update } = useWizard()
   const StepComponent = STEPS[currentStep - 1]
+
+  // Pre-fill fields from Google Ads lead form URL params
+  // CTA URL format: /#brief?name=...&email=...&phone=...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const name  = params.get('name')?.trim()
+    const email = params.get('email')?.trim()
+    const phone = params.get('phone')?.trim()
+    if (name || email || phone) {
+      update({
+        ...(name  && { contactName: name }),
+        ...(email && { bizEmail: email }),
+        ...(phone && { bizPhone: phone }),
+      })
+    }
+  }, [update])
 
   if (isSubmitted) return <WizardSuccess />
 

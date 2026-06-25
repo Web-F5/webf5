@@ -8,13 +8,13 @@ const problems = [
     icon: Copy,
     title: 'Built for everyone, suited to no one',
     description:
-      'Template sites look like every other business in your industry. Your competitors have the same one — and so does the one down the street.',
+      'Template sites look like every other business in your industry. Your competitors have the same one; and so does the one down the street.',
   },
   {
     icon: HelpCircle,
     title: 'Nobody asked the right questions',
     description:
-      'If the agency doesn\'t understand your business, your customers, or your goals — the site won\'t either. Guesswork costs money and time.',
+      'If the agency doesn\'t understand your business, your customers, or your goals; the site won\'t either. Guesswork costs money and time.',
   },
   {
     icon: Wrench,
@@ -26,7 +26,7 @@ const problems = [
     icon: Rocket,
     title: 'Launched and forgotten',
     description:
-      'A site that can\'t be updated, found on Google, or adapted as your business grows is a liability — not an asset.',
+      'A site that can\'t be updated, found on Google, or adapted as your business grows is a liability; not an asset.',
   },
 ]
 
@@ -76,7 +76,7 @@ export function ProblemsSection() {
             Most small business websites fail before they're even launched.
           </h2>
           <p className="text-lg text-foreground/60 max-w-2xl mx-auto text-balance">
-            It's not bad luck — it's the same four problems, every time. Our discovery process is built specifically to fix them.
+            It's not bad luck, it's the same four problems, every time. Our discovery process is built specifically to fix them.
           </p>
         </motion.div>
 
