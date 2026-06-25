@@ -6,25 +6,25 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const testimonials = [
   {
-    quote: 'Web F5 transformed our online presence. Thanks to their SEO, web design, and hosting expertise, we now rank on the first page for key trenching and excavation terms. The team was friendly, professional, and took the time to understand our business. We\'ve seen a notable increase in local enquiries since switching to Web F5. Highly recommend them for anyone needing digital services that actually deliver results.',
+    quote: 'Web F5 transformed our website. Thanks to their SEO and web design, we now rank on the first page. Highly recommended.',
     author: 'CJ Ogston',
     role: 'Australian Trenching & Excavations',
     location: '',
   },
   {
-    quote: 'Web F5 has been instrumental in elevating our digital footprint. Their expertise in web design, SEO, and hosting has given us a competitive edge in our local market. From crafting our professional website to optimising it for local searches, their team was meticulous and truly understood our industry. Thanks to their strategic SEO work, we now rank on the first page for key terms, driving more qualified leads. What impressed us most was their customised approach — they didn\'t just deliver a template but tailored every element to reflect our brand.',
+    quote: 'Web F5 helped us with professional web design, and SEO to give us a competitive edge in our local market. ',
     author: 'Ben Speechley',
     role: 'Speechless Electrical',
     location: 'Seymour, VIC',
   },
   {
-    quote: 'Web F5 updated our website and pushed our site from ranking on the 7th page of Google to hitting number 1 in local and regular results — and even in the AI section for most of our key words. Couldn\'t be happier!',
+    quote: 'Web F5 updated our website and pushed our site from ranking on the 7th page of Google to hitting number 1. Couldn\'t be happier!',
     author: 'Ben Quaggin',
     role: '',
     location: '',
   },
   {
-    quote: 'Web F5 helped us from start to finish. We started with a website from Web F5, they offered a competitive rate on hosting and organised a domain that we liked. After the site was done they worked with us to get our SEO sorted out, stepping in when it got too technical. Fantastic service, we highly recommend Web F5.',
+    quote: 'Web F5 helped us from start to finish. We started with a website, they organised hosting a domain at a competative rate, definately recommend them.',
     author: 'Rebecca Austin',
     role: '',
     location: '',
