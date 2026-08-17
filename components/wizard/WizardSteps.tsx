@@ -10,11 +10,14 @@ import {
 import { ADD_ONS, SOCIAL_OPTIONS, PAGE_OPTIONS, FEATURE_OPTIONS } from '../../types'
 import type { PageService, GalleryItem, TeamMember, FaqItem, Testimonial, ContactField } from '../../types'
 import { useState, useRef } from 'react'
+import { SignInButton, SignUpButton, useAuth } from '@clerk/nextjs'
 
 // ── Step 1: Starting point ─────────────────────────────────────────────────
 
 export function Step1() {
   const { data, update, currentStep, totalSteps } = useWizard()
+  const { isSignedIn } = useAuth()
+  const [promptDismissed, setPromptDismissed] = useState(false)
   const showExisting = data.startType === 'rebuild' || data.startType === 'refresh'
 
   return (
@@ -25,6 +28,67 @@ export function Step1() {
         title="Let's understand where you're starting from."
         description="Tell us about your current situation so we can tailor this process for you."
       />
+
+      {/* Soft sign-up prompt — only shown to guests who haven't dismissed it */}
+      {!isSignedIn && !promptDismissed && (
+        <div style={{
+          background: 'rgba(99,102,241,0.12)',
+          border: '1px solid rgba(99,102,241,0.35)',
+          borderRadius: '12px',
+          padding: '1rem 1.25rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+            <div>
+              <p style={{ fontWeight: 600, marginBottom: '0.25rem', fontSize: '0.95rem' }}>
+                Save your progress — create a free account <span style={{ color: '#a5b4fc' }}>(recommended)</span>
+              </p>
+              <p style={{ fontSize: '0.82rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                We'll autosave every step so you can come back anytime. Without an account we save for 30 days via email link.
+              </p>
+            </div>
+            <button
+              onClick={() => setPromptDismissed(true)}
+              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1, padding: '0.1rem 0.25rem', flexShrink: 0 }}
+              aria-label="Dismiss"
+            >×</button>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <SignUpButton mode="modal">
+              <button style={{
+                background: '#6366f1', color: '#fff', border: 'none',
+                borderRadius: '8px', padding: '0.5rem 1.1rem',
+                fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
+              }}>
+                Create free account
+              </button>
+            </SignUpButton>
+            <SignInButton mode="modal">
+              <button style={{
+                background: 'transparent', color: '#a5b4fc',
+                border: '1px solid rgba(99,102,241,0.5)',
+                borderRadius: '8px', padding: '0.5rem 1.1rem',
+                fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer',
+              }}>
+                Sign in
+              </button>
+            </SignInButton>
+            <button
+              onClick={() => setPromptDismissed(true)}
+              style={{
+                background: 'transparent', color: '#64748b', border: 'none',
+                padding: '0.5rem 0.25rem', fontSize: '0.8rem', cursor: 'pointer',
+              }}
+            >
+              Continue as guest
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-3">
         <OptionCard selected={data.startType === 'fresh'}   onClick={() => update({ startType: 'fresh' })}   icon="✦" title="Starting fresh"                subtitle="I don't have a website yet" />
         <OptionCard selected={data.startType === 'rebuild'} onClick={() => update({ startType: 'rebuild' })} icon="⟳" title="Rebuilding an existing site"   subtitle="I have a site but want a new one" />
@@ -47,6 +111,21 @@ export function Step1() {
           </div>
         </>
       )}
+
+      {/* Consent checkbox — unchecked by default (Spam Act 2003 compliance) */}
+      <Divider />
+      <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.875rem', color: '#94a3b8', lineHeight: 1.5 }}>
+        <input
+          type="checkbox"
+          checked={data.consentFollowup}
+          onChange={e => update({ consentFollowup: e.target.checked })}
+          style={{ marginTop: '0.2rem', accentColor: '#6366f1', width: '1rem', height: '1rem', flexShrink: 0 }}
+        />
+        <span>
+          I'm OK with Web F5 sending me occasional reminder emails if I don't finish this brief.
+          {' '}You can unsubscribe at any time.
+        </span>
+      </label>
     </div>
   )
 }
@@ -1602,9 +1681,13 @@ export function Step11() {
     }
     setSubmitting(true)
     try {
+      const guestToken = typeof window !== 'undefined' ? (localStorage.getItem('guestBriefToken') ?? '') : ''
       const res = await fetch('/api/brief', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(guestToken ? { 'x-guest-token': guestToken } : {}),
+        },
         body: JSON.stringify(data),
       })
       if (res.ok) {

@@ -40,6 +40,9 @@ export interface ContactField {
 // ── Wizard data ───────────────────────────────────────────────────────────────
 
 export interface WizardData {
+  // Consent (Step 1)
+  consentFollowup: boolean
+
   // Step 1 - Starting point
   startType: 'fresh' | 'rebuild' | 'refresh' | ''
   existingUrl: string
@@ -164,6 +167,7 @@ export interface WizardData {
 }
 
 export const defaultWizardData: WizardData = {
+  consentFollowup: false,
   startType: '',
   existingUrl: '',
   siteLike: '',
