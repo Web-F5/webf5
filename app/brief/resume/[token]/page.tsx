@@ -32,8 +32,8 @@ export default function ResumePage() {
         }
 
         setStatus('resuming')
-        // Navigate to the wizard — WizardContext will read localStorage on mount
-        router.replace('/#wizard')
+        // Use window.location so the hash is preserved — Next.js router strips it
+        window.location.href = '/#brief'
       })
       .catch(() => setStatus('error'))
   }, [token, router])
