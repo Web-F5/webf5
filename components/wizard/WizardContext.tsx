@@ -50,6 +50,7 @@ async function firePartialCapture(data: WizardData) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        contactName:  data.contactName,
         bizName:      data.bizName,
         bizEmail:     data.bizEmail,
         bizPhone:     data.bizPhone,
