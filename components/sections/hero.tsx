@@ -168,16 +168,15 @@ export function HeroSection() {
             </span>
           </motion.h1>
 
-          {/* Subheadline */}
-          <motion.p
-            variants={itemVariants}
+          {/* Subheadline — rendered immediately so it counts as LCP without animation delay */}
+          <p
             className="text-base md:text-lg text-foreground/80 mb-3 max-w-lg leading-relaxed"
           >
             <span className="font-bold text-white">Web F5</span> builds websites
             for trades, local businesses, and ecommerce brands across Victoria.
             Our discovery process means we understand your business before we
             write a line of code.
-          </motion.p>
+          </p>
 
           <motion.p
             variants={itemVariants}
