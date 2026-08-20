@@ -33,7 +33,7 @@ export default function ResumePage() {
 
         setStatus('resuming')
         // Use window.location so the hash is preserved — Next.js router strips it
-        window.location.href = '/#brief'
+        window.location.href = '/brief'
       })
       .catch(() => setStatus('error'))
   }, [token, router])
@@ -69,7 +69,7 @@ export default function ResumePage() {
         )}
         <p style={{ fontSize: '1.25rem', maxWidth: '420px' }}>{msgs[status]}</p>
         {(status === 'expired' || status === 'not_found' || status === 'error') && (
-          <a href="/" style={{
+          <a href="/brief" style={{
             display: 'inline-block',
             marginTop: '1.5rem',
             padding: '0.75rem 1.5rem',

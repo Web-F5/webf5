@@ -25,7 +25,7 @@ export function FinalCTASection() {
   }
 
   return (
-    <section id="brief" className="py-24 px-4 relative overflow-hidden">
+    <section className="py-24 px-4 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -61,17 +61,17 @@ export function FinalCTASection() {
 
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="#pricing"
+            href="/brief"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all"
           >
-            Get Started Now
+            Start your brief
             <ArrowRight size={20} />
           </a>
           <a
             href="#process"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-border text-foreground rounded-full font-semibold hover:bg-card transition-all"
           >
-            Learn More
+            See how it works
           </a>
         </motion.div>
       </motion.div>

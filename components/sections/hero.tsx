@@ -191,7 +191,7 @@ export function HeroSection() {
             className="flex flex-col sm:flex-row gap-3 mb-8"
           >
             <a
-              href="#brief"
+              href="/brief"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold text-sm hover:shadow-lg hover:shadow-primary/40 transition-all"
             >
               Tell us about your project

@@ -126,7 +126,7 @@ export function PricingSection() {
               </div>
 
               <a
-                href="#brief"
+                href="/brief"
                 className="w-full py-3 rounded-lg font-semibold text-center mb-8 text-sm border border-border text-foreground transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary group-hover:shadow-lg group-hover:shadow-primary/40"
               >
                 {plan.cta} →

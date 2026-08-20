@@ -58,7 +58,7 @@ export function Navigation() {
 
         {/* CTA Button Desktop */}
         <motion.a
-          href={anchor('#brief')}
+          href="/brief"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
@@ -99,7 +99,7 @@ export function Navigation() {
                 </a>
               ))}
               <a
-                href={anchor('#brief')}
+                href="/brief"
                 className="block w-full mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold text-center"
                 onClick={() => setIsOpen(false)}
               >
