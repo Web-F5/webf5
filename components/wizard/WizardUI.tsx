@@ -19,7 +19,7 @@ export function Field({ label, hint, required, children, className }: FieldProps
       <label className="text-sm font-medium text-slate-300">
         {label}
         {required && <span className="ml-1 text-red-400">*</span>}
-        {hint && <span className="ml-1.5 font-normal text-slate-500">{hint}</span>}
+        {hint && <span className="ml-1.5 font-normal text-slate-400">{hint}</span>}
       </label>
       {children}
     </div>
@@ -36,7 +36,7 @@ export function Input({ className, error, ...props }: InputProps) {
   return (
     <input
       className={cn(
-        'w-full rounded-lg border bg-slate-800/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-500',
+        'w-full rounded-lg border bg-slate-800/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-400',
         'transition-colors focus:outline-none focus:ring-1',
         error
           ? 'border-red-500/70 focus:border-red-500 focus:ring-red-500/20'
@@ -55,7 +55,7 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
     <textarea
       rows={3}
       className={cn(
-        'w-full resize-y rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-500',
+        'w-full resize-y rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-400',
         'transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/40',
         className
       )}
@@ -114,7 +114,7 @@ export function OptionCard({ selected, onClick, icon, title, subtitle, className
       <div>
         <p className={cn('text-sm font-medium', selected ? 'text-indigo-200' : 'text-white')}>{title}</p>
         {subtitle && (
-          <p className={cn('mt-0.5 text-xs', selected ? 'text-indigo-400' : 'text-slate-500')}>{subtitle}</p>
+          <p className={cn('mt-0.5 text-xs', selected ? 'text-indigo-400' : 'text-slate-400')}>{subtitle}</p>
         )}
       </div>
     </button>
@@ -152,7 +152,7 @@ export function CheckRow({ checked, onChange, label, sublabel }: CheckRowProps) 
       </span>
       <div>
         <span className={cn('text-sm', checked ? 'text-indigo-200' : 'text-white')}>{label}</span>
-        {sublabel && <p className="mt-0.5 text-xs text-slate-500">{sublabel}</p>}
+        {sublabel && <p className="mt-0.5 text-xs text-slate-400">{sublabel}</p>}
       </div>
     </button>
   )
@@ -190,7 +190,7 @@ export function AddOnRow({ checked, onChange, name, description, price }: AddOnR
       </span>
       <div className="flex-1">
         <p className={cn('text-sm font-medium', checked ? 'text-indigo-200' : 'text-white')}>{name}</p>
-        <p className="mt-0.5 text-xs text-slate-500">{description}</p>
+        <p className="mt-0.5 text-xs text-slate-400">{description}</p>
         <p className={cn('mt-1.5 text-xs font-medium', checked ? 'text-indigo-400' : 'text-slate-400')}>{price}</p>
       </div>
     </button>
@@ -221,9 +221,9 @@ export function UploadZone({ id, label, sublabel, accept, multiple, files, onFil
         htmlFor={id}
         className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 px-6 py-8 text-center transition-colors hover:border-indigo-500/60 hover:bg-slate-800/60"
       >
-        <span className="text-2xl text-slate-500">↑</span>
+        <span className="text-2xl text-slate-400">↑</span>
         <span className="text-sm font-medium text-slate-300">{label}</span>
-        <span className="text-xs text-slate-500">{sublabel}</span>
+        <span className="text-xs text-slate-400">{sublabel}</span>
         <input id={id} type="file" accept={accept} multiple={multiple} className="sr-only" onChange={handleChange} />
       </label>
       {files.length > 0 && (
@@ -325,7 +325,7 @@ export function RemoveButton({ onClick }: RemoveButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className="ml-auto text-xs text-slate-600 hover:text-red-400 transition-colors px-2 py-1 rounded"
+      className="ml-auto text-xs text-slate-400 hover:text-red-400 transition-colors px-2 py-1 rounded"
     >
       Remove ×
     </button>
@@ -412,7 +412,7 @@ export function ColourSwatch({ label, hint, value, onChange, autoNote }: ColourS
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-slate-300">{label}</p>
-        {hint && <p className="text-xs text-slate-500 mt-0.5">{hint}</p>}
+        {hint && <p className="text-xs text-slate-400 mt-0.5">{hint}</p>}
         {autoNote && <p className="text-xs text-indigo-400/70 mt-0.5">{autoNote}</p>}
       </div>
       <input
@@ -446,7 +446,7 @@ export function PalettePreview({ colours }: PalettePreviewProps) {
       <div className="flex bg-slate-900/60 divide-x divide-slate-800">
         {valid.map(c => (
           <div key={c.label} className="flex-1 py-1.5 px-1 text-center min-w-0">
-            <p className="text-[10px] text-slate-500 font-mono truncate">{c.value}</p>
+            <p className="text-[10px] text-slate-400 font-mono truncate">{c.value}</p>
           </div>
         ))}
       </div>
@@ -500,7 +500,7 @@ export function FontSelector({ label, hint, value, onChange, suggested }: FontSe
     <div className="flex flex-col gap-1.5">
       <label className="text-sm font-medium text-slate-300">
         {label}
-        {hint && <span className="ml-1.5 font-normal text-slate-500">{hint}</span>}
+        {hint && <span className="ml-1.5 font-normal text-slate-400">{hint}</span>}
       </label>
 
       {suggested && (
@@ -523,7 +523,7 @@ export function FontSelector({ label, hint, value, onChange, suggested }: FontSe
           className="flex items-center justify-between w-full rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-sm text-white hover:border-slate-500 transition-colors"
         >
           <span style={{ fontFamily: value || 'inherit' }}>{value || 'Select a font…'}</span>
-          <span className="text-slate-500 text-xs ml-2">▾</span>
+          <span className="text-slate-400 text-xs ml-2">▾</span>
         </button>
 
         {open && (
@@ -534,7 +534,7 @@ export function FontSelector({ label, hint, value, onChange, suggested }: FontSe
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search fonts…"
-                className="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
                 onClick={e => e.stopPropagation()}
               />
             </div>
@@ -559,7 +559,7 @@ export function FontSelector({ label, hint, value, onChange, suggested }: FontSe
               <input
                 type="text"
                 placeholder="Or type any Google Font name + Enter…"
-                className="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     const v = (e.target as HTMLInputElement).value.trim()
@@ -574,7 +574,7 @@ export function FontSelector({ label, hint, value, onChange, suggested }: FontSe
 
       {value && (
         <div className="rounded-lg bg-slate-900/40 border border-slate-700 px-4 py-3">
-          <p className="text-xs text-slate-500 mb-1.5">Preview</p>
+          <p className="text-xs text-slate-400 mb-1.5">Preview</p>
           <p className="text-base text-white leading-snug" style={{ fontFamily: value }}>
             The quick brown fox jumps over the lazy dog
           </p>

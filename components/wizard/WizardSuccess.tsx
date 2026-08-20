@@ -44,7 +44,7 @@ export function WizardSuccess() {
         </ol>
       </div>
 
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-400">
         Questions in the meantime?{' '}
         <a
           href="mailto:contact@webf5.com.au"

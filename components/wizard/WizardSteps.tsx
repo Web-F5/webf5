@@ -229,7 +229,7 @@ export function Step2() {
 
             {searched && results.length > 0 && (
               <>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-400">
                   {results.filter(r => r.available).length > 0 ? 'Select your preferred domain to continue.' : 'No available domains found. Try a different name.'}
                 </p>
                 <div className="flex flex-col gap-2">
@@ -257,7 +257,7 @@ export function Step2() {
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
                         {r.available && r.price && <span className={`text-xs ${selectedDomain === r.domain ? 'text-indigo-400' : 'text-slate-400'}`}>${r.price.toFixed(2)}/yr</span>}
-                        {r.available ? <span className="text-xs font-medium text-emerald-400">Available</span> : <span className="text-xs text-slate-600">Taken</span>}
+                        {r.available ? <span className="text-xs font-medium text-emerald-400">Available</span> : <span className="text-xs text-slate-400">Taken</span>}
                       </div>
                     </button>
                   ))}
@@ -265,7 +265,7 @@ export function Step2() {
                 {selectedDomain && (
                   <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 px-4 py-3">
                     <p className="text-sm text-indigo-300">Selected: <span className="font-semibold text-white">{selectedDomain}</span></p>
-                    <p className="mt-0.5 text-xs text-slate-500">Click Continue to proceed with this domain.</p>
+                    <p className="mt-0.5 text-xs text-slate-400">Click Continue to proceed with this domain.</p>
                   </div>
                 )}
               </>
@@ -295,7 +295,7 @@ export function Step3() {
       <div className="flex flex-col gap-4">
 
         <p className="text-xs font-medium uppercase tracking-widest text-indigo-400">Your contact details</p>
-        <p className="text-xs text-slate-500 -mt-2">So we can follow up with your quote. These stay private.</p>
+        <p className="text-xs text-slate-400 -mt-2">So we can follow up with your quote. These stay private.</p>
 
         <Field label="Contact name" required>
           <Input value={data.contactName ?? ''} onChange={e => { update({ contactName: e.target.value }); clearError('contactName') }} placeholder="e.g. Josh Smith" error={stepErrors['contactName']} />
@@ -576,7 +576,7 @@ export function Step4() {
                 rows={4}
                 placeholder="Click 'Find towns' to auto-populate, or type towns manually — e.g. Seymour, Kilmore, Broadford…"
               />
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {data.serviceRadiusTowns
                   ? 'Edit this list down to the 20 areas most relevant to your business — remove towns you don\'t service and add any that are missing.'
                   : 'Towns will appear here after lookup, sorted closest first. You can also type them manually.'}
@@ -796,7 +796,7 @@ export function Step6() {
         {STYLE_PALETTES[data.designStyle] && (
           <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col gap-3">
             <p className="text-xs font-medium uppercase tracking-widest text-indigo-400">Suggested palettes</p>
-            <p className="text-xs text-slate-500 -mt-1">Choose a starting point — you can fine-tune any colour below.</p>
+            <p className="text-xs text-slate-400 -mt-1">Choose a starting point — you can fine-tune any colour below.</p>
             <div className="flex flex-col gap-3">
               {STYLE_PALETTES[data.designStyle].map((palette) => {
                 const swatches = [
@@ -859,7 +859,7 @@ export function Step6() {
                     <div className="flex">
                       {swatches.map((s, i) => (
                         <div key={i} className="flex-1 text-center">
-                          <span className="text-[9px] text-slate-600 font-mono leading-none">{s.hex}</span>
+                          <span className="text-[9px] text-slate-400 font-mono leading-none">{s.hex}</span>
                         </div>
                       ))}
                     </div>
@@ -875,7 +875,7 @@ export function Step6() {
         {/* Colour swatches */}
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-1">Brand colours</p>
-          <p className="text-xs text-slate-500 mb-4">Click any colour dot to open the picker, or type a hex code directly.</p>
+          <p className="text-xs text-slate-400 mb-4">Click any colour dot to open the picker, or type a hex code directly.</p>
 
           <div className="flex flex-col gap-0 divide-y divide-slate-800/60">
             <ColourSwatch label="Primary colour" hint="Main brand colour — headings, highlights"
@@ -891,7 +891,7 @@ export function Step6() {
 
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-1">Button colours</p>
-          <p className="text-xs text-slate-500 mb-4">Primary button is your main CTA. Accent is a secondary call-to-action.</p>
+          <p className="text-xs text-slate-400 mb-4">Primary button is your main CTA. Accent is a secondary call-to-action.</p>
 
           <div className="flex flex-col gap-0 divide-y divide-slate-800/60">
             <ColourSwatch label="Primary button" hint="CTA button background"
@@ -911,7 +911,7 @@ export function Step6() {
 
         {/* Palette preview */}
         <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-slate-500 mb-2">Your palette</p>
+          <p className="text-xs font-medium uppercase tracking-widest text-slate-400 mb-2">Your palette</p>
           <PalettePreview colours={paletteColours} />
         </div>
 
@@ -921,7 +921,7 @@ export function Step6() {
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-1">Typography</p>
           {fontSuggestion && (
-            <p className="text-xs text-slate-500 mb-4">Based on your <strong className="text-slate-300">{data.designStyle}</strong> style, we suggest <strong className="text-slate-300">{fontSuggestion.display}</strong> + <strong className="text-slate-300">{fontSuggestion.body}</strong>. You can accept these or choose your own below.</p>
+            <p className="text-xs text-slate-400 mb-4">Based on your <strong className="text-slate-300">{data.designStyle}</strong> style, we suggest <strong className="text-slate-300">{fontSuggestion.display}</strong> + <strong className="text-slate-300">{fontSuggestion.body}</strong>. You can accept these or choose your own below.</p>
           )}
         </div>
 
@@ -995,7 +995,7 @@ export function Step7() {
         return (
           <PageCard>
             <SectionHeading>Home page content</SectionHeading>
-            <p className="text-xs text-slate-500 -mt-2">These images will be used in a hero carousel or similar display at the top of your homepage.</p>
+            <p className="text-xs text-slate-400 -mt-2">These images will be used in a hero carousel or similar display at the top of your homepage.</p>
 
             <Field label="Desktop hero images — landscape (up to 3)">
               {data.heroLandscapeUrls.length < 3 && (
@@ -1025,7 +1025,7 @@ export function Step7() {
                   <button type="button" onClick={() => update({
                     heroLandscapeFiles: data.heroLandscapeFiles.filter((_, i) => i !== idx),
                     heroLandscapeUrls: data.heroLandscapeUrls.filter((_, i) => i !== idx),
-                  })} className="text-xs text-slate-500 hover:text-red-400 ml-2">Remove</button>
+                  })} className="text-xs text-slate-400 hover:text-red-400 ml-2">Remove</button>
                 </div>
               ))}
             </Field>
@@ -1058,7 +1058,7 @@ export function Step7() {
                   <button type="button" onClick={() => update({
                     heroPortraitFiles: data.heroPortraitFiles.filter((_, i) => i !== idx),
                     heroPortraitUrls: data.heroPortraitUrls.filter((_, i) => i !== idx),
-                  })} className="text-xs text-slate-500 hover:text-red-400 ml-2">Remove</button>
+                  })} className="text-xs text-slate-400 hover:text-red-400 ml-2">Remove</button>
                 </div>
               ))}
             </Field>
@@ -1078,7 +1078,7 @@ export function Step7() {
               {data.aboutImageUrl ? (
                 <div className="flex items-center gap-3">
                   <p className="text-xs text-emerald-400 truncate max-w-[70%]">✓ {data.aboutImageFile?.name ?? 'Image uploaded'}</p>
-                  <button type="button" onClick={() => update({ aboutImageFile: null, aboutImageUrl: '' })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
+                  <button type="button" onClick={() => update({ aboutImageFile: null, aboutImageUrl: '' })} className="text-xs text-slate-400 hover:text-red-400">Remove</button>
                 </div>
               ) : (
                 <UploadZone
@@ -1105,7 +1105,7 @@ export function Step7() {
           <PageCard>
             <SectionHeading>Services</SectionHeading>
             {data.pageServices.length === 0 && (
-              <p className="text-xs text-slate-500">Add the services you offer. Each gets its own section on your services page.</p>
+              <p className="text-xs text-slate-400">Add the services you offer. Each gets its own section on your services page.</p>
             )}
             {data.pageServices.map((svc, idx) => (
               <ItemCard key={idx} label={`Service ${idx + 1}`} onRemove={() => update({ pageServices: delItem(data.pageServices, idx) })}>
@@ -1119,7 +1119,7 @@ export function Step7() {
                   {svc.imageUrl ? (
                     <div className="flex items-center gap-3">
                       <p className="text-xs text-emerald-400 truncate max-w-[70%]">✓ {svc.imageName ?? 'Image uploaded'}</p>
-                      <button type="button" onClick={() => update({ pageServices: updItem(data.pageServices, idx, { imageUrl: '', imageName: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
+                      <button type="button" onClick={() => update({ pageServices: updItem(data.pageServices, idx, { imageUrl: '', imageName: '' }) })} className="text-xs text-slate-400 hover:text-red-400">Remove</button>
                     </div>
                   ) : (
                     <label className="flex items-center gap-3 cursor-pointer text-sm text-slate-400 border border-dashed border-slate-700 rounded-lg px-4 py-2.5 hover:border-indigo-500/60 transition-colors">
@@ -1158,7 +1158,7 @@ export function Step7() {
                   {item.imageUrl ? (
                     <div className="flex items-center gap-3">
                       <p className="text-xs text-emerald-400 truncate max-w-[70%]">✓ {item.imageName ?? 'Image uploaded'}</p>
-                      <button type="button" onClick={() => update({ pageGallery: updItem(data.pageGallery, idx, { imageUrl: '', imageName: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
+                      <button type="button" onClick={() => update({ pageGallery: updItem(data.pageGallery, idx, { imageUrl: '', imageName: '' }) })} className="text-xs text-slate-400 hover:text-red-400">Remove</button>
                     </div>
                   ) : (
                     <label className="flex items-center gap-3 cursor-pointer text-sm text-slate-400 border border-dashed border-slate-700 rounded-lg px-4 py-2.5 hover:border-indigo-500/60 transition-colors">
@@ -1202,7 +1202,7 @@ export function Step7() {
                   {member.imageUrl ? (
                     <div className="flex items-center gap-3">
                       <p className="text-xs text-emerald-400">✓ Photo uploaded</p>
-                      <button type="button" onClick={() => update({ pageTeam: updItem(data.pageTeam, idx, { imageUrl: '' }) })} className="text-xs text-slate-500 hover:text-red-400">Remove</button>
+                      <button type="button" onClick={() => update({ pageTeam: updItem(data.pageTeam, idx, { imageUrl: '' }) })} className="text-xs text-slate-400 hover:text-red-400">Remove</button>
                     </div>
                   ) : (
                     <label className="flex items-center gap-3 cursor-pointer text-sm text-slate-400 border border-dashed border-slate-700 rounded-lg px-4 py-2.5 hover:border-indigo-500/60 transition-colors">
@@ -1229,7 +1229,7 @@ export function Step7() {
         return (
           <PageCard>
             <SectionHeading>Blog / news</SectionHeading>
-            <p className="text-xs text-slate-500 -mt-2">Suggest topics you'd like to write about or have us create content for.</p>
+            <p className="text-xs text-slate-400 -mt-2">Suggest topics you'd like to write about or have us create content for.</p>
             {data.blogTopics.map((topic, idx) => (
               <div key={idx} className="flex gap-2">
                 <Input
@@ -1238,7 +1238,7 @@ export function Step7() {
                   placeholder={`e.g. Topic ${idx + 1}`}
                   className="flex-1"
                 />
-                <button type="button" onClick={() => update({ blogTopics: data.blogTopics.filter((_, i) => i !== idx) })} className="text-xs text-slate-600 hover:text-red-400 px-2 transition-colors">×</button>
+                <button type="button" onClick={() => update({ blogTopics: data.blogTopics.filter((_, i) => i !== idx) })} className="text-xs text-slate-400 hover:text-red-400 px-2 transition-colors">×</button>
               </div>
             ))}
             <AddButton label="Add a blog topic" onClick={() => update({ blogTopics: [...data.blogTopics, ''] })} />
@@ -1249,7 +1249,7 @@ export function Step7() {
         return (
           <PageCard>
             <SectionHeading>FAQ</SectionHeading>
-            <p className="text-xs text-slate-500 -mt-2">We can populate general FAQs for your industry, but real examples from your customers are always best.</p>
+            <p className="text-xs text-slate-400 -mt-2">We can populate general FAQs for your industry, but real examples from your customers are always best.</p>
             {data.faqItems.map((item, idx) => (
               <ItemCard key={idx} label={`FAQ ${idx + 1}`} onRemove={() => update({ faqItems: delItem(data.faqItems, idx) })}>
                 <Field label="Question">
@@ -1305,14 +1305,14 @@ export function Step7() {
             </Field>
             {data.contactFormFields.length > 0 && (
               <div className="flex flex-col gap-3">
-                <p className="text-xs text-slate-500">Additional fields:</p>
+                <p className="text-xs text-slate-400">Additional fields:</p>
                 {data.contactFormFields.map((field, idx) => (
                   <div key={idx} className="flex gap-2 items-start">
                     <div className="flex-1 grid grid-cols-2 gap-2">
                       <Input value={field.name} onChange={e => update({ contactFormFields: updItem(data.contactFormFields, idx, { name: e.target.value }) })} placeholder="Field name" />
                       <Input value={field.desc} onChange={e => update({ contactFormFields: updItem(data.contactFormFields, idx, { desc: e.target.value }) })} placeholder="Description / placeholder" />
                     </div>
-                    <button type="button" onClick={() => update({ contactFormFields: delItem(data.contactFormFields, idx) })} className="text-xs text-slate-600 hover:text-red-400 px-2 pt-2.5 transition-colors">×</button>
+                    <button type="button" onClick={() => update({ contactFormFields: delItem(data.contactFormFields, idx) })} className="text-xs text-slate-400 hover:text-red-400 px-2 pt-2.5 transition-colors">×</button>
                   </div>
                 ))}
               </div>
@@ -1421,10 +1421,10 @@ export function Step7() {
                 <button type="button" onClick={() => update({
                   existingCopyFiles: data.existingCopyFiles.filter((_, i) => i !== idx),
                   existingCopyUrls: data.existingCopyUrls.filter((_, i) => i !== idx),
-                })} className="text-xs text-slate-500 hover:text-red-400 ml-2">Remove</button>
+                })} className="text-xs text-slate-400 hover:text-red-400 ml-2">Remove</button>
               </div>
             ))}
-            <p className="text-xs text-slate-500">Or send us an email to <span className="text-indigo-400">contact@webf5.au</span></p>
+            <p className="text-xs text-slate-400">Or send us an email to <span className="text-indigo-400">contact@webf5.au</span></p>
           </div>
         )}
 
@@ -1457,7 +1457,7 @@ export function Step8() {
       <StepHeader step={currentStep} total={totalSteps} title="Features & functionality" description="Select everything you'd like your website to do. We'll scope it all out properly." />
       <div className="flex flex-col gap-5">
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-slate-500">E-commerce</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-slate-400">E-commerce</p>
           <AddOnRow checked={data.hasEcommerce} onChange={() => update({ hasEcommerce: !data.hasEcommerce })} name="Online shop" description="Sell products or services directly from your site" price="Included in selected plans" />
           {data.hasEcommerce && (
             <div className="mt-3 flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
@@ -1488,7 +1488,7 @@ export function Step8() {
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-slate-500">Bookings & scheduling</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-slate-400">Bookings & scheduling</p>
           <AddOnRow checked={data.hasBookings} onChange={() => update({ hasBookings: !data.hasBookings })} name="Online bookings" description="Let clients book appointments or services online" price="Included in selected plans" />
           {data.hasBookings && (
             <div className="mt-3 flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
@@ -1507,7 +1507,7 @@ export function Step8() {
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-slate-500">Other features</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-slate-400">Other features</p>
           <div className="flex flex-col gap-2">
             {FEATURE_OPTIONS.map(f => (
               <CheckRow key={f.value} checked={data.features.includes(f.value)} onChange={() => toggleArray('features', f.value)} label={f.label} />
@@ -1642,7 +1642,7 @@ function SummaryRow({ label, value }: SummaryRowProps) {
   if (!value) return null
   return (
     <div className="flex items-start justify-between gap-4 py-2 text-sm">
-      <span className="flex-shrink-0 text-slate-500">{label}</span>
+      <span className="flex-shrink-0 text-slate-400">{label}</span>
       <span className="text-right text-slate-200">{value}</span>
     </div>
   )
@@ -1812,7 +1812,7 @@ export function Step11() {
           {submitting ? 'Submitting…' : 'Submit my brief →'}
         </button>
 
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-xs text-slate-400">
           We'll review your brief within 1 business day and reach out with your personalised recommendation.
         </p>
       </div>

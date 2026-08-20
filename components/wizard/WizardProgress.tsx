@@ -23,8 +23,8 @@ export function WizardProgress() {
   return (
     <div className="mb-8">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs text-slate-500">{STEP_LABELS[currentStep - 1]}</span>
-        <span className="text-xs text-slate-500">{pct}% complete</span>
+        <span className="text-xs text-slate-400">{STEP_LABELS[currentStep - 1]}</span>
+        <span className="text-xs text-slate-400">{pct}% complete</span>
       </div>
       <div className="h-1 w-full overflow-hidden rounded-full bg-slate-800">
         <div

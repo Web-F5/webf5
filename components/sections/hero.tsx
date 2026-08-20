@@ -151,7 +151,7 @@ export function HeroSection() {
           <motion.div variants={itemVariants} className="mb-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
               <MapPin size={13} className="text-primary" />
-              <span className="text-xs font-medium text-primary tracking-wide">
+              <span className="text-xs font-medium text-indigo-300 tracking-wide">
                 Web design &amp; development · Central Victoria
               </span>
             </div>
@@ -171,7 +171,7 @@ export function HeroSection() {
           {/* Subheadline */}
           <motion.p
             variants={itemVariants}
-            className="text-base md:text-lg text-foreground/65 mb-3 max-w-lg leading-relaxed"
+            className="text-base md:text-lg text-foreground/80 mb-3 max-w-lg leading-relaxed"
           >
             <span className="font-bold text-white">Web F5</span> builds websites
             for trades, local businesses, and ecommerce brands across Victoria.
@@ -238,6 +238,7 @@ export function HeroSection() {
                     alt={client.name}
                     width={120}
                     height={48}
+                    sizes="120px"
                     className={`${client.logoClass} w-auto object-contain`}
                   />
                 </a>

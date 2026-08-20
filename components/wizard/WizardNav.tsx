@@ -36,7 +36,7 @@ export function WizardNav() {
           ← Back
         </button>
 
-        <span className="text-xs text-slate-600">
+        <span className="text-xs text-slate-400">
           {currentStep} / {totalSteps}
         </span>
 
