@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { ClerkProvider } from '@clerk/nextjs'
 import Script from 'next/script'
 import './globals.css'
 
@@ -63,7 +62,6 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
     <html lang="en" className="dark">
       <head>
         <Script
@@ -91,6 +89,5 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <Analytics />
       </body>
     </html>
-    </ClerkProvider>
   )
 }

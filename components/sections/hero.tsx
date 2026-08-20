@@ -75,13 +75,13 @@ export function HeroSection() {
     },
     {
       name: 'Appti',
-      logo: '/images/Appti-logo.png',
+      logo: '/images/Appti-logo.webp',
       url: 'https://appti.net',
       logoClass: 'h-8',
     },
     {
       name: 'Speechless Electrical',
-      logo: '/images/logo-speechless-electrical.jpg',
+      logo: '/images/logo-speechless-electrical.webp',
       url: 'https://speechlesselec.com',
       logoClass: 'h-10',
     },

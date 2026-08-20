@@ -5,25 +5,8 @@ const nextConfig = {
   basePath: '',
   assetPrefix: '',
 
-  trailingSlash: true,
-
-  async redirects() {
-    return [
-      {
-        source: '/sitemap.xml/',
-        destination: '/sitemap.xml',
-        permanent: true,
-      },
-      {
-        source: '/robots.txt/',
-        destination: '/robots.txt',
-        permanent: true,
-      },
-    ]
-  },
-
   images: {
-    unoptimized: true,
+    formats: ['image/webp'],
   },
 
   reactStrictMode: false,

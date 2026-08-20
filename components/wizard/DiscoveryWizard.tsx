@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { ClerkProvider } from '@clerk/nextjs'
 import { WizardProvider, useWizard } from './WizardContext'
 import { WizardProgress } from './WizardProgress'
 import { WizardNav } from './WizardNav'
@@ -62,10 +63,12 @@ function WizardInner() {
  */
 export function DiscoveryWizard() {
   return (
-    <WizardProvider>
-      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-sm sm:p-10">
-        <WizardInner />
-      </div>
-    </WizardProvider>
+    <ClerkProvider>
+      <WizardProvider>
+        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-sm sm:p-10">
+          <WizardInner />
+        </div>
+      </WizardProvider>
+    </ClerkProvider>
   )
 }
