@@ -117,7 +117,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const INACTIVITY_MS = 5 * 60 * 1000
 
-  // ── Init: get or create guest token, hydrate from resume ──────────────────
+  // ── Init: get or create guest token, hydrate from resume or saved draft ──────
   useEffect(() => {
     let token = localStorage.getItem('guestBriefToken') ?? ''
     if (!token) {
@@ -126,7 +126,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     }
     setGuestToken(token)
 
-    // Resume: if resume page stored data, hydrate the wizard
+    // Guest resume via email link — takes priority
     const resumeRaw = localStorage.getItem('resumeBriefData')
     if (resumeRaw) {
       try {
@@ -135,8 +135,22 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         setCurrentStep(resumeStep ?? 1)
       } catch { /* ignore */ }
       localStorage.removeItem('resumeBriefData')
+      return
     }
-  }, [])
+
+    // Signed-in user returning: fetch their saved draft from the DB
+    if (userId) {
+      fetch('/api/brief/save')
+        .then(res => res.ok ? res.json() : null)
+        .then(json => {
+          if (json?.draft) {
+            setData(prev => ({ ...prev, ...json.draft.data }))
+            setCurrentStep(json.draft.currentStep ?? 1)
+          }
+        })
+        .catch(() => {})
+    }
+  }, [userId])
 
   const resetInactivityTimer = useCallback((step: number, currentData: WizardData, token: string) => {
     if (inactivityTimer.current) clearTimeout(inactivityTimer.current)

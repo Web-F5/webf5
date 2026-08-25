@@ -137,18 +137,31 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// ── GET: retrieve a draft by guest token (for resume page) ────────────────────
+// ── GET: retrieve a draft by userId (signed-in) or guestToken (guest resume) ──
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')
-  if (!token) return NextResponse.json({ error: 'token required' }, { status: 400 })
 
+  // Signed-in: fetch their most recent in-progress draft
+  if (!token) {
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: 'token required' }, { status: 400 })
+
+    const draft = await db.query.briefDrafts.findFirst({
+      where: and(eq(briefDrafts.userId, userId), eq(briefDrafts.status, 'in_progress')),
+      orderBy: (t, { desc }) => [desc(t.updatedAt)],
+    })
+
+    if (!draft) return NextResponse.json({ error: 'not_found' }, { status: 404 })
+    return NextResponse.json({ draft })
+  }
+
+  // Guest: fetch by token (used by /brief/resume/[token] page)
   const draft = await db.query.briefDrafts.findFirst({
     where: eq(briefDrafts.guestToken, token),
   })
 
   if (!draft) return NextResponse.json({ error: 'not_found' }, { status: 404 })
 
-  // Check expiry
   if (draft.expiresAt && draft.expiresAt < new Date()) {
     return NextResponse.json({ error: 'expired' }, { status: 410 })
   }
