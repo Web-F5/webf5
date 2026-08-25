@@ -104,7 +104,8 @@ async function autosave(opts: {
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 export function WizardProvider({ children }: { children: ReactNode }) {
-  const { userId } = useAuth()
+  const { userId, isLoaded } = useAuth()
+  const hydratedRef = useRef(false)
   const [data, setData]               = useState<WizardData>(defaultWizardData)
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -117,7 +118,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const INACTIVITY_MS = 5 * 60 * 1000
 
-  // ── Init: get or create guest token, hydrate from resume or saved draft ──────
+  // ── Init: guest token + one-time hydration from resume or saved draft ─────────
   useEffect(() => {
     let token = localStorage.getItem('guestBriefToken') ?? ''
     if (!token) {
@@ -126,7 +127,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     }
     setGuestToken(token)
 
-    // Guest resume via email link — takes priority
+    // Guest resume via email link — takes priority, runs immediately
     const resumeRaw = localStorage.getItem('resumeBriefData')
     if (resumeRaw) {
       try {
@@ -135,22 +136,28 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         setCurrentStep(resumeStep ?? 1)
       } catch { /* ignore */ }
       localStorage.removeItem('resumeBriefData')
-      return
+      hydratedRef.current = true
     }
+  }, [])
 
-    // Signed-in user returning: fetch their saved draft from the DB
-    if (userId) {
-      fetch('/api/brief/save')
-        .then(res => res.ok ? res.json() : null)
-        .then(json => {
-          if (json?.draft) {
-            setData(prev => ({ ...prev, ...json.draft.data }))
-            setCurrentStep(json.draft.currentStep ?? 1)
-          }
-        })
-        .catch(() => {})
-    }
-  }, [userId])
+  // Signed-in user: fetch saved draft once when Clerk finishes loading
+  useEffect(() => {
+    if (!isLoaded) return              // Clerk still initialising
+    if (hydratedRef.current) return    // already hydrated from resume link
+    hydratedRef.current = true         // only fetch once, even if userId changes
+
+    if (!userId) return                // guest — nothing to fetch
+
+    fetch('/api/brief/save')
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        if (json?.draft) {
+          setData(prev => ({ ...prev, ...json.draft.data }))
+          setCurrentStep(json.draft.currentStep ?? 1)
+        }
+      })
+      .catch(() => {})
+  }, [isLoaded, userId])
 
   const resetInactivityTimer = useCallback((step: number, currentData: WizardData, token: string) => {
     if (inactivityTimer.current) clearTimeout(inactivityTimer.current)

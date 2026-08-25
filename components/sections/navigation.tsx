@@ -5,11 +5,18 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
+
+const BriefAuthButton = dynamic(
+  () => import('@/components/BriefAuthButton').then(m => m.BriefAuthButton),
+  { ssr: false }
+)
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const isHome = pathname === '/'
+  const isBrief = pathname === '/brief'
 
   const anchor = (hash: string) => (isHome ? hash : `/${hash}`)
 
@@ -31,7 +38,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
         <motion.a
-          href="#"
+          href="/"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
@@ -56,16 +63,24 @@ export function Navigation() {
           ))}
         </div>
 
-        {/* CTA Button Desktop */}
-        <motion.a
-          href="/brief"
+        {/* CTA / Auth Button Desktop */}
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="hidden md:block px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all"
+          className="hidden md:block"
         >
-          Get Started
-        </motion.a>
+          {isBrief ? (
+            <BriefAuthButton />
+          ) : (
+            <a
+              href="/brief"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all"
+            >
+              Get Started
+            </a>
+          )}
+        </motion.div>
 
         {/* Mobile Menu Button */}
         <button
