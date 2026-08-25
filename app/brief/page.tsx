@@ -1,6 +1,7 @@
 import { Navigation } from '@/components/sections/navigation'
 import { Footer } from '@/components/sections/footer'
 import { DiscoveryWizard } from '@/components/wizard'
+import { BriefAuthButton } from '@/components/BriefAuthButton'
 
 export const metadata = {
   title: 'Start Your Brief — Web F5',
@@ -19,9 +20,12 @@ export default function BriefPage() {
           <h1 className="text-4xl font-semibold text-white mb-4">
             Skip the back-and-forth. Tell us what you need.
           </h1>
-          <p className="text-slate-400 max-w-xl mx-auto">
+          <p className="text-slate-400 max-w-xl mx-auto mb-6">
             Most agencies start with a phone call, then a long email chain, then a proposal you didn't quite ask for. Our discovery process asks the right questions upfront — so we can come back to you with a clear plan and a real fixed-price quote. No fluff, no vague timelines. Takes about 20 minutes.
           </p>
+          <div className="flex justify-center">
+            <BriefAuthButton />
+          </div>
         </div>
         <DiscoveryWizard />
       </section>
