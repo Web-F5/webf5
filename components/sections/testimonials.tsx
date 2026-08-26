@@ -94,7 +94,7 @@ export function TestimonialsSection() {
     <section className="py-24 px-4 relative overflow-hidden">
 
       {/* Ambient glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div
           animate={{ opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 9, repeat: Infinity }}
@@ -135,7 +135,7 @@ export function TestimonialsSection() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Card */}
-          <div className="overflow-hidden rounded-xl border border-border bg-card/50 px-8 py-10 md:px-14 md:py-12 min-h-[280px] flex items-center">
+          <div className="overflow-hidden rounded-xl border border-border bg-card px-8 py-10 md:px-14 md:py-12 min-h-[280px] flex items-center">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={current}
@@ -160,8 +160,8 @@ export function TestimonialsSection() {
 
                 {/* Author */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-primary">
+                  <div className="w-10 h-10 rounded-full bg-indigo-700 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-white">
                       {initials}
                     </span>
                   </div>
@@ -204,6 +204,7 @@ export function TestimonialsSection() {
               key={i}
               onClick={() => goTo(i, i > current ? 1 : -1)}
               aria-label={`Go to review ${i + 1}`}
+              className="flex items-center justify-center w-11 h-11"
             >
               <span
                 className={`block rounded-full transition-all duration-300 ${

@@ -75,7 +75,7 @@ export function Navigation() {
           ) : (
             <a
               href="/brief"
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all"
+              className="px-6 py-2 bg-indigo-700 text-white rounded-full text-sm font-semibold hover:bg-indigo-600 hover:shadow-lg hover:shadow-primary/50 transition-all"
             >
               Get Started
             </a>

@@ -124,7 +124,7 @@ export function HeroSection() {
     <section className="min-h-screen flex items-center justify-center pt-20 px-4 relative overflow-hidden">
 
       {/* Ambient glows */}
-      <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none" aria-hidden="true">
         <motion.div
           animate={{ opacity: [0.15, 0.3, 0.15] }}
           transition={{ duration: 8, repeat: Infinity }}
@@ -192,7 +192,7 @@ export function HeroSection() {
           >
             <a
               href="/brief"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold text-sm hover:shadow-lg hover:shadow-primary/40 transition-all"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-indigo-700 text-white rounded-full font-semibold text-sm hover:bg-indigo-600 hover:shadow-lg hover:shadow-primary/40 transition-all"
             >
               Tell us about your project
               <ArrowRight size={16} />
@@ -207,7 +207,7 @@ export function HeroSection() {
 
           {/* Trust signals */}
           <motion.div variants={itemVariants} className="mb-10">
-            <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-foreground/45">
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-foreground/70">
               {['No lock-in contracts', 'Fixed-price quotes', 'Real people, real builds'].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <span className="w-1 h-1 rounded-full bg-primary/50 inline-block" />
