@@ -40,13 +40,10 @@ export default async function AdminBriefsPage() {
             <p className="text-slate-400 text-sm mt-1">Most recent activity first · last 200 rows</p>
           </div>
           <a
-            href="/api/admin/auth"
+            href="/api/admin/logout"
             className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
-            onClick={(e) => {
-              // handled client-side logout would need a client component — link is enough hint
-            }}
           >
-            {/* logout handled by clearing cookie */}
+            Sign out
           </a>
         </div>
 
