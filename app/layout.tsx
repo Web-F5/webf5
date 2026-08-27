@@ -8,20 +8,25 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Web F5 - Brief to Execution in Minutes',
-  description: 'Transform your brief into a fully executed web presence with AI-powered guidance.',
-  generator: 'v0.app',
+  title: {
+    default: 'Web Design & Development Central Victoria | Web F5',
+    template: '%s | Web F5',
+  },
+  description:
+    'Web F5 builds websites for trades, local businesses, and ecommerce brands across Central Victoria. Fixed-price quotes, no lock-in contracts.',
+  metadataBase: new URL('https://www.webf5.com.au'),
   openGraph: {
-    title: 'Web F5 - Brief to Execution in Minutes',
-    description: 'Transform your brief into a fully executed web presence with AI-powered guidance.',
-    url: 'https://webf5.com.au',
+    title: 'Web Design & Development Central Victoria | Web F5',
+    description:
+      'Web F5 builds websites for trades, local businesses, and ecommerce brands across Central Victoria. Fixed-price quotes, no lock-in contracts.',
+    url: 'https://www.webf5.com.au',
     siteName: 'Web F5',
     images: [
       {
         url: '/images/Web-F5-brief-to-execution-in-minutes.webp',
         width: 1200,
         height: 630,
-        alt: 'Web F5 - Brief to Execution in Minutes',
+        alt: 'Web F5 — Web Design & Development Central Victoria',
       },
     ],
     locale: 'en_AU',
@@ -29,8 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Web F5 - Brief to Execution in Minutes',
-    description: 'Transform your brief into a fully executed web presence with AI-powered guidance.',
+    title: 'Web Design & Development Central Victoria | Web F5',
+    description:
+      'Web F5 builds websites for trades, local businesses, and ecommerce brands across Central Victoria. Fixed-price quotes, no lock-in contracts.',
     images: ['/images/Web-F5-brief-to-execution-in-minutes.webp'],
   },
   icons: {
