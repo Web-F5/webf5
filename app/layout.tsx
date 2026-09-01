@@ -41,22 +41,9 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      {
-        url: '/favicon.ico',
-        type: 'image/x-icon',
-      },
-      {
-        url: '/favicon-96x96.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/web-app-manifest-192x192.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/favicon.svg',
-        type: 'image/svg+xml',
-      }
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
     ],
     apple: '/apple-touch-icon.png',
   },
