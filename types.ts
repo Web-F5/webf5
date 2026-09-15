@@ -164,6 +164,13 @@ export interface WizardData {
   internalContactEmail: string
   internalContactPhone: string
   extraNotes: string
+
+  // Third-party disclosure (Step 11, shown conditionally for ecommerce/payment builds)
+  thirdPartyDisclosureAcknowledged: boolean
+  thirdPartyDisclosureAcknowledgedAt: string // ISO timestamp
+
+  // Tier inference — computed on submit, not shown to client
+  inferredTier: 'Starter' | 'Professional' | 'Shopify Hydrogen' | ''
 }
 
 export const defaultWizardData: WizardData = {
@@ -270,6 +277,9 @@ export const defaultWizardData: WizardData = {
   internalContactEmail: '',
   internalContactPhone: '',
   extraNotes: '',
+  thirdPartyDisclosureAcknowledged: false,
+  thirdPartyDisclosureAcknowledgedAt: '',
+  inferredTier: '',
 }
 
 export interface AddOn {

@@ -69,6 +69,7 @@ export default async function AdminBriefsPage() {
                 <th className="px-4 py-3 text-left">Last active</th>
                 <th className="px-4 py-3 text-left">Created</th>
                 <th className="px-4 py-3 text-left">Type</th>
+                <th className="px-4 py-3 text-left">Tier</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -89,7 +90,7 @@ export default async function AdminBriefsPage() {
               ))}
               {drafts.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
+                  <td colSpan={10} className="px-4 py-10 text-center text-slate-500">
                     No drafts yet.
                   </td>
                 </tr>

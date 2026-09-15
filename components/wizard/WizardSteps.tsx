@@ -1634,6 +1634,35 @@ export function Step10() {
   )
 }
 
+// ── Tier inference & disclosure helpers ───────────────────────────────────
+
+const DISCLOSURE_TEXT =
+  'This kind of build usually needs its own Shopify subscription (roughly $56–$575/month depending on your store\'s size) plus payment processing fees (around 1.75% + 30c per transaction). These are billed directly to you by Shopify, not by Web F5, and aren\'t included in our monthly fee.'
+
+function needsDisclosure(data: WizardData): boolean {
+  return data.hasEcommerce || (data.hasBookings && !!data.bookingPayment)
+}
+
+function inferTier(data: WizardData): 'Starter' | 'Professional' | 'Shopify Hydrogen' | '' {
+  if (!data.startType) return ''
+
+  if (data.hasEcommerce) {
+    const count = (data.productCount ?? '').replace(/,/g, '').toLowerCase()
+    const num = parseInt(count)
+    const isLargeStore =
+      count.includes('500') || count.includes('1000') || (!isNaN(num) && num >= 200)
+    const isHighBudget = ['$10,000 – $25,000', '$25,000+'].includes(data.budget)
+    if (isLargeStore || isHighBudget) return 'Shopify Hydrogen'
+    return 'Professional'
+  }
+
+  const hasBlog = data.pages.includes('blog')
+  const manyPages = data.pages.length >= 5
+  if (hasBlog || manyPages) return 'Professional'
+
+  return 'Starter'
+}
+
 // ── Step 11: Summary & submit ──────────────────────────────────────────────
 
 interface SummaryRowProps { label: string; value: string }
@@ -1660,10 +1689,12 @@ function SummarySection({ title, children }: SummarySectionProps) {
 }
 
 export function Step11() {
-  const { data, currentStep, totalSteps, setIsSubmitted } = useWizard()
+  const { data, update, currentStep, totalSteps, setIsSubmitted } = useWizard()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const selectedAddOns = ADD_ONS.filter(a => data.addOns.includes(a.id))
+  const showDisclosure = needsDisclosure(data)
+  const disclosureBlocking = showDisclosure && !data.thirdPartyDisclosureAcknowledged
 
   const getMissingFields = () => {
     const missing: string[] = []
@@ -1682,13 +1713,26 @@ export function Step11() {
     setSubmitting(true)
     try {
       const guestToken = typeof window !== 'undefined' ? (localStorage.getItem('guestBriefToken') ?? '') : ''
+      const tier = inferTier(data)
+      const payload = {
+        ...data,
+        inferredTier: tier,
+        ...(showDisclosure ? {
+          thirdPartyDisclosureText: DISCLOSURE_TEXT,
+          thirdPartyDisclosureTriggers: {
+            hasEcommerce: data.hasEcommerce,
+            hasBookings: data.hasBookings,
+            bookingPayment: data.bookingPayment,
+          },
+        } : {}),
+      }
       const res = await fetch('/api/brief', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(guestToken ? { 'x-guest-token': guestToken } : {}),
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         // Push conversion event to GTM dataLayer
@@ -1798,6 +1842,28 @@ export function Step11() {
           <SummaryRow label="Notes"       value={data.extraNotes} />
         </SummarySection>
 
+        {/* Third-party cost disclosure — shown only when ecommerce/payments indicated */}
+        {showDisclosure && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/8 px-5 py-4 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">Third-party costs — please read</p>
+            <p className="text-sm text-slate-300 leading-relaxed">{DISCLOSURE_TEXT}</p>
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={data.thirdPartyDisclosureAcknowledged}
+                onChange={e => update({
+                  thirdPartyDisclosureAcknowledged: e.target.checked,
+                  thirdPartyDisclosureAcknowledgedAt: e.target.checked ? new Date().toISOString() : '',
+                })}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900"
+              />
+              <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
+                I understand this build may need separate third-party subscriptions as described above.
+              </span>
+            </label>
+          </div>
+        )}
+
         {error && (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3">
             <p className="text-sm text-red-300">{error}</p>
@@ -1806,7 +1872,8 @@ export function Step11() {
 
         <button
           onClick={handleSubmit}
-          disabled={submitting}
+          disabled={submitting || disclosureBlocking}
+          title={disclosureBlocking ? 'Please acknowledge the third-party cost disclosure above' : undefined}
           className="mt-2 w-full rounded-xl bg-indigo-600 px-6 py-4 text-base font-semibold text-white transition-all duration-150 hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? 'Submitting…' : 'Submit my brief →'}

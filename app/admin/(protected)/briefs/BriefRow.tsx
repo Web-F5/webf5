@@ -282,6 +282,19 @@ export function BriefRow({ draft, timeAgo, createdLabel }: BriefRowProps) {
             {isGuest ? 'Guest' : 'Account'}
           </span>
         </td>
+        <td className="px-4 py-3">
+          {scalar(d.inferredTier) !== '—' && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              d.inferredTier === 'Shopify Hydrogen'
+                ? 'bg-purple-500/15 text-purple-400'
+                : d.inferredTier === 'Professional'
+                ? 'bg-indigo-500/15 text-indigo-400'
+                : 'bg-slate-700 text-slate-300'
+            }`}>
+              {scalar(d.inferredTier)}
+            </span>
+          )}
+        </td>
         <td className="px-4 py-3 text-slate-500">
           {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </td>
@@ -290,7 +303,7 @@ export function BriefRow({ draft, timeAgo, createdLabel }: BriefRowProps) {
       {/* Expanded detail panel */}
       {open && (
         <tr className="bg-[#0a0f1c]">
-          <td colSpan={9} className="px-6 py-5">
+          <td colSpan={10} className="px-6 py-5">
 
             {/* Actions */}
             <div className="flex items-center gap-3 mb-6">
