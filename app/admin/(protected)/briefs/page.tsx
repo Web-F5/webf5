@@ -27,18 +27,13 @@ export default async function AdminBriefsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0F1E] text-white px-4 py-10">
+    <div className="text-white px-4 py-10">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Brief drafts</h1>
-            <p className="text-slate-400 text-sm mt-1">Click any row to expand · most recent first · last 200</p>
-          </div>
-          <a href="/api/admin/logout" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-            Sign out
-          </a>
+        <div>
+          <h1 className="text-2xl font-bold">Brief drafts</h1>
+          <p className="text-slate-400 text-sm mt-1">Click any row to expand · most recent first · last 200</p>
         </div>
 
         {/* Stats */}
