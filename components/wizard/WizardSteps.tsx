@@ -8,7 +8,7 @@ import {
   ColourSwatch, PalettePreview, FontSelector, lightenHex,
 } from './WizardUI'
 import { ADD_ONS, SOCIAL_OPTIONS, PAGE_OPTIONS, FEATURE_OPTIONS } from '../../types'
-import type { PageService, GalleryItem, TeamMember, FaqItem, Testimonial, ContactField } from '../../types'
+import type { WizardData, PageService, GalleryItem, TeamMember, FaqItem, Testimonial, ContactField } from '../../types'
 import { useState, useRef } from 'react'
 import { SignInButton, SignUpButton, useAuth } from '@clerk/nextjs'
 
