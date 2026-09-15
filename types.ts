@@ -53,6 +53,7 @@ export interface WizardData {
   domainStatus: 'have' | 'new' | 'unsure' | ''
   domainName: string
   domainRegistrar: string
+  domainManagement: 'transfer' | 'self' | ''
   domainIdeas: string
   domainExtension: string
 
@@ -182,6 +183,7 @@ export const defaultWizardData: WizardData = {
   domainStatus: '',
   domainName: '',
   domainRegistrar: '',
+  domainManagement: '',
   domainIdeas: '',
   domainExtension: '.com',
   contactName: '',

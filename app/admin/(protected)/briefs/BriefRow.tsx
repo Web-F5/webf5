@@ -100,11 +100,12 @@ function formatAsText(draft: BriefRowProps['draft']): string {
   lines.push('')
 
   lines.push('── STEP 2: DOMAIN ───────────────────')
-  add('Domain status',  d.domainStatus)
-  add('Domain name',    d.domainName)
-  add('Registrar',      d.domainRegistrar)
-  add('Domain ideas',   d.domainIdeas)
-  add('Extension',      d.domainExtension)
+  add('Domain status',     d.domainStatus)
+  add('Domain name',       d.domainName)
+  add('Registrar',         d.domainRegistrar)
+  add('Domain management', d.domainManagement)
+  add('Domain ideas',      d.domainIdeas)
+  add('Extension',         d.domainExtension)
   lines.push('')
 
   lines.push('── STEP 3: BUSINESS INFO ────────────')
@@ -337,6 +338,7 @@ export function BriefRow({ draft, timeAgo, createdLabel }: BriefRowProps) {
                 <Row label="Domain status"        value={d.domainStatus} />
                 <Row label="Domain name"          value={d.domainName} />
                 <Row label="Registrar"            value={d.domainRegistrar} />
+                <Row label="Domain management"    value={d.domainManagement} />
                 <Row label="Domain ideas"         value={d.domainIdeas} />
                 <Row label="Extension"            value={d.domainExtension} />
               </Section>

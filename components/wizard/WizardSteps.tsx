@@ -192,6 +192,24 @@ export function Step2() {
             <Field label="Domain registrar" hint="(where it's registered)">
               <Input value={data.domainRegistrar} onChange={e => update({ domainRegistrar: e.target.value })} placeholder="GoDaddy, Namecheap, Crazy Domains…" />
             </Field>
+            <Field label="Domain management" hint="Would you like us to manage your domain as part of your plan, or keep it with your current registrar?">
+              <div className="flex flex-col gap-2">
+                <OptionCard
+                  selected={data.domainManagement === 'transfer'}
+                  onClick={() => update({ domainManagement: 'transfer' })}
+                  icon="→"
+                  title="Transfer to Web F5 management"
+                  subtitle="We'll handle renewals, DNS, and SSL — included in your monthly plan"
+                />
+                <OptionCard
+                  selected={data.domainManagement === 'self'}
+                  onClick={() => update({ domainManagement: 'self' })}
+                  icon="☑"
+                  title="Keep it with my current registrar"
+                  subtitle="You manage renewals — we'll guide you on DNS settings when needed"
+                />
+              </div>
+            </Field>
           </div>
         </>
       )}
