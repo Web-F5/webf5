@@ -602,7 +602,7 @@ function buildEmailHtml(touch: Touch): string {
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td style="vertical-align:middle;">
         <a href="https://webf5.com.au" style="font-size:20px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;font-family:Arial,Helvetica,sans-serif;text-decoration:none;">Web F5</a>
-        <span style="font-size:10px;color:#F5A623;text-transform:uppercase;letter-spacing:1.5px;margin-left:10px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">Professional Web Development Agency</span>
+        <span style="font-size:10px;color:#F5A623;text-transform:uppercase;letter-spacing:1.5px;margin-left:10px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">Professional Web Development Services</span>
       </td>
       <td align="right" style="vertical-align:middle;">
         <a href="https://webf5.com.au"><img src="https://webf5.com.au/apple-touch-icon.png" width="48" height="48" alt="Web F5" style="border-radius:50%;display:block;border:0;"></a>
@@ -628,7 +628,7 @@ function buildEmailHtml(touch: Touch): string {
         <td style="padding-right:16px;border-right:3px solid #6366F1;vertical-align:top;white-space:nowrap;">
           <a href="https://webf5.com.au" style="font-size:19px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;line-height:1.2;font-family:Arial,Helvetica,sans-serif;text-decoration:none;display:block;">Web F5</a>
           <div style="font-size:9px;color:#F5A623;text-transform:uppercase;letter-spacing:1.2px;margin-top:5px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Professional<br>Web Development<br>Agency</div>
-          <a href="https://webf5.com.au"><img src="https://webf5.com.au/images/Web-F5-logo-bw.png" width="44" height="44" alt="Web F5" style="display:block;margin-top:10px;border:0;border-radius:50%;"></a>
+          <a href="https://webf5.com.au"><img src="https://webf5.com.au/images/Web-F5-logo-bw.png" width="48" height="48" alt="Web F5" style="display:block;margin-top:10px;border:0;border-radius:50%;"></a>
         </td>
         <td style="padding-left:16px;vertical-align:top;">
           <div style="font-size:14px;font-weight:700;color:#111827;font-family:Arial,Helvetica,sans-serif;">Josh Ekberg</div>
@@ -637,7 +637,7 @@ function buildEmailHtml(touch: Touch): string {
             <a href="tel:0419510206" style="color:#4B5563;text-decoration:none;">0419 510 206</a><br>
             <a href="mailto:contact@webf5.au" style="color:#6366F1;text-decoration:none;">contact@webf5.au</a><br>
             <a href="https://webf5.com.au" style="color:#6366F1;text-decoration:none;">webf5.com.au</a><br>
-            <a href="https://linkedin.com/in/joshua-ekberg-b148a094" style="color:#6366F1;text-decoration:none;">linkedin.com/in/joshua-ekberg-b148a094</a><br>
+            <a href="https://linkedin.com/in/joshua-ekberg-b148a094" style="color:#6366F1;text-decoration:none;">LinkedIn</a><br>
             <span style="color:#6B7280;">Belmont, VIC, Australia</span>
           </div>
         </td>
