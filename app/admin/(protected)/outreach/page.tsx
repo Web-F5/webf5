@@ -580,6 +580,26 @@ export default function OutreachPage() {
     })
   }
 
+  function globeLogoSrc(): string {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <defs><clipPath id="gc"><circle cx="256" cy="256" r="236"/></clipPath></defs>
+      <circle cx="256" cy="256" r="248" fill="white"/>
+      <g clip-path="url(#gc)" fill="none" stroke="black" stroke-width="18">
+        <line x1="0" y1="256" x2="512" y2="256"/>
+        <path d="M 20 160 Q 256 198 492 160"/>
+        <path d="M 20 352 Q 256 314 492 352"/>
+        <line x1="256" y1="8" x2="256" y2="504"/>
+        <path d="M 256 8 Q 138 256 256 504"/>
+        <path d="M 256 8 Q 374 256 256 504"/>
+        <path d="M 256 8 Q 46 256 256 504"/>
+        <path d="M 256 8 Q 466 256 256 504"/>
+      </g>
+      <circle cx="256" cy="256" r="236" fill="none" stroke="black" stroke-width="20"/>
+      <text x="256" y="300" text-anchor="middle" font-size="172" font-weight="bold" font-family="Arial,Helvetica,sans-serif" fill="black">F5</text>
+    </svg>`
+    return `data:image/svg+xml;base64,${btoa(svg)}`
+  }
+
   function buildEmailHtml(touch: Touch): string {
     const bodyHtml = touch.body
       .split('\n')
@@ -628,7 +648,7 @@ export default function OutreachPage() {
         <td style="padding-right:16px;border-right:3px solid #6366F1;vertical-align:top;white-space:nowrap;">
           <a href="https://webf5.com.au" style="font-size:19px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;line-height:1.2;font-family:Arial,Helvetica,sans-serif;text-decoration:none;display:block;">Web F5</a>
           <div style="font-size:9px;color:#F5A623;text-transform:uppercase;letter-spacing:1.2px;margin-top:5px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Professional<br>Web Development<br>Agency</div>
-          <a href="https://webf5.com.au"><img src="https://webf5.com.au/apple-touch-icon.png" width="40" height="40" alt="Web F5" style="border-radius:50%;display:block;margin-top:10px;border:0;"></a>
+          <a href="https://webf5.com.au"><img src="${globeLogoSrc()}" width="44" height="44" alt="Web F5" style="display:block;margin-top:10px;border:0;border-radius:50%;"></a>
         </td>
         <td style="padding-left:16px;vertical-align:top;">
           <div style="font-size:14px;font-weight:700;color:#111827;font-family:Arial,Helvetica,sans-serif;">Josh Ekberg</div>
