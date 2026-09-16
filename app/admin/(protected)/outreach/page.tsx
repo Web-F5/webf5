@@ -605,7 +605,7 @@ function buildEmailHtml(touch: Touch): string {
         <span style="font-size:10px;color:#F5A623;text-transform:uppercase;letter-spacing:1.5px;margin-left:10px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">Professional Web Development Services</span>
       </td>
       <td align="right" style="vertical-align:middle;">
-        <a href="https://webf5.com.au"><img src="https://webf5.com.au/apple-touch-icon.png" width="48" height="48" alt="Web F5" style="border-radius:50%;display:block;border:0;"></a>
+        <a href="https://webf5.com.au"><img src="https://webf5.com.au/apple-touch-icon.png" width="50" height="50" alt="Web F5" style="border-radius:50%;display:block;border:0;"></a>
       </td>
     </tr></table>
   </td></tr>
@@ -627,8 +627,8 @@ function buildEmailHtml(touch: Touch): string {
       <tr>
         <td style="padding-right:16px;border-right:3px solid #6366F1;vertical-align:top;white-space:nowrap;">
           <a href="https://webf5.com.au" style="font-size:19px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;line-height:1.2;font-family:Arial,Helvetica,sans-serif;text-decoration:none;display:block;">Web F5</a>
-          <div style="font-size:9px;color:#F5A623;text-transform:uppercase;letter-spacing:1.2px;margin-top:5px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Professional<br>Web Development<br>Agency</div>
-          <a href="https://webf5.com.au"><img src="https://webf5.com.au/images/Web-F5-logo-bw.png" width="48" height="48" alt="Web F5" style="display:block;margin-top:10px;border:0;border-radius:50%;"></a>
+          <div style="font-size:9px;color:#F5A623;text-transform:uppercase;letter-spacing:1.2px;margin-top:5px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Professional<br>Web Development<br>Services</div>
+          <a href="https://webf5.com.au"><img src="https://webf5.com.au/images/Web-F5-logo-bw.png" width="38" height="38" alt="Web F5" style="display:block;margin-top:10px;border:0;border-radius:50%;"></a>
         </td>
         <td style="padding-left:16px;vertical-align:top;">
           <div style="font-size:14px;font-weight:700;color:#111827;font-family:Arial,Helvetica,sans-serif;">Josh Ekberg</div>
