@@ -570,12 +570,90 @@ export default function OutreachPage() {
   const [activeSeq, setActiveSeq] = useState(0)
   const [rulesOpen, setRulesOpen] = useState(true)
   const [copied, setCopied] = useState<string | null>(null)
+  const [copiedHtml, setCopiedHtml] = useState<string | null>(null)
   const seq = SEQUENCES[activeSeq]
 
   function copyTouch(text: string, id: string) {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(id)
       setTimeout(() => setCopied(null), 2000)
+    })
+  }
+
+  function buildEmailHtml(touch: Touch): string {
+    const bodyHtml = touch.body
+      .split('\n')
+      .map(line => line.trim() === ''
+        ? '<tr><td style="height:14px;"></td></tr>'
+        : `<tr><td style="font-size:15px;line-height:1.6;color:#1F2937;font-family:Arial,Helvetica,sans-serif;">${line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td></tr>`
+      )
+      .join('\n')
+
+    return `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+  <!-- Header -->
+  <tr><td style="background:#0A0F1E;border-radius:10px 10px 0 0;padding:22px 32px;">
+    <span style="font-size:20px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;font-family:Arial,Helvetica,sans-serif;">Web F5</span>
+    <span style="font-size:10px;color:#F5A623;text-transform:uppercase;letter-spacing:1.5px;margin-left:10px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">Professional Web Development Agency</span>
+  </td></tr>
+  <tr><td style="background:#6366F1;height:2px;"></td></tr>
+
+  <!-- Body -->
+  <tr><td style="padding:32px 32px 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      ${bodyHtml}
+    </table>
+  </td></tr>
+
+  <!-- Signature divider -->
+  <tr><td style="padding:0 32px;"><hr style="border:none;border-top:1px solid #e5e7eb;margin:0;"></td></tr>
+
+  <!-- Signature -->
+  <tr><td style="padding:20px 32px 24px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td style="padding-right:16px;border-right:3px solid #6366F1;vertical-align:top;white-space:nowrap;">
+          <div style="font-size:19px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;line-height:1.2;font-family:Arial,Helvetica,sans-serif;">Web F5</div>
+          <div style="font-size:9px;color:#F5A623;text-transform:uppercase;letter-spacing:1.2px;margin-top:5px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Professional<br>Web Development<br>Agency</div>
+        </td>
+        <td style="padding-left:16px;vertical-align:top;">
+          <div style="font-size:14px;font-weight:700;color:#111827;font-family:Arial,Helvetica,sans-serif;">Josh Ekberg</div>
+          <div style="font-size:12px;color:#6366F1;margin-bottom:6px;font-family:Arial,Helvetica,sans-serif;">Account Executive</div>
+          <div style="font-size:12px;color:#4B5563;line-height:1.8;font-family:Arial,Helvetica,sans-serif;">
+            <a href="tel:0419510206" style="color:#4B5563;text-decoration:none;">0419 510 206</a><br>
+            <a href="mailto:contact@webf5.au" style="color:#6366F1;text-decoration:none;">contact@webf5.au</a><br>
+            <a href="https://webf5.com.au" style="color:#6366F1;text-decoration:none;">webf5.com.au</a><br>
+            <a href="https://linkedin.com/in/joshua-ekberg-b148a094" style="color:#6366F1;text-decoration:none;">linkedin.com/in/joshua-ekberg-b148a094</a><br>
+            <span style="color:#6B7280;">Belmont, VIC, Australia</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#f9fafb;border-radius:0 0 10px 10px;padding:14px 32px;border-top:1px solid #e5e7eb;">
+    <p style="font-size:11px;color:#9CA3AF;margin:0;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Web F5 &#183; Belmont VIC 3216 &#183; ABN&#160;23&#160;626&#160;640&#160;650<br>
+    You're receiving this because we think we could help your business. <a href="#" style="color:#9CA3AF;">Unsubscribe</a></p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`
+  }
+
+  function copyHtmlTouch(touch: Touch, id: string) {
+    navigator.clipboard.writeText(buildEmailHtml(touch)).then(() => {
+      setCopiedHtml(id)
+      setTimeout(() => setCopiedHtml(null), 2000)
     })
   }
 
@@ -698,16 +776,30 @@ export default function OutreachPage() {
                       </span>
                       <span className="text-sm font-medium text-white">{touch.type}</span>
                     </div>
-                    <button
-                      onClick={() => copyTouch(touch.body, touchId)}
-                      className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors ${
-                        isCopied
-                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
-                      }`}
-                    >
-                      {isCopied ? '✓ Copied' : 'Copy'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {touch.channel === 'email' && (
+                        <button
+                          onClick={() => copyHtmlTouch(touch, touchId + '-html')}
+                          className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors ${
+                            copiedHtml === touchId + '-html'
+                              ? 'bg-indigo-500/30 border-indigo-500/50 text-indigo-200'
+                              : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:text-indigo-200 hover:border-indigo-500/40'
+                          }`}
+                        >
+                          {copiedHtml === touchId + '-html' ? '✓ HTML' : 'HTML'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => copyTouch(touch.body, touchId)}
+                        className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors ${
+                          isCopied
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                            : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                        }`}
+                      >
+                        {isCopied ? '✓ Copied' : 'Copy'}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Subject line */}
