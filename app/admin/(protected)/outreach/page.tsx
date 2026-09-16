@@ -599,8 +599,15 @@ export default function OutreachPage() {
 
   <!-- Header -->
   <tr><td style="background:#0A0F1E;border-radius:10px 10px 0 0;padding:22px 32px;">
-    <a href="https://webf5.com.au" style="font-size:20px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;font-family:Arial,Helvetica,sans-serif;text-decoration:none;">Web F5</a>
-    <span style="font-size:10px;color:#F5A623;text-transform:uppercase;letter-spacing:1.5px;margin-left:10px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">Professional Web Development Agency</span>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="vertical-align:middle;">
+        <a href="https://webf5.com.au" style="font-size:20px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;font-family:Arial,Helvetica,sans-serif;text-decoration:none;">Web F5</a>
+        <span style="font-size:10px;color:#F5A623;text-transform:uppercase;letter-spacing:1.5px;margin-left:10px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">Professional Web Development Agency</span>
+      </td>
+      <td align="right" style="vertical-align:middle;">
+        <a href="https://webf5.com.au"><img src="https://webf5.com.au/apple-touch-icon.png" width="48" height="48" alt="Web F5" style="border-radius:50%;display:block;border:0;"></a>
+      </td>
+    </tr></table>
   </td></tr>
   <tr><td style="background:#6366F1;height:2px;"></td></tr>
 
@@ -621,6 +628,7 @@ export default function OutreachPage() {
         <td style="padding-right:16px;border-right:3px solid #6366F1;vertical-align:top;white-space:nowrap;">
           <a href="https://webf5.com.au" style="font-size:19px;font-weight:700;color:#6366F1;letter-spacing:-0.5px;line-height:1.2;font-family:Arial,Helvetica,sans-serif;text-decoration:none;display:block;">Web F5</a>
           <div style="font-size:9px;color:#F5A623;text-transform:uppercase;letter-spacing:1.2px;margin-top:5px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">Professional<br>Web Development<br>Agency</div>
+          <a href="https://webf5.com.au"><img src="https://webf5.com.au/apple-touch-icon.png" width="40" height="40" alt="Web F5" style="border-radius:50%;display:block;margin-top:10px;border:0;"></a>
         </td>
         <td style="padding-left:16px;vertical-align:top;">
           <div style="font-size:14px;font-weight:700;color:#111827;font-family:Arial,Helvetica,sans-serif;">Josh Ekberg</div>
