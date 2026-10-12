@@ -1,4 +1,4 @@
-import { db, auditLeads } from '@/lib/db'
+import { db, auditLeads, checklistLeads } from '@/lib/db'
 import { desc } from 'drizzle-orm'
 
 export const dynamic = 'force-dynamic'
@@ -32,11 +32,10 @@ function timeAgo(date: Date): string {
 }
 
 export default async function AdminLeadsPage() {
-  const leads = await db
-    .select()
-    .from(auditLeads)
-    .orderBy(desc(auditLeads.createdAt))
-    .limit(200)
+  const [leads, checklistDownloads] = await Promise.all([
+    db.select().from(auditLeads).orderBy(desc(auditLeads.createdAt)).limit(200),
+    db.select().from(checklistLeads).orderBy(desc(checklistLeads.createdAt)).limit(200),
+  ])
 
   const grades = leads.map(l => (l.report as ReportShape)?.grade ?? '?')
   const stats = {
@@ -68,10 +67,10 @@ export default async function AdminLeadsPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total leads',    value: stats.total },
-            { label: 'Grade A sites',  value: stats.gradeA },
-            { label: 'Grade D sites',  value: stats.gradeD },
-            { label: 'Left feedback',  value: stats.withFrustration },
+            { label: 'Audit leads',      value: stats.total },
+            { label: 'Grade A sites',    value: stats.gradeA },
+            { label: 'Grade D sites',    value: stats.gradeD },
+            { label: 'Checklist downloads', value: checklistDownloads.length },
           ].map(s => (
             <div key={s.label} className="bg-[#111827] border border-white/10 rounded-xl px-5 py-4">
               <p className="text-2xl font-bold">{s.value}</p>
@@ -158,6 +157,57 @@ export default async function AdminLeadsPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Checklist Downloads */}
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold">Checklist Downloads</h2>
+              <p className="text-slate-400 text-sm mt-0.5">12-Point Website Checklist lead magnet · most recent first</p>
+            </div>
+            <a
+              href="/resources/website-checklist"
+              target="_blank"
+              className="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 hover:border-indigo-500/50 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              View checklist page ↗
+            </a>
+          </div>
+          <div className="overflow-x-auto rounded-xl border border-white/10">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#111827] text-slate-400 text-xs uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left">Contact</th>
+                  <th className="px-4 py-3 text-left">Business</th>
+                  <th className="px-4 py-3 text-left">Industry</th>
+                  <th className="px-4 py-3 text-left">Downloaded</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {checklistDownloads.map(lead => (
+                  <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="px-4 py-3.5">
+                      <p className="font-medium text-white">{lead.name}</p>
+                      <a href={`mailto:${lead.email}`} className="text-xs text-indigo-400 hover:underline">{lead.email}</a>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-300">{lead.businessName || '—'}</td>
+                    <td className="px-4 py-3.5 text-slate-400 text-xs">{lead.industry || '—'}</td>
+                    <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">
+                      {timeAgo(new Date(lead.createdAt))}
+                    </td>
+                  </tr>
+                ))}
+                {checklistDownloads.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-10 text-center text-slate-500">
+                      No checklist downloads yet. Share <span className="text-indigo-400">/resources/website-checklist</span> to start collecting them.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>

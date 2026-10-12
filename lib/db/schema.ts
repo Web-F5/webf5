@@ -32,6 +32,15 @@ export const auditLeads = pgTable('audit_leads', {
   createdAt:          timestamp('created_at').notNull().defaultNow(),
 })
 
+export const checklistLeads = pgTable('checklist_leads', {
+  id:           uuid('id').primaryKey().defaultRandom(),
+  name:         text('name').notNull(),
+  businessName: text('business_name'),
+  email:        text('email').notNull(),
+  industry:     text('industry'),
+  createdAt:    timestamp('created_at').notNull().defaultNow(),
+})
+
 export const courseEntitlements = pgTable('course_entitlements', {
   id:              uuid('id').primaryKey().defaultRandom(),
   userId:          text('user_id').notNull(),
