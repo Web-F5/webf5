@@ -53,3 +53,13 @@ body {
   background-color: var(--background);
   color: var(--foreground);
 }
+
+@keyframes heroPulse1 {
+  0%, 100% { opacity: 0.15; }
+  50%       { opacity: 0.30; }
+}
+
+@keyframes heroPulse2 {
+  0%, 100% { opacity: 0.08; }
+  50%       { opacity: 0.18; }
+}

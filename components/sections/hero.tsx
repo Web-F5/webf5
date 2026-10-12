@@ -123,18 +123,10 @@ export function HeroSection() {
   return (
     <section className="min-h-screen flex items-center justify-center pt-20 px-4 relative overflow-hidden">
 
-      {/* Ambient glows */}
+      {/* Ambient glows — CSS animation, no JS frame loop */}
       <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none" aria-hidden="true">
-        <motion.div
-          animate={{ opacity: [0.15, 0.3, 0.15] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-20 right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ opacity: [0.08, 0.18, 0.08] }}
-          transition={{ duration: 11, repeat: Infinity, delay: 1.5 }}
-          className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl"
-        />
+        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl animate-[heroPulse1_8s_ease-in-out_infinite]" />
+        <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl animate-[heroPulse2_11s_ease-in-out_infinite_1.5s]" />
       </div>
 
       {/* Two-column layout */}
@@ -157,16 +149,13 @@ export function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1
-            variants={itemVariants}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-balance leading-[1.1]"
-          >
+          {/* Headline — not animated so LCP is measured immediately */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-balance leading-[1.1]">
             A website built around{' '}
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               your business.
             </span>
-          </motion.h1>
+          </h1>
 
           {/* Subheadline — rendered immediately so it counts as LCP without animation delay */}
           <p
@@ -223,7 +212,7 @@ export function HeroSection() {
               Recent projects
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-              {clients.map((client) => (
+              {clients.map((client, idx) => (
                 <a
                   key={client.name}
                   href={client.url}
@@ -238,6 +227,7 @@ export function HeroSection() {
                     width={120}
                     height={48}
                     sizes="120px"
+                    priority={idx < 3}
                     className={`${client.logoClass} w-auto object-contain`}
                   />
                 </a>
@@ -294,6 +284,7 @@ export function HeroSection() {
                   src={shot.src}
                   alt={shot.alt}
                   fill
+                  priority
                   className="object-cover object-top"
                   sizes="320px"
                 />
