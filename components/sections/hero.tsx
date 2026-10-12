@@ -135,7 +135,7 @@ export function HeroSection() {
         {/* ── Left: copy ── */}
         <motion.div
           variants={containerVariants}
-          initial="hidden"
+          initial={{ opacity: 1 }}
           animate="visible"
           className="flex flex-col items-start"
         >
