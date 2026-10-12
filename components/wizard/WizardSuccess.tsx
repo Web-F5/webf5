@@ -16,10 +16,13 @@ export function WizardSuccess() {
       <h2 className="mb-3 text-2xl font-semibold text-white">
         Brief submitted, {name}!
       </h2>
-      <p className="mb-8 max-w-sm text-sm leading-relaxed text-slate-400">
+      <p className="mb-4 max-w-sm text-sm leading-relaxed text-slate-400">
         Thanks for taking the time — you've given us everything we need to get started.
         We'll review your brief and come back to you within{' '}
         <strong className="text-white">1 business day</strong> with a clear plan and a real quote.
+      </p>
+      <p className="mb-8 max-w-sm text-sm text-slate-500">
+        A copy of your brief has been sent to your email for your records.
       </p>
 
       {/* What happens next */}

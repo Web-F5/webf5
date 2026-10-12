@@ -25,6 +25,7 @@ export function Navigation() {
     { label: 'Work', href: '/work' },
     { label: 'Process', href: anchor('#process') },
     { label: 'Pricing', href: anchor('#pricing') },
+    { label: 'Free Audit', href: '/audit' },
     { label: 'FAQ', href: anchor('#faq') },
   ]
 
@@ -56,7 +57,11 @@ export function Navigation() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + index * 0.05 }}
-              className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                item.label === 'Free Audit'
+                  ? 'text-amber-400 hover:text-amber-300'
+                  : 'text-foreground/70 hover:text-foreground'
+              }`}
             >
               {item.label}
             </motion.a>
@@ -107,7 +112,11 @@ export function Navigation() {
                 <a
                   key={item.label}
                   href={item.href}
-                  className="block text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
+                  className={`block text-sm font-medium py-2 transition-colors ${
+                    item.label === 'Free Audit'
+                      ? 'text-amber-400 hover:text-amber-300'
+                      : 'text-foreground/70 hover:text-foreground'
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}

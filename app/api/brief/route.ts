@@ -61,14 +61,18 @@ export async function POST(req: NextRequest) {
       '',
       `If you have any questions in the meantime, just reply to this email or reach us at contact@webf5.au`,
       '',
+      `── Your brief summary ────────────────────────────────────────`,
+      '',
+      summary,
+      '',
     ]
 
-    // Only include the brief copy if the user is signed in AND has an active course entitlement
+    // Course-entitlement users get file links appended as well
     if (entitled) {
       clientEmailLines.push(
-        `── Your brief summary ────────────────────────────────────────`,
+        `── Uploaded files ────────────────────────────────────────────`,
         '',
-        summary,
+        fileLinks,
         '',
       )
     }
