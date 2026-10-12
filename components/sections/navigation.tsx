@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 
@@ -12,8 +12,14 @@ const BriefAuthButton = dynamic(
   { ssr: false }
 )
 
+const RESOURCES = [
+  { label: 'Free Website Audit', href: '/audit', desc: 'Instant report — speed, SEO, contact & more' },
+  { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs' },
+]
+
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [resourcesOpen, setResourcesOpen] = useState(false)
   const pathname = usePathname()
   const isHome = pathname === '/'
   const isBrief = pathname === '/brief'
@@ -25,7 +31,6 @@ export function Navigation() {
     { label: 'Work', href: '/work' },
     { label: 'Process', href: anchor('#process') },
     { label: 'Pricing', href: anchor('#pricing') },
-    { label: 'Free Audit', href: '/audit' },
     { label: 'FAQ', href: anchor('#faq') },
   ]
 
@@ -57,15 +62,49 @@ export function Navigation() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + index * 0.05 }}
-              className={`text-sm font-medium transition-colors ${
-                item.label === 'Free Audit'
-                  ? 'text-amber-400 hover:text-amber-300'
-                  : 'text-foreground/70 hover:text-foreground'
-              }`}
+              className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
             >
               {item.label}
             </motion.a>
           ))}
+
+          {/* Resources dropdown */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + navItems.length * 0.05 }}
+            className="relative"
+            onMouseEnter={() => setResourcesOpen(true)}
+            onMouseLeave={() => setResourcesOpen(false)}
+          >
+            <button className="flex items-center gap-1 text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors">
+              Resources
+              <ChevronDown size={14} className={`transition-transform duration-200 ${resourcesOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {resourcesOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full right-0 mt-2 w-64 bg-[#111827] border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                >
+                  {RESOURCES.map(r => (
+                    <a
+                      key={r.href}
+                      href={r.href}
+                      className="flex flex-col gap-0.5 px-4 py-3.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                    >
+                      <span className="text-sm font-semibold text-white">{r.label}</span>
+                      <span className="text-xs text-slate-400">{r.desc}</span>
+                    </a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
 
         {/* CTA / Auth Button Desktop */}
@@ -112,16 +151,28 @@ export function Navigation() {
                 <a
                   key={item.label}
                   href={item.href}
-                  className={`block text-sm font-medium py-2 transition-colors ${
-                    item.label === 'Free Audit'
-                      ? 'text-amber-400 hover:text-amber-300'
-                      : 'text-foreground/70 hover:text-foreground'
-                  }`}
+                  className="block text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
                 </a>
               ))}
+
+              {/* Resources section in mobile */}
+              <div className="pt-1 border-t border-border/50">
+                <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider py-2">Resources</p>
+                {RESOURCES.map(r => (
+                  <a
+                    key={r.href}
+                    href={r.href}
+                    className="block text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {r.label}
+                  </a>
+                ))}
+              </div>
+
               <a
                 href="/brief"
                 className="block w-full mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold text-center"
