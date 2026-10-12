@@ -29,13 +29,21 @@ async function fetchPageContent(url: string) {
   }
 }
 
+function decodeEntities(str: string): string {
+  return str
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+}
+
 function checkContent(html: string) {
   const lower = html.toLowerCase()
   const phonePattern = /(\+?61|0)[2-9]\d{8}|(\+?61|0)4\d{8}/
   const emailPattern = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i
-  const metaTitle    = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? null
-  const metaDesc     = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1]?.trim() ?? null
-  const h1           = html.match(/<h1[^>]*>([^<]+)<\/h1>/i)?.[1]?.trim() ?? null
+  const rawTitle  = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? null
+  const rawH1     = html.match(/<h1[^>]*>([^<]+)<\/h1>/i)?.[1]?.trim() ?? null
+  const metaTitle = rawTitle ? decodeEntities(rawTitle) : null
+  const metaDesc  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1]?.trim() ?? null
+  const h1        = rawH1 ? decodeEntities(rawH1) : null
   const hasPhone     = phonePattern.test(html)
   const hasEmail     = emailPattern.test(lower)
   const hasContact   = hasPhone || hasEmail || lower.includes('contact') || lower.includes('get in touch')
@@ -107,20 +115,38 @@ webf5.com.au
 }
 
 function buildNotifyEmail(name: string, biz: string, email: string, url: string, industry: string | undefined, frustration: string | undefined, report: AuditReport): string {
-  return `New audit lead — ${biz}
+  const { lcp, grade, ssl, content } = report
+  return `New audit lead — ${biz} (Grade ${grade})
 
-Contact: ${name} <${email}>
+Contact:  ${name} <${email}>
 Business: ${biz}
 Industry: ${industry || '—'}
-URL: ${url}
-Grade: ${report.grade}
-LCP: ${report.lcp.toFixed(2)}s
-SSL: ${report.ssl ? 'Yes' : 'No'}
-Meta title: ${report.content.metaTitle || 'Missing'}
-Meta desc: ${report.content.metaDesc ? 'Present' : 'Missing'}
-H1: ${report.content.h1 || 'Missing'}
-Phone on page: ${report.content.hasPhone ? 'Yes' : 'No'}
-CTA on page: ${report.content.hasCta ? 'Yes' : 'No'}
+URL:      ${url}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  OVERALL GRADE: ${grade}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📱 MOBILE SPEED
+${scoreIcon(lcp < 4)} ${lcpImpact(lcp)}
+
+🔒 SECURITY
+${scoreIcon(ssl)} ${ssl ? 'Secure (HTTPS).' : 'NOT secure — browsers show a "Not Secure" warning.'}
+
+📞 CONTACT ACCESSIBILITY
+${scoreIcon(content.hasContact)} ${content.hasContact ? 'Contact details found on page.' : 'No contact details found — visitors may leave without reaching them.'}
+   Phone on page: ${content.hasPhone ? 'Yes' : 'No'}
+   Email on page: ${content.hasEmail ? 'Yes' : 'No'}
+
+📋 SEARCH VISIBILITY
+${scoreIcon(!!content.metaTitle)} Page title: ${content.metaTitle ? `"${content.metaTitle}"` : 'Missing'}
+${scoreIcon(!!content.metaDesc)} Meta description: ${content.metaDesc ? 'Present' : 'Missing'}
+${scoreIcon(!!content.h1)} H1 heading: ${content.h1 ? `"${content.h1}"` : 'Missing'}
+
+🎯 CALL TO ACTION
+${scoreIcon(content.hasCta)} ${content.hasCta ? 'CTA found on page.' : 'No clear call to action found.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Biggest frustration: ${frustration || '—'}
 `

@@ -90,7 +90,12 @@ export default async function AdminLeadsPage() {
                 <th className="px-4 py-3 text-left">Industry</th>
                 <th className="px-4 py-3 text-left">Grade</th>
                 <th className="px-4 py-3 text-left">Speed</th>
-                <th className="px-4 py-3 text-left">Checks</th>
+                <th className="px-4 py-3 text-left" title="HTTPS">SSL</th>
+                <th className="px-4 py-3 text-left" title="Contact on page">Contact</th>
+                <th className="px-4 py-3 text-left">Page Title</th>
+                <th className="px-4 py-3 text-left" title="Meta description">Desc</th>
+                <th className="px-4 py-3 text-left">H1</th>
+                <th className="px-4 py-3 text-left" title="Call to action">CTA</th>
                 <th className="px-4 py-3 text-left">Frustration</th>
                 <th className="px-4 py-3 text-left">Received</th>
               </tr>
@@ -99,9 +104,6 @@ export default async function AdminLeadsPage() {
               {leads.map(lead => {
                 const r = lead.report as ReportShape
                 const grade = r?.grade ?? '?'
-                const passing = [r?.ssl, !!r?.content?.metaTitle, !!r?.content?.metaDesc,
-                  !!r?.content?.h1, r?.content?.hasContact, r?.content?.hasCta,
-                  (r?.lcp ?? 99) < 4].filter(Boolean).length
                 return (
                   <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
                     <td className="px-4 py-3.5">
@@ -128,14 +130,23 @@ export default async function AdminLeadsPage() {
                     <td className="px-4 py-3.5 text-slate-300 text-xs font-mono">
                       {r?.lcp != null ? `${r.lcp.toFixed(1)}s` : '—'}
                     </td>
-                    <td className="px-4 py-3.5">
-                      <span className="text-xs text-slate-400">
-                        {passing}<span className="text-slate-600">/7</span>
-                      </span>
+                    <td className="px-4 py-3.5 text-center text-sm">{r?.ssl ? '✅' : '❌'}</td>
+                    <td className="px-4 py-3.5 text-center text-sm">{r?.content?.hasContact ? '✅' : '❌'}</td>
+                    <td className="px-4 py-3.5 text-xs text-slate-300 max-w-[160px]">
+                      {r?.content?.metaTitle
+                        ? <span className="truncate block" title={r.content.metaTitle}>✅ {r.content.metaTitle}</span>
+                        : <span className="text-red-400">❌ Missing</span>}
                     </td>
+                    <td className="px-4 py-3.5 text-center text-sm">{r?.content?.metaDesc ? '✅' : '❌'}</td>
+                    <td className="px-4 py-3.5 text-xs text-slate-300 max-w-[140px]">
+                      {r?.content?.h1
+                        ? <span className="truncate block" title={r.content.h1}>✅ {r.content.h1}</span>
+                        : <span className="text-red-400">❌ Missing</span>}
+                    </td>
+                    <td className="px-4 py-3.5 text-center text-sm">{r?.content?.hasCta ? '✅' : '❌'}</td>
                     <td className="px-4 py-3.5">
                       {lead.biggestFrustration ? (
-                        <p className="text-xs text-slate-300 max-w-[200px] truncate" title={lead.biggestFrustration}>
+                        <p className="text-xs text-slate-300 max-w-[180px] truncate" title={lead.biggestFrustration}>
                           {lead.biggestFrustration}
                         </p>
                       ) : (
@@ -150,7 +161,7 @@ export default async function AdminLeadsPage() {
               })}
               {leads.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-16 text-center text-slate-500">
+                  <td colSpan={14} className="px-4 py-16 text-center text-slate-500">
                     No audit leads yet. Share <span className="text-indigo-400">/audit</span> to start collecting them.
                   </td>
                 </tr>
