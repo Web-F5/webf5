@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   },
   description:
     'Web F5 builds websites for trades, local businesses, and ecommerce brands across Central Victoria. Fixed-price quotes, no lock-in contracts.',
-  metadataBase: new URL('https://www.webf5.com.au'),
+  metadataBase: new URL('https://webf5.com.au'),
   openGraph: {
     title: 'Web Design & Development Central Victoria | Web F5',
     description:
       'Web F5 builds websites for trades, local businesses, and ecommerce brands across Central Victoria. Fixed-price quotes, no lock-in contracts.',
-    url: 'https://www.webf5.com.au',
+    url: 'https://webf5.com.au',
     siteName: 'Web F5',
     images: [
       {
