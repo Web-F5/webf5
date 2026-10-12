@@ -127,8 +127,16 @@ export default async function AdminLeadsPage() {
                         {grade}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-300 text-xs font-mono">
-                      {r?.lcp != null ? `${r.lcp.toFixed(1)}s` : '—'}
+                    <td className="px-4 py-3.5 text-xs font-mono font-semibold">
+                      {r?.lcp != null ? (
+                        <span className={
+                          r.lcp < 2.5 ? 'text-emerald-400' :
+                          r.lcp < 4.0 ? 'text-amber-400' :
+                          'text-red-400'
+                        }>
+                          {r.lcp.toFixed(1)}s
+                        </span>
+                      ) : '—'}
                     </td>
                     <td className="px-4 py-3.5 text-center text-sm">{r?.ssl ? '✅' : '❌'}</td>
                     <td className="px-4 py-3.5 text-center text-sm">{r?.content?.hasContact ? '✅' : '❌'}</td>
