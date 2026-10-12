@@ -1,0 +1,166 @@
+import { db, auditLeads } from '@/lib/db'
+import { desc } from 'drizzle-orm'
+
+export const dynamic = 'force-dynamic'
+
+const GRADE_STYLE: Record<string, string> = {
+  A: 'bg-green-500/20 text-green-300 border-green-500/30',
+  B: 'bg-lime-500/20 text-lime-300 border-lime-500/30',
+  C: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  D: 'bg-red-500/20 text-red-300 border-red-500/30',
+}
+
+interface ReportShape {
+  grade:   string
+  lcp:     number
+  ssl:     boolean
+  content: {
+    metaTitle:  string | null
+    metaDesc:   string | null
+    h1:         string | null
+    hasContact: boolean
+    hasCta:     boolean
+  }
+}
+
+function timeAgo(date: Date): string {
+  const secs = Math.floor((Date.now() - date.getTime()) / 1000)
+  if (secs < 60)    return `${secs}s ago`
+  if (secs < 3600)  return `${Math.floor(secs / 60)}m ago`
+  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`
+  return `${Math.floor(secs / 86400)}d ago`
+}
+
+export default async function AdminLeadsPage() {
+  const leads = await db
+    .select()
+    .from(auditLeads)
+    .orderBy(desc(auditLeads.createdAt))
+    .limit(200)
+
+  const grades = leads.map(l => (l.report as ReportShape)?.grade ?? '?')
+  const stats = {
+    total: leads.length,
+    gradeA: grades.filter(g => g === 'A').length,
+    gradeD: grades.filter(g => g === 'D').length,
+    withFrustration: leads.filter(l => l.biggestFrustration).length,
+  }
+
+  return (
+    <div className="text-white px-4 py-10">
+      <div className="max-w-7xl mx-auto space-y-8">
+
+        {/* Header */}
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Audit Leads</h1>
+            <p className="text-slate-400 text-sm mt-1">Website audit submissions · most recent first · last 200</p>
+          </div>
+          <a
+            href="/audit"
+            target="_blank"
+            className="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 hover:border-indigo-500/50 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            View audit page ↗
+          </a>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Total leads',    value: stats.total },
+            { label: 'Grade A sites',  value: stats.gradeA },
+            { label: 'Grade D sites',  value: stats.gradeD },
+            { label: 'Left feedback',  value: stats.withFrustration },
+          ].map(s => (
+            <div key={s.label} className="bg-[#111827] border border-white/10 rounded-xl px-5 py-4">
+              <p className="text-2xl font-bold">{s.value}</p>
+              <p className="text-slate-400 text-xs mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto rounded-xl border border-white/10">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#111827] text-slate-400 text-xs uppercase tracking-wider">
+                <th className="px-4 py-3 text-left">Contact</th>
+                <th className="px-4 py-3 text-left">Business</th>
+                <th className="px-4 py-3 text-left">Website</th>
+                <th className="px-4 py-3 text-left">Industry</th>
+                <th className="px-4 py-3 text-left">Grade</th>
+                <th className="px-4 py-3 text-left">Speed</th>
+                <th className="px-4 py-3 text-left">Checks</th>
+                <th className="px-4 py-3 text-left">Frustration</th>
+                <th className="px-4 py-3 text-left">Received</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {leads.map(lead => {
+                const r = lead.report as ReportShape
+                const grade = r?.grade ?? '?'
+                const passing = [r?.ssl, !!r?.content?.metaTitle, !!r?.content?.metaDesc,
+                  !!r?.content?.h1, r?.content?.hasContact, r?.content?.hasCta,
+                  (r?.lcp ?? 99) < 4].filter(Boolean).length
+                return (
+                  <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="px-4 py-3.5">
+                      <p className="font-medium text-white">{lead.name}</p>
+                      <a href={`mailto:${lead.email}`} className="text-xs text-indigo-400 hover:underline">{lead.email}</a>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-300">{lead.businessName}</td>
+                    <td className="px-4 py-3.5">
+                      <a
+                        href={lead.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-slate-400 hover:text-indigo-300 transition-colors max-w-[160px] truncate block"
+                      >
+                        {lead.url.replace(/^https?:\/\//, '')}
+                      </a>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-400 text-xs">{lead.industry || '—'}</td>
+                    <td className="px-4 py-3.5">
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${GRADE_STYLE[grade] ?? 'bg-slate-500/20 text-slate-300 border-slate-500/30'}`}>
+                        {grade}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-300 text-xs font-mono">
+                      {r?.lcp != null ? `${r.lcp.toFixed(1)}s` : '—'}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className="text-xs text-slate-400">
+                        {passing}<span className="text-slate-600">/7</span>
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      {lead.biggestFrustration ? (
+                        <p className="text-xs text-slate-300 max-w-[200px] truncate" title={lead.biggestFrustration}>
+                          {lead.biggestFrustration}
+                        </p>
+                      ) : (
+                        <span className="text-slate-600 text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">
+                      {timeAgo(new Date(lead.createdAt))}
+                    </td>
+                  </tr>
+                )
+              })}
+              {leads.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="px-4 py-16 text-center text-slate-500">
+                    No audit leads yet. Share <span className="text-indigo-400">/audit</span> to start collecting them.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  )
+}

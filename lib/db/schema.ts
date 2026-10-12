@@ -20,6 +20,18 @@ export const briefDrafts = pgTable('brief_drafts', {
   expiresAt:             timestamp('expires_at'), // guest rows expire after 30 days
 })
 
+export const auditLeads = pgTable('audit_leads', {
+  id:                 uuid('id').primaryKey().defaultRandom(),
+  name:               text('name').notNull(),
+  businessName:       text('business_name').notNull(),
+  email:              text('email').notNull(),
+  url:                text('url').notNull(),
+  industry:           text('industry'),
+  biggestFrustration: text('biggest_frustration'),
+  report:             jsonb('report').notNull().default({}),
+  createdAt:          timestamp('created_at').notNull().defaultNow(),
+})
+
 export const courseEntitlements = pgTable('course_entitlements', {
   id:              uuid('id').primaryKey().defaultRandom(),
   userId:          text('user_id').notNull(),

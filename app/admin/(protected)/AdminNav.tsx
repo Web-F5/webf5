@@ -7,6 +7,7 @@ const tabs = [
   { label: 'Brief drafts', href: '/admin/briefs' },
   { label: 'Quote builder', href: '/admin/quotes' },
   { label: 'Outreach', href: '/admin/outreach' },
+  { label: 'Leads', href: '/admin/leads' },
 ]
 
 export function AdminNav() {
