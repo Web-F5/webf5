@@ -40,10 +40,13 @@ function checkContent(html: string) {
   const phonePattern = /(\+?61|0)[2-9]\d{8}|(\+?61|0)4\d{8}/
   const emailPattern = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i
   const rawTitle  = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? null
-  const rawH1     = html.match(/<h1[^>]*>([^<]+)<\/h1>/i)?.[1]?.trim() ?? null
+  const h1Match   = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? null
   const metaTitle = rawTitle ? decodeEntities(rawTitle) : null
   const metaDesc  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1]?.trim() ?? null
-  const h1        = rawH1 ? decodeEntities(rawH1) : null
+  // Strip inner tags to get plain text, then collapse whitespace
+  const h1        = h1Match
+    ? decodeEntities(h1Match.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()) || null
+    : null
   const hasPhone     = phonePattern.test(html)
   const hasEmail     = emailPattern.test(lower)
   const hasContact   = hasPhone || hasEmail || lower.includes('contact') || lower.includes('get in touch')
