@@ -39,13 +39,13 @@ export function HeroSection() {
   const clients = [
     {
       name: 'Outright Electrical',
-      logo: '/images/outrightelectrical-logo.png',
+      logo: '/images/outrightelectrical-logo.webp',
       url: 'https://outrightelectrical.com.au',
       logoClass: 'h-7',
     },
     {
       name: 'Valley Feeds & General',
-      logo: '/images/valley-feeds-logo.png',
+      logo: '/images/valley-feeds-logo.webp',
       url: 'https://valleyfeeds.com.au',
       logoClass: 'h-8',
     },
