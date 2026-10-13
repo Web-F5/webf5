@@ -261,7 +261,7 @@ export default function ChecklistPage() {
   return (
     <main className="min-h-screen bg-[#0A0F1E] text-white print:bg-white print:text-black">
       <Navigation />
-      <div className="max-w-2xl mx-auto px-4 py-16 space-y-10">
+      <div className="max-w-2xl mx-auto px-4 pt-28 pb-16 space-y-10">
 
         {/* Hero */}
         <div className="text-center space-y-4">
