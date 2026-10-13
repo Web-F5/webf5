@@ -211,7 +211,7 @@ export function HeroSection() {
             <p className="text-xs text-foreground/35 mb-4 uppercase tracking-widest">
               Recent projects
             </p>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 min-h-[48px]">
               {clients.map((client, idx) => (
                 <a
                   key={client.name}
