@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Navigation } from '@/components/sections/navigation'
 
 const INDUSTRIES = [
   'Trades & Construction',
@@ -199,6 +200,7 @@ export default function AuditPage() {
 
   return (
     <main className="min-h-screen bg-[#0A0F1E] text-white">
+      <Navigation />
       <div className="max-w-2xl mx-auto px-4 py-16 space-y-10">
 
         {/* Hero */}
