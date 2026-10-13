@@ -218,7 +218,7 @@ export function HeroSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={client.name}
-                  className="opacity-40 hover:opacity-80 transition-opacity grayscale hover:grayscale-0"
+                  className="opacity-40 hover:opacity-80 transition-opacity grayscale hover:grayscale-0 h-12 flex items-center"
                 >
                   <Image
                     src={client.logo}
