@@ -125,8 +125,8 @@ export function HeroSection() {
 
       {/* Ambient glows — CSS animation, no JS frame loop */}
       <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl animate-[heroPulse1_8s_ease-in-out_infinite]" />
-        <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl animate-[heroPulse2_11s_ease-in-out_infinite_1.5s]" />
+        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl" style={{ opacity: 0.15, animation: 'heroPulse1 8s ease-in-out infinite' }} />
+        <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl" style={{ opacity: 0.08, animation: 'heroPulse2 11s ease-in-out infinite' }} />
       </div>
 
       {/* Two-column layout */}
@@ -212,7 +212,7 @@ export function HeroSection() {
               Recent projects
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4 min-h-[48px]">
-              {clients.map((client, idx) => (
+              {clients.map((client) => (
                 <a
                   key={client.name}
                   href={client.url}
@@ -227,7 +227,7 @@ export function HeroSection() {
                     width={120}
                     height={48}
                     sizes="120px"
-                    priority={idx < 3}
+                    priority
                     className={`${client.logoClass} w-auto object-contain`}
                   />
                 </a>
