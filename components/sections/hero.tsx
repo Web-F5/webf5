@@ -16,25 +16,6 @@ function pickFour<T>(arr: T[]): T[] {
 }
 
 export function HeroSection() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.6, ease: 'easeOut' },
-    },
-  }
-
   const clients = [
     {
       name: 'Outright Electrical',
@@ -131,24 +112,18 @@ export function HeroSection() {
       {/* Two-column layout */}
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
 
-        {/* ── Left: copy ── */}
-        <motion.div
-          variants={containerVariants}
-          initial={{ opacity: 1 }}
-          animate="visible"
-          className="flex flex-col items-start"
-        >
+        {/* ── Left: copy — static, no Framer Motion so LCP element paints immediately ── */}
+        <div className="flex flex-col items-start">
           {/* Location badge */}
-          <motion.div variants={itemVariants} className="mb-6">
+          <div className="mb-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
               <MapPin size={13} className="text-primary" />
               <span className="text-xs font-medium text-indigo-300 tracking-wide">
                 Web design &amp; development · Central Victoria
               </span>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Headline — not animated so LCP is measured immediately */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-balance leading-[1.1]">
             A website built around{' '}
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
@@ -156,28 +131,19 @@ export function HeroSection() {
             </span>
           </h1>
 
-          {/* Subheadline — rendered immediately so it counts as LCP without animation delay */}
-          <p
-            className="text-base md:text-lg text-foreground/80 mb-3 max-w-lg leading-relaxed"
-          >
+          <p className="text-base md:text-lg text-foreground/80 mb-3 max-w-lg leading-relaxed">
             <span className="font-bold text-white">Web F5</span> builds websites
             for trades, local businesses, and ecommerce brands across Victoria.
             Our discovery process means we understand your business before we
             write a line of code.
           </p>
 
-          <motion.p
-            variants={itemVariants}
-            className="text-sm text-foreground/45 mb-8 max-w-md"
-          >
+          <p className="text-sm text-foreground/45 mb-8 max-w-md">
             No templates. No guesswork. A site that actually works for you.
-          </motion.p>
+          </p>
 
           {/* CTAs */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-3 mb-8"
-          >
+          <div className="flex flex-col sm:flex-row gap-3 mb-8">
             <a
               href="/brief"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-indigo-700 text-white rounded-full font-semibold text-sm hover:bg-indigo-600 hover:shadow-lg hover:shadow-primary/40 transition-all"
@@ -191,10 +157,10 @@ export function HeroSection() {
             >
               See our work
             </a>
-          </motion.div>
+          </div>
 
           {/* Trust signals */}
-          <motion.div variants={itemVariants} className="mb-10">
+          <div className="mb-10">
             <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-foreground/70">
               {['No lock-in contracts', 'Fixed-price quotes', 'Real people, real builds'].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
@@ -203,10 +169,10 @@ export function HeroSection() {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Client logos */}
-          <motion.div variants={itemVariants} className="w-full">
+          <div className="w-full">
             <p className="text-xs text-foreground/35 mb-4 uppercase tracking-widest">
               Recent projects
             </p>
@@ -232,8 +198,8 @@ export function HeroSection() {
                 </a>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* ── Right: screenshot collage ── */}
         {/*
