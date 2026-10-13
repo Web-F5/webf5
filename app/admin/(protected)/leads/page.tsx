@@ -1,5 +1,6 @@
 import { db, auditLeads, checklistLeads } from '@/lib/db'
 import { desc } from 'drizzle-orm'
+import { DeleteAuditLead, DeleteChecklistLead } from './DeleteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,10 +68,10 @@ export default async function AdminLeadsPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Audit leads',      value: stats.total },
-            { label: 'Grade A sites',    value: stats.gradeA },
-            { label: 'Grade D sites',    value: stats.gradeD },
-            { label: 'Checklist downloads', value: checklistDownloads.length },
+            { label: 'Audit leads',         value: stats.total },
+            { label: 'Grade A sites',        value: stats.gradeA },
+            { label: 'Grade D sites',        value: stats.gradeD },
+            { label: 'Checklist downloads',  value: checklistDownloads.length },
           ].map(s => (
             <div key={s.label} className="bg-[#111827] border border-white/10 rounded-xl px-5 py-4">
               <p className="text-2xl font-bold">{s.value}</p>
@@ -98,6 +99,7 @@ export default async function AdminLeadsPage() {
                 <th className="px-4 py-3 text-left" title="Call to action">CTA</th>
                 <th className="px-4 py-3 text-left">Frustration</th>
                 <th className="px-4 py-3 text-left">Received</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -164,12 +166,15 @@ export default async function AdminLeadsPage() {
                     <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">
                       {timeAgo(new Date(lead.createdAt))}
                     </td>
+                    <td className="px-4 py-3.5">
+                      <DeleteAuditLead id={lead.id} />
+                    </td>
                   </tr>
                 )
               })}
               {leads.length === 0 && (
                 <tr>
-                  <td colSpan={14} className="px-4 py-16 text-center text-slate-500">
+                  <td colSpan={15} className="px-4 py-16 text-center text-slate-500">
                     No audit leads yet. Share <span className="text-indigo-400">/audit</span> to start collecting them.
                   </td>
                 </tr>
@@ -201,6 +206,7 @@ export default async function AdminLeadsPage() {
                   <th className="px-4 py-3 text-left">Business</th>
                   <th className="px-4 py-3 text-left">Industry</th>
                   <th className="px-4 py-3 text-left">Downloaded</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -215,11 +221,14 @@ export default async function AdminLeadsPage() {
                     <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">
                       {timeAgo(new Date(lead.createdAt))}
                     </td>
+                    <td className="px-4 py-3.5">
+                      <DeleteChecklistLead id={lead.id} />
+                    </td>
                   </tr>
                 ))}
                 {checklistDownloads.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-10 text-center text-slate-500">
+                    <td colSpan={5} className="px-4 py-10 text-center text-slate-500">
                       No checklist downloads yet. Share <span className="text-indigo-400">/resources/website-checklist</span> to start collecting them.
                     </td>
                   </tr>
