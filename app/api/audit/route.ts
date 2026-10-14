@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { db, auditLeads } from '@/lib/db'
+import { generateAuditPdf } from '@/lib/audit-pdf'
+import { buildAuditEmailHtml } from '@/lib/audit-email'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM   = 'contact@webf5.au'
@@ -314,19 +316,29 @@ export async function POST(req: NextRequest) {
       report,
     })
 
+    const bizDisplay = businessName?.trim() || name.trim()
+    const [pdfBuffer, emailHtml] = await Promise.all([
+      generateAuditPdf(report, name.trim(), bizDisplay),
+      Promise.resolve(buildAuditEmailHtml(name.trim(), bizDisplay, report)),
+    ])
+
     await Promise.all([
       resend.emails.send({
         from:    FROM,
         to:      email.trim(),
         replyTo: 'contact@webf5.au',
-        subject: `Your free website audit — ${businessName?.trim() || name.trim()}`,
-        text:    buildProspectEmail(name.trim(), businessName?.trim() || name.trim(), report),
+        subject: `Your website audit — ${bizDisplay} (Grade ${grade})`,
+        html:    emailHtml,
+        attachments: [{
+          filename: `website-audit-${bizDisplay.toLowerCase().replace(/\s+/g, '-')}.pdf`,
+          content:  pdfBuffer,
+        }],
       }),
       resend.emails.send({
         from:    FROM,
         to:      NOTIFY,
-        subject: `Audit lead — ${businessName?.trim() || name.trim()} (Grade ${grade} · ${overallScore}/100)`,
-        text:    buildNotifyEmail(name.trim(), businessName?.trim() || name.trim(), email.trim(), normUrl, industry, biggestFrustration, report),
+        subject: `Audit lead — ${bizDisplay} (Grade ${grade} · ${overallScore}/100)`,
+        text:    buildNotifyEmail(name.trim(), bizDisplay, email.trim(), normUrl, industry, biggestFrustration, report),
       }),
     ])
 
