@@ -41,6 +41,21 @@ export const checklistLeads = pgTable('checklist_leads', {
   createdAt:    timestamp('created_at').notNull().defaultNow(),
 })
 
+export const reviewRatings = pgTable('review_ratings', {
+  id:             uuid('id').primaryKey().defaultRandom(), // doubles as the token in the email link
+  sendId:         uuid('send_id').references(() => reviewSends.id),
+  recipientName:  text('recipient_name').notNull(),
+  recipientEmail: text('recipient_email').notNull(),
+  fromBusiness:   text('from_business').notNull(),
+  platform:       text('platform').notNull(),
+  reviewUrl:      text('review_url').notNull(),
+  rating:         integer('rating'),
+  feedback:       text('feedback'),
+  clickedReview:  boolean('clicked_review').notNull().default(false),
+  createdAt:      timestamp('created_at').notNull().defaultNow(),
+  ratedAt:        timestamp('rated_at'),
+})
+
 export const reviewSends = pgTable('review_sends', {
   id:             uuid('id').primaryKey().defaultRandom(),
   fromBusiness:   text('from_business').notNull(),

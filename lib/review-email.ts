@@ -31,22 +31,33 @@ function platformIcon(platform: string): string {
 // ── Main builder ────────────────────────────────────────────────────────────
 
 export interface ReviewEmailData {
-  recipientName: string
-  fromBusiness:  string
-  platform:      string
-  reviewUrl:     string
+  recipientName:  string
+  fromBusiness:   string
+  platform:       string
+  reviewUrl:      string
   customMessage?: string
+  /** When set, the CTA links to the rating page instead of the review URL directly */
+  ratingUrl?:     string
 }
 
 export function buildReviewEmailHtml(d: ReviewEmailData): string {
-  const { recipientName, fromBusiness, platform, reviewUrl, customMessage } = d
+  const { recipientName, fromBusiness, platform, reviewUrl, customMessage, ratingUrl } = d
   const platformName  = platformLabel(platform)
   const buttonColor   = platformButtonColor(platform)
   const icon          = platformIcon(platform)
   const firstName     = recipientName.split(' ')[0]
+  const useFilter     = !!ratingUrl
 
   const defaultNote = `It was a pleasure working with you — I hope everything has been going well since.`
   const note = customMessage?.trim() || defaultNote
+
+  const ctaHref  = useFilter ? ratingUrl! : reviewUrl
+  const ctaLabel = useFilter
+    ? `Rate your experience with ${fromBusiness}`
+    : `Leave us a review on ${platformName}`
+  const bodyAsk = useFilter
+    ? `We'd love to hear how your experience was. It only takes a moment, and your feedback means a lot to a small business like ours.`
+    : `If you were happy with our service, we'd really appreciate you taking 2 minutes to leave us a review on ${platformName}. Reviews make a genuine difference for a small business like ours.`
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -71,16 +82,14 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
     <tr><td style="background:#FFFFFF;padding:36px 40px;">
       <p style="font-size:16px;color:#1E293B;margin:0 0 20px;line-height:1.7;">Hi ${firstName},</p>
       <p style="font-size:15px;color:#334155;margin:0 0 20px;line-height:1.7;">${note}</p>
-      <p style="font-size:15px;color:#334155;margin:0 0 28px;line-height:1.7;">
-        If you were happy with our service, we'd really appreciate you taking 2 minutes to leave us a review on ${platformName}. Reviews make a genuine difference for a small business like ours.
-      </p>
+      <p style="font-size:15px;color:#334155;margin:0 0 28px;line-height:1.7;">${bodyAsk}</p>
 
       <!-- CTA Button -->
       <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
         <tr>
           <td style="background:${buttonColor};border-radius:50px;padding:14px 32px;">
-            <a href="${reviewUrl}" style="color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;display:flex;align-items:center;">
-              ${icon}Leave us a review on ${platformName}
+            <a href="${ctaHref}" style="color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;">
+              ${useFilter ? '★ ' : icon}${ctaLabel}
             </a>
           </td>
         </tr>
