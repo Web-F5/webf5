@@ -41,6 +41,16 @@ export const checklistLeads = pgTable('checklist_leads', {
   createdAt:    timestamp('created_at').notNull().defaultNow(),
 })
 
+export const reviewSends = pgTable('review_sends', {
+  id:             uuid('id').primaryKey().defaultRandom(),
+  fromBusiness:   text('from_business').notNull(),
+  platform:       text('platform').notNull(), // 'google' | 'facebook' | 'custom'
+  reviewUrl:      text('review_url').notNull(),
+  customMessage:  text('custom_message'),
+  recipientCount: integer('recipient_count').notNull().default(0),
+  createdAt:      timestamp('created_at').notNull().defaultNow(),
+})
+
 export const courseEntitlements = pgTable('course_entitlements', {
   id:              uuid('id').primaryKey().defaultRandom(),
   userId:          text('user_id').notNull(),
