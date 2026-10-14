@@ -174,6 +174,14 @@ export function Navigation() {
               </div>
 
               <a
+                href="tel:+61419510206"
+                className="block text-sm font-medium text-indigo-400 hover:text-indigo-300 py-2 transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                📞 0419 510 206
+              </a>
+
+              <a
                 href="/brief"
                 className="block w-full mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold text-center"
                 onClick={() => setIsOpen(false)}
