@@ -186,7 +186,9 @@ export function RatingWidget({ token, recipientName, fromBusiness, platform, rev
         </button>
 
         <p className="text-center text-xs text-slate-500 mt-6">
-          Sent by <span className="font-medium">{fromBusiness}</span> via{' '}
+          {fromBusiness && fromBusiness.toLowerCase() !== 'web f5' && (
+            <>Sent by <span className="font-medium">{fromBusiness}</span> via{' '}</>
+          )}
           <a href="https://webf5.com.au" className="text-indigo-400 hover:text-indigo-600 transition-colors" target="_blank" rel="noopener noreferrer">Web F5</a>
         </p>
       </div>
@@ -210,7 +212,9 @@ export function RatingWidget({ token, recipientName, fromBusiness, platform, rev
         <p className="text-xs text-slate-600 mt-4">No pressure, we appreciate your rating either way.</p>
 
         <p className="text-center text-xs text-slate-500 mt-8">
-          Sent by <span className="font-medium text-slate-600">{fromBusiness}</span> via{' '}
+          {fromBusiness && fromBusiness.toLowerCase() !== 'web f5' && (
+            <>Sent by <span className="font-medium text-slate-600">{fromBusiness}</span> via{' '}</>
+          )}
           <a href="https://webf5.com.au" className="text-indigo-400 hover:text-indigo-600 transition-colors" target="_blank" rel="noopener noreferrer">Web F5</a>
         </p>
       </div>
@@ -254,7 +258,9 @@ export function RatingWidget({ token, recipientName, fromBusiness, platform, rev
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-8">
-          Sent by <span className="font-medium text-slate-600">{fromBusiness}</span> via{' '}
+          {fromBusiness && fromBusiness.toLowerCase() !== 'web f5' && (
+            <>Sent by <span className="font-medium text-slate-600">{fromBusiness}</span> via{' '}</>
+          )}
           <a href="https://webf5.com.au" className="text-indigo-400 hover:text-indigo-600 transition-colors" target="_blank" rel="noopener noreferrer">Web F5</a>
         </p>
       </div>
@@ -267,20 +273,14 @@ export function RatingWidget({ token, recipientName, fromBusiness, platform, rev
     <div className={card + ' text-center'}>
       <div className="text-5xl mb-5">🙏</div>
       <h1 className="text-xl font-bold text-slate-800 mb-3">Thank you for your feedback</h1>
-      <p className="text-sm text-slate-500 mb-8 leading-relaxed max-w-sm mx-auto">
-        We really do appreciate you taking the time. We'll review your comments and do better next time.
+      <p className="text-sm text-slate-500 leading-relaxed max-w-sm mx-auto">
+        We appreciate your honesty, and will make a huge effort to correct this. If this means contacting you, we will do so as soon as possible.
       </p>
 
-      <div className="border-t border-slate-100 pt-6">
-        <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-          If you can give us a chance to address your concerns, it would be very much appreciated.
-          If you'd like to share publicly, you still can here.
-        </p>
-        <ReviewButton />
-      </div>
-
       <p className="text-center text-xs text-slate-500 mt-8">
-        Sent by <span className="font-medium text-slate-600">{fromBusiness}</span> via{' '}
+        {fromBusiness && fromBusiness.toLowerCase() !== 'web f5' && (
+          <>Sent by <span className="font-medium text-slate-600">{fromBusiness}</span> via{' '}</>
+        )}
         <a href="https://webf5.com.au" className="text-indigo-400 hover:text-indigo-600 transition-colors" target="_blank" rel="noopener noreferrer">Web F5</a>
       </p>
     </div>
