@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
   if (!apiKey) return NextResponse.json({ error: 'Places API not configured.' }, { status: 503 })
 
   try {
-    // Text Search — returns up to 5 results
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}&fields=place_id,name,formatted_address`
+    // Text Search — biased to Australia, returns up to 5 results
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&region=au&key=${apiKey}`
     const res  = await fetch(url, { next: { revalidate: 0 } })
     const data = await res.json()
 
