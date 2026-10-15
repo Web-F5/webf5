@@ -113,7 +113,7 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
         ${fromEmail
           ? `<a href="mailto:${fromEmail}" style="color:#6366F1;text-decoration:none;">just reply to this email</a>`
           : 'just reply to this email'
-        } — we read every response.
+        }. We read every response.
       </p>
     </td></tr>
 
