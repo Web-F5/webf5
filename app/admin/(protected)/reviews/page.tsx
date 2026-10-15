@@ -103,11 +103,10 @@ function SendForm() {
   const [customMessage, setCustomMessage] = useState('It was a pleasure working with you.')
   const [useFilter, setUseFilter]             = useState(false)
   const [logoBase64, setLogoBase64]           = useState<string | null>(null)
-  const [placeSearch, setPlaceSearch]         = useState('')
-  const [placeResults, setPlaceResults]       = useState<{ placeId: string; name: string; address: string; reviewUrl: string }[]>([])
-  const [placesLoading, setPlacesLoading]     = useState(false)
-  const [placesError, setPlacesError]         = useState('')
-  const [placesEnabled, setPlacesEnabled]     = useState<boolean | null>(null) // null = unknown
+  const [placeSearch, setPlaceSearch]   = useState('')
+  const [placeResults, setPlaceResults] = useState<{ placeId: string; name: string; address: string; reviewUrl: string }[]>([])
+  const [placesLoading, setPlacesLoading] = useState(false)
+  const [placesError, setPlacesError]   = useState('')
   const [recipients, setRecipients]       = useState<Recipient[]>([{ name: '', email: '' }])
   const [mode, setMode]                   = useState<'single' | 'bulk'>('single')
   const [csvText, setCsvText]             = useState('')
@@ -175,11 +174,12 @@ function SendForm() {
     const data = await res.json()
     setPlacesLoading(false)
     if (data.error) {
-      setPlacesError(data.error)
-      if (res.status === 503) setPlacesEnabled(false)
+      setPlacesError(res.status === 503
+        ? 'Google Places API key not configured. Add GOOGLE_PLACES_API_KEY to your Vercel environment variables.'
+        : data.error)
     } else {
-      setPlacesEnabled(true)
       setPlaceResults(data.results || [])
+      if ((data.results || []).length === 0) setPlacesError('No businesses found. Try adding a suburb or city name.')
     }
   }
 
@@ -310,7 +310,7 @@ function SendForm() {
           <p className="text-xs text-slate-500 mt-1.5">Direct link to the review form. Customers click this in the email.</p>
 
           {/* Google Places autofill — only shown for Google platform */}
-          {platform === 'google' && placesEnabled !== false && (
+          {platform === 'google' && (
             <div className="mt-3 bg-[#111827] border border-white/10 rounded-xl p-4">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Find Google review link</p>
               <div className="flex gap-2">
@@ -350,9 +350,6 @@ function SendForm() {
                     </button>
                   ))}
                 </div>
-              )}
-              {placeResults.length === 0 && !placesLoading && placeSearch && (
-                <p className="text-xs text-slate-600 mt-2">No results yet — press Find to search.</p>
               )}
             </div>
           )}
