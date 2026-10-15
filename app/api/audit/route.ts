@@ -11,11 +11,13 @@ const NOTIFY = 'leads@webf5.au'
 // ── PageSpeed (mobile + desktop in parallel) ───────────────────────────────
 
 async function fetchPageSpeedBoth(url: string) {
+  const key  = process.env.PAGESPEED_API_KEY ? `&key=${process.env.PAGESPEED_API_KEY}` : ''
   const base = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}`
-  const [mobile, desktop] = await Promise.allSettled([
-    fetch(`${base}&strategy=mobile`,  { next: { revalidate: 0 } }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch(`${base}&strategy=desktop`, { next: { revalidate: 0 } }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ])
+  const doFetch = (strategy: string) =>
+    fetch(`${base}&strategy=${strategy}${key}`, { next: { revalidate: 0 } })
+      .then(r => { if (!r.ok) { console.warn(`PageSpeed ${strategy} HTTP ${r.status}`); return null } return r.json() })
+      .catch(e => { console.warn(`PageSpeed ${strategy} error:`, e); return null })
+  const [mobile, desktop] = await Promise.allSettled([doFetch('mobile'), doFetch('desktop')])
   return {
     mobile:  mobile.status  === 'fulfilled' ? mobile.value  : null,
     desktop: desktop.status === 'fulfilled' ? desktop.value : null,

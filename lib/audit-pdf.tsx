@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, View, Text, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
+import { Document, Page, View, Text, StyleSheet, renderToBuffer, Link } from '@react-pdf/renderer'
 
 export interface AuditReportData {
   lcp:            number
@@ -149,10 +149,10 @@ const s = StyleSheet.create({
 
   ctaBox:      { backgroundColor: '#EEF2FF', borderRadius: 8, padding: 20, marginTop: 20, alignItems: 'center' },
   ctaTitle:    { fontSize: 13, fontFamily: 'Helvetica-Bold', color: C.dark, marginBottom: 6, textAlign: 'center' },
-  ctaBody:     { fontSize: 10, fontFamily: 'Helvetica', color: C.slate, textAlign: 'center', lineHeight: 1.5, marginBottom: 12 },
+  ctaBody:     { fontSize: 10, fontFamily: 'Helvetica', color: '#475569', textAlign: 'center', lineHeight: 1.5, marginBottom: 12 },
   ctaButton:   { backgroundColor: C.indigo, borderRadius: 6, paddingHorizontal: 24, paddingVertical: 10 },
   ctaButtonText:{ fontSize: 11, fontFamily: 'Helvetica-Bold', color: C.white },
-  ctaContact:  { fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginTop: 8, textAlign: 'center' },
+  ctaContact:  { fontSize: 9, fontFamily: 'Helvetica', color: '#475569', marginTop: 8, textAlign: 'center' },
 })
 
 // ── Components ─────────────────────────────────────────────────────────────
@@ -393,9 +393,12 @@ function FindingsPage({ report, biz }: { report: AuditReportData; biz: string })
           We fix exactly these problems for local businesses across Victoria.{'\n'}
           Book a free 15-minute call and we'll walk through your site together.
         </Text>
-        <View style={s.ctaButton}>
-          <Text style={s.ctaButtonText}>webf5.com.au/brief</Text>
-        </View>
+        <Link src={`mailto:contact@webf5.au?subject=${encodeURIComponent(`${biz} - request for a 15 minute call.`)}&body=${encodeURIComponent(`Please contact ${biz} regarding the items identified on the website audit.`)}`}
+          style={{ textDecoration: 'none' }}>
+          <View style={s.ctaButton}>
+            <Text style={s.ctaButtonText}>Book a free 15-minute call</Text>
+          </View>
+        </Link>
         <Text style={s.ctaContact}>Or call Josh: 0419 510 206 · contact@webf5.au</Text>
       </View>
     </Page>

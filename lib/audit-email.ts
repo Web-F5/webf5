@@ -245,7 +245,7 @@ export function buildAuditEmailHtml(
           ? 'We can review your conversion flow, design, and content to find growth opportunities beyond the basics.'
           : 'We fix exactly these problems for local businesses across Victoria. Book a free 15-minute call — no obligation.'}
       </div>
-      <a href="https://webf5.com.au/brief" style="display:inline-block;background:#4F46E5;color:#FFFFFF;font-weight:700;font-size:14px;padding:14px 32px;border-radius:50px;text-decoration:none;">
+      <a href="mailto:contact@webf5.au?subject=${encodeURIComponent(`${biz} - request for a 15 minute call.`)}&body=${encodeURIComponent(`Please contact ${biz} regarding the items identified on the website audit.`)}" style="display:inline-block;background:#4F46E5;color:#FFFFFF;font-weight:700;font-size:14px;padding:14px 32px;border-radius:50px;text-decoration:none;">
         Book a free 15-minute call →
       </a>
       <div style="margin-top:16px;font-size:12px;color:#6366F1;">
