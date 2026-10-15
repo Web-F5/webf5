@@ -240,7 +240,7 @@ function SendForm() {
             <input
               type="text"
               value={fromBusiness}
-              onChange={e => setFromBusiness(e.target.value)}
+              onChange={e => { setFromBusiness(e.target.value); setPlaceSearch(e.target.value) }}
               placeholder="Acme Electrical"
               className="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
             />
