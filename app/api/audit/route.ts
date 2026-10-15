@@ -12,7 +12,8 @@ const NOTIFY = 'leads@webf5.au'
 
 async function fetchPageSpeedBoth(url: string) {
   const key  = process.env.PAGESPEED_API_KEY ? `&key=${process.env.PAGESPEED_API_KEY}` : ''
-  const base = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}`
+  const cats = 'category=performance&category=accessibility&category=best-practices'
+  const base = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&${cats}`
   const doFetch = (strategy: string) =>
     fetch(`${base}&strategy=${strategy}${key}`, { next: { revalidate: 0 } })
       .then(r => { if (!r.ok) { console.warn(`PageSpeed ${strategy} HTTP ${r.status}`); return null } return r.json() })

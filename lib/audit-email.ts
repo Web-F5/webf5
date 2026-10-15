@@ -135,10 +135,12 @@ export function buildAuditEmailHtml(
       <!-- Grade + score -->
       <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
         <tr>
-          <td style="padding-right:20px;">
-            <div style="width:80px;height:80px;border-radius:50%;border:4px solid ${gc};display:flex;align-items:center;justify-content:center;text-align:center;line-height:80px;">
-              <span style="font-size:38px;font-weight:900;color:${gc};line-height:80px;display:block;">${grade}</span>
-            </div>
+          <td style="padding-right:20px;vertical-align:middle;">
+            <table width="80" height="80" cellpadding="0" cellspacing="0" style="border-radius:50%;border:4px solid ${gc};">
+              <tr><td align="center" valign="middle" style="text-align:center;vertical-align:middle;">
+                <span style="font-size:38px;font-weight:900;color:${gc};line-height:1;">${grade}</span>
+              </td></tr>
+            </table>
           </td>
           <td style="vertical-align:middle;">
             <div style="font-size:42px;font-weight:900;color:${gc};line-height:1;">${overallScore}</div>
