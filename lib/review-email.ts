@@ -33,6 +33,7 @@ function platformIcon(platform: string): string {
 export interface ReviewEmailData {
   recipientName:  string
   fromBusiness:   string
+  fromEmail?:     string
   platform:       string
   reviewUrl:      string
   customMessage?: string
@@ -43,7 +44,7 @@ export interface ReviewEmailData {
 }
 
 export function buildReviewEmailHtml(d: ReviewEmailData): string {
-  const { recipientName, fromBusiness, platform, reviewUrl, customMessage, ratingUrl, logoBase64 } = d
+  const { recipientName, fromBusiness, fromEmail, platform, reviewUrl, customMessage, ratingUrl, logoBase64 } = d
   const platformName  = platformLabel(platform)
   const buttonColor   = platformButtonColor(platform)
   const icon          = platformIcon(platform)
@@ -107,8 +108,12 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
         </tr>
       </table>
 
-      <p style="font-size:13px;color:#94A3B8;margin:0;line-height:1.6;">
-        No pressure at all — if now isn't a good time, feel free to ignore this. And if there's anything we could have done better, just reply to this email — we read every response.
+      <p style="font-size:13px;color:#334155;margin:0;line-height:1.6;">
+        No pressure at all. If now isn't a good time, feel free to ignore this. Also if there's anything we could have done better,
+        ${fromEmail
+          ? `<a href="mailto:${fromEmail}" style="color:#6366F1;text-decoration:none;">just reply to this email</a>`
+          : 'just reply to this email'
+        } — we read every response.
       </p>
     </td></tr>
 
@@ -119,15 +124,23 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
     </td></tr>
 
     <!-- ═══ FOOTER ═══ -->
-    <tr><td style="background:#0A0F1E;border-radius:0 0 16px 16px;padding:20px 40px;text-align:center;">
-      <a href="https://webf5.com.au" style="display:inline-block;margin-bottom:10px;text-decoration:none;">
-        <img src="https://webf5.com.au/images/Web-F5-logo-bw.png" alt="Web F5" width="32" height="32"
-          style="display:block;border:0;opacity:0.6;" />
-      </a>
-      <p style="font-size:11px;color:#334155;margin:0;line-height:1.6;">
-        Sent from <a href="https://webf5.com.au" style="color:#6366F1;text-decoration:none;">Web F5</a> Bulk Review Finder ·
-        <a href="mailto:contact@webf5.au" style="color:#475569;text-decoration:none;">Contact us</a> to send your own review requests
-      </p>
+    <tr><td style="background:#0A0F1E;border-radius:0 0 16px 16px;padding:20px 40px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:middle;">
+            <p style="font-size:12px;color:#FFFFFF;margin:0;line-height:1.7;">
+              Sent from <a href="https://webf5.com.au" style="color:#6366F1;text-decoration:none;">Web F5</a> Bulk Review Finder ·
+              <a href="mailto:contact@webf5.au" style="color:#94A3B8;text-decoration:none;">Contact us</a> to send your own review requests
+            </p>
+          </td>
+          <td style="vertical-align:middle;text-align:right;padding-left:16px;width:1%;">
+            <a href="https://webf5.com.au" style="text-decoration:none;">
+              <img src="https://webf5.com.au/images/web-app-manifest-512x512.png" alt="Web F5" width="36" height="36"
+                style="display:block;border:0;" />
+            </a>
+          </td>
+        </tr>
+      </table>
     </td></tr>
 
   </table>

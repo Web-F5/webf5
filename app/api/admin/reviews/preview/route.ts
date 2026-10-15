@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { buildReviewEmailHtml } from '@/lib/review-email'
 
 export async function POST(req: NextRequest) {
-  const { fromBusiness, platform, reviewUrl, customMessage, recipientName, useFilter, logoBase64 } = await req.json()
+  const { fromBusiness, fromEmail, platform, reviewUrl, customMessage, recipientName, useFilter, logoBase64 } = await req.json()
 
   const html = buildReviewEmailHtml({
     recipientName: recipientName || 'Customer',
     fromBusiness:  fromBusiness || 'Your Business',
+    fromEmail:     fromEmail || undefined,
     platform:      platform || 'google',
     reviewUrl:     reviewUrl || '#',
     customMessage: customMessage?.trim() || undefined,

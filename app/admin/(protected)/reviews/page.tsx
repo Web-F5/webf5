@@ -98,6 +98,7 @@ function resizeToBase64(file: File, maxPx = 300): Promise<string> {
 
 function SendForm() {
   const [fromBusiness, setFromBusiness]   = useState('')
+  const [fromEmail, setFromEmail]         = useState('')
   const [platform, setPlatform]           = useState<Platform>('google')
   const [reviewUrl, setReviewUrl]         = useState('')
   const [customMessage, setCustomMessage] = useState('It was a pleasure working with you.')
@@ -129,6 +130,7 @@ function SendForm() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         fromBusiness:  fromBusiness || 'Your Business',
+        fromEmail:     fromEmail || undefined,
         platform,
         reviewUrl:     reviewUrl || 'https://example.com',
         customMessage,
@@ -150,7 +152,7 @@ function SendForm() {
       const res = await fetch('/api/admin/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromBusiness, platform, reviewUrl, customMessage, recipients: activeRecipients, useFilter, logoBase64: logoBase64 || undefined }),
+        body: JSON.stringify({ fromBusiness, fromEmail: fromEmail || undefined, platform, reviewUrl, customMessage, recipients: activeRecipients, useFilter, logoBase64: logoBase64 || undefined }),
       })
       const data = await res.json()
       if (data.success) {
@@ -245,6 +247,14 @@ function SendForm() {
               className="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
             />
             <p className="text-xs text-slate-500 mt-1.5">The business name the email is sent on behalf of</p>
+            <input
+              type="email"
+              value={fromEmail}
+              onChange={e => setFromEmail(e.target.value)}
+              placeholder="hello@acmeelectrical.com.au"
+              className="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors mt-2"
+            />
+            <p className="text-xs text-slate-500 mt-1.5">So that clients can respond to your email</p>
           </div>
 
           {/* Logo upload */}
