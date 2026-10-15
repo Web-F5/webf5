@@ -38,17 +38,19 @@ export interface ReviewEmailData {
   customMessage?: string
   /** When set, the CTA links to the rating page instead of the review URL directly */
   ratingUrl?:     string
+  /** Base64 data URI of the client's logo, e.g. "data:image/png;base64,..." */
+  logoBase64?:    string
 }
 
 export function buildReviewEmailHtml(d: ReviewEmailData): string {
-  const { recipientName, fromBusiness, platform, reviewUrl, customMessage, ratingUrl } = d
+  const { recipientName, fromBusiness, platform, reviewUrl, customMessage, ratingUrl, logoBase64 } = d
   const platformName  = platformLabel(platform)
   const buttonColor   = platformButtonColor(platform)
   const icon          = platformIcon(platform)
   const firstName     = recipientName.split(' ')[0]
   const useFilter     = !!ratingUrl
 
-  const defaultNote = `It was a pleasure working with you — I hope everything has been going well since.`
+  const defaultNote = `It was a pleasure working with you.`
   const note = customMessage?.trim() || defaultNote
 
   const ctaHref  = useFilter ? ratingUrl! : reviewUrl
@@ -74,7 +76,10 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
 
     <!-- ═══ HEADER ═══ -->
     <tr><td style="background:#0A0F1E;border-radius:16px 16px 0 0;padding:36px 40px 32px;">
-      <div style="font-size:22px;font-weight:800;color:#FFFFFF;margin-bottom:6px;">${fromBusiness}</div>
+      ${logoBase64
+        ? `<img src="${logoBase64}" alt="${fromBusiness}" height="60" style="display:block;max-width:200px;height:60px;object-fit:contain;margin-bottom:16px;border:0;" />`
+        : `<div style="font-size:22px;font-weight:800;color:#FFFFFF;margin-bottom:6px;">${fromBusiness}</div>`
+      }
       <div style="font-size:14px;color:#64748B;">A quick favour</div>
     </td></tr>
 

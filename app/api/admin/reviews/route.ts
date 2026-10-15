@@ -12,7 +12,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'
 
 export async function POST(req: NextRequest) {
   try {
-    const { fromBusiness, platform, reviewUrl, customMessage, recipients, useFilter } = await req.json()
+    const { fromBusiness, platform, reviewUrl, customMessage, recipients, useFilter, logoBase64 } = await req.json()
 
     if (!fromBusiness?.trim()) return NextResponse.json({ error: 'From business is required.' }, { status: 400 })
     if (!platform)             return NextResponse.json({ error: 'Platform is required.' }, { status: 400 })
@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
             reviewUrl:     reviewUrl.trim(),
             customMessage: customMessage?.trim() || undefined,
             ratingUrl,
+            logoBase64:   logoBase64 || undefined,
           }),
         }
       })

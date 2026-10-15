@@ -71,12 +71,38 @@ function PreviewModal({ html, onClose }: { html: string; onClose: () => void }) 
 
 // ── Send form ──────────────────────────────────────────────────────────────
 
+// ── Image resizer ──────────────────────────────────────────────────────────
+
+function resizeToBase64(file: File, maxPx = 300): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = reject
+    reader.onload = e => {
+      const img = new Image()
+      img.onerror = reject
+      img.onload = () => {
+        const ratio  = Math.min(maxPx / img.width, maxPx / img.height, 1)
+        const canvas = document.createElement('canvas')
+        canvas.width  = Math.round(img.width  * ratio)
+        canvas.height = Math.round(img.height * ratio)
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/png'))
+      }
+      img.src = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+// ── Send form ──────────────────────────────────────────────────────────────
+
 function SendForm() {
   const [fromBusiness, setFromBusiness]   = useState('')
   const [platform, setPlatform]           = useState<Platform>('google')
   const [reviewUrl, setReviewUrl]         = useState('')
   const [customMessage, setCustomMessage] = useState('')
   const [useFilter, setUseFilter]         = useState(false)
+  const [logoBase64, setLogoBase64]       = useState<string | null>(null)
   const [recipients, setRecipients]       = useState<Recipient[]>([{ name: '', email: '' }])
   const [mode, setMode]                   = useState<'single' | 'bulk'>('single')
   const [csvText, setCsvText]             = useState('')
@@ -84,7 +110,8 @@ function SendForm() {
   const [confirming, setConfirming]       = useState(false)
   const [sending, setSending]             = useState(false)
   const [result, setResult]               = useState<{ sent: number; errors: string[] } | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
+  const fileRef    = useRef<HTMLInputElement>(null)
+  const logoRef    = useRef<HTMLInputElement>(null)
 
   const selectedPlatform = PLATFORMS.find(p => p.value === platform)!
 
@@ -103,6 +130,7 @@ function SendForm() {
         customMessage,
         recipientName: activeRecipients[0]?.name || 'Customer',
         useFilter,
+        logoBase64:    logoBase64 || undefined,
       }),
     })
     if (res.ok) {
@@ -118,7 +146,7 @@ function SendForm() {
       const res = await fetch('/api/admin/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromBusiness, platform, reviewUrl, customMessage, recipients: activeRecipients, useFilter }),
+        body: JSON.stringify({ fromBusiness, platform, reviewUrl, customMessage, recipients: activeRecipients, useFilter, logoBase64: logoBase64 || undefined }),
       })
       const data = await res.json()
       if (data.success) {
@@ -131,6 +159,18 @@ function SendForm() {
     } finally {
       setSending(false)
     }
+  }
+
+  async function handleLogoFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const b64 = await resizeToBase64(file, 300)
+      setLogoBase64(b64)
+    } catch {
+      alert('Could not read image. Please try a different PNG file.')
+    }
+    e.target.value = ''
   }
 
   function handleCsvFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -171,17 +211,49 @@ function SendForm() {
 
       <div className="space-y-6">
 
-        {/* From business */}
-        <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">From business name</label>
-          <input
-            type="text"
-            value={fromBusiness}
-            onChange={e => setFromBusiness(e.target.value)}
-            placeholder="Acme Electrical"
-            className="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
-          />
-          <p className="text-xs text-slate-500 mt-1.5">The business name the email is sent on behalf of</p>
+        {/* From business + logo */}
+        <div className="flex gap-4 items-start">
+          <div className="flex-1">
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">From business name</label>
+            <input
+              type="text"
+              value={fromBusiness}
+              onChange={e => setFromBusiness(e.target.value)}
+              placeholder="Acme Electrical"
+              className="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+            />
+            <p className="text-xs text-slate-500 mt-1.5">The business name the email is sent on behalf of</p>
+          </div>
+
+          {/* Logo upload */}
+          <div className="flex-shrink-0">
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Logo <span className="normal-case font-normal text-slate-600">(PNG)</span>
+            </label>
+            <input ref={logoRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={handleLogoFile} className="hidden" />
+            <button
+              type="button"
+              onClick={() => logoRef.current?.click()}
+              className="relative w-20 h-20 rounded-xl border-2 border-dashed border-white/10 hover:border-indigo-500/50 transition-colors overflow-hidden flex items-center justify-center bg-[#111827]"
+              title="Upload client logo"
+            >
+              {logoBase64 ? (
+                <>
+                  <img src={logoBase64} alt="Logo preview" className="w-full h-full object-contain p-1.5" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-xs font-semibold">Change</span>
+                  </div>
+                </>
+              ) : (
+                <span className="text-slate-600 text-xs text-center leading-snug px-1">Upload<br/>logo</span>
+              )}
+            </button>
+            {logoBase64 && (
+              <button type="button" onClick={() => setLogoBase64(null)} className="block text-xs text-red-400 hover:text-red-300 mt-1.5 transition-colors">
+                Remove
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Platform */}
