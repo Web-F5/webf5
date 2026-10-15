@@ -108,6 +108,10 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
 
     <!-- ═══ FOOTER ═══ -->
     <tr><td style="background:#0A0F1E;border-radius:0 0 16px 16px;padding:20px 40px;text-align:center;">
+      <a href="https://webf5.com.au" style="display:inline-block;margin-bottom:10px;text-decoration:none;">
+        <img src="https://webf5.com.au/images/Web-F5-logo-bw.png" alt="Web F5" width="32" height="32"
+          style="display:block;border:0;opacity:0.6;" />
+      </a>
       <p style="font-size:11px;color:#334155;margin:0;line-height:1.6;">
         Sent from <a href="https://webf5.com.au" style="color:#6366F1;text-decoration:none;">Web F5</a> Bulk Review Finder ·
         <a href="mailto:contact@webf5.au" style="color:#475569;text-decoration:none;">Contact us</a> to send your own review requests

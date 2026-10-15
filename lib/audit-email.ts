@@ -89,7 +89,17 @@ export function buildAuditEmailHtml(
     <tr><td style="background:#0A0F1E;border-radius:16px 16px 0 0;padding:40px 40px 36px;">
 
       <!-- Brand -->
-      <div style="font-size:20px;font-weight:800;color:#6366F1;margin-bottom:4px;">Web F5</div>
+      <table cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
+        <tr>
+          <td style="padding-right:10px;vertical-align:middle;">
+            <img src="https://webf5.com.au/images/Web-F5-logo-bw.png" alt="Web F5" width="36" height="36"
+              style="display:block;border:0;" />
+          </td>
+          <td style="vertical-align:middle;">
+            <div style="font-size:20px;font-weight:800;color:#6366F1;line-height:1;">Web F5</div>
+          </td>
+        </tr>
+      </table>
       <div style="font-size:10px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;">Website Audit Report · ${date}</div>
 
       <!-- Grade + score -->
