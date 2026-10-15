@@ -188,11 +188,17 @@ function SendForm() {
   async function handleLogoFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml']
+    if (!allowed.includes(file.type)) {
+      alert('Please upload an image file: PNG, JPG, WebP, GIF, or SVG.')
+      e.target.value = ''
+      return
+    }
     try {
       const b64 = await resizeToBase64(file, 300)
       setLogoBase64(b64)
     } catch {
-      alert('Could not read image. Please try a different PNG file.')
+      alert('Could not read image. Please try a different file.')
     }
     e.target.value = ''
   }
@@ -262,7 +268,7 @@ function SendForm() {
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
               Logo <span className="normal-case font-normal text-slate-600">(PNG)</span>
             </label>
-            <input ref={logoRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={handleLogoFile} className="hidden" />
+            <input ref={logoRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/svg+xml" onChange={handleLogoFile} className="hidden" />
             <button
               type="button"
               onClick={() => logoRef.current?.click()}

@@ -39,12 +39,12 @@ export interface ReviewEmailData {
   customMessage?: string
   /** When set, the CTA links to the rating page instead of the review URL directly */
   ratingUrl?:     string
-  /** Base64 data URI of the client's logo, e.g. "data:image/png;base64,..." */
-  logoBase64?:    string
+  /** When true, use cid:logo to reference an inline attachment instead of a data URI */
+  hasLogo?:       boolean
 }
 
 export function buildReviewEmailHtml(d: ReviewEmailData): string {
-  const { recipientName, fromBusiness, fromEmail, platform, reviewUrl, customMessage, ratingUrl, logoBase64 } = d
+  const { recipientName, fromBusiness, fromEmail, platform, reviewUrl, customMessage, ratingUrl, hasLogo } = d
   const platformName  = platformLabel(platform)
   const buttonColor   = platformButtonColor(platform)
   const icon          = platformIcon(platform)
@@ -83,8 +83,8 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
             <div style="font-size:22px;font-weight:800;color:#FFFFFF;line-height:1.2;">${fromBusiness}</div>
             <div style="font-size:14px;color:#64748B;margin-top:5px;">A quick favour</div>
           </td>
-          ${logoBase64 ? `<td style="vertical-align:middle;text-align:right;padding-left:20px;width:1%;">
-            <img src="${logoBase64}" alt="${fromBusiness} logo" height="56"
+          ${hasLogo ? `<td style="vertical-align:middle;text-align:right;padding-left:20px;width:1%;">
+            <img src="cid:logo" alt="${fromBusiness} logo" height="56"
               style="display:block;max-width:140px;height:56px;object-fit:contain;border:0;" />
           </td>` : ''}
         </tr>

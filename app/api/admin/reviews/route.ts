@@ -64,6 +64,21 @@ export async function POST(req: NextRequest) {
         const token    = tokenMap[r.email.trim()]
         const ratingUrl = token ? `${BASE_URL}/review?t=${token}` : undefined
 
+        // Parse base64 data URI for inline attachment
+        let attachments: { content: string; filename: string; content_type: string; content_id: string; inline: boolean }[] | undefined
+        if (logoBase64) {
+          const match = (logoBase64 as string).match(/^data:(image\/[a-z+]+);base64,(.+)$/)
+          if (match) {
+            attachments = [{
+              content:      match[2],
+              filename:     'logo',
+              content_type: match[1],
+              content_id:   'logo',
+              inline:       true,
+            }]
+          }
+        }
+
         return {
           from:    `${fromBusiness.trim()} via Web F5 <${FROM}>`,
           to:      r.email.trim(),
@@ -77,8 +92,9 @@ export async function POST(req: NextRequest) {
             fromEmail:     fromEmail?.trim() || undefined,
             customMessage: customMessage?.trim() || undefined,
             ratingUrl,
-            logoBase64:   logoBase64 || undefined,
+            hasLogo:       !!logoBase64,
           }),
+          ...(attachments ? { attachments } : {}),
         }
       })
 
