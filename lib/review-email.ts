@@ -153,5 +153,5 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
 
 export function buildReviewEmailSubject(fromBusiness: string, platform: string): string {
   const name = platformLabel(platform)
-  return `Quick favour — would you mind leaving us a ${name} review?`
+  return `Quick favour, would you mind leaving us a ${name} review?`
 }
