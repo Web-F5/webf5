@@ -4,10 +4,29 @@ import { Document, Page, View, Text, StyleSheet, renderToBuffer } from '@react-p
 export interface AuditReportData {
   lcp:            number
   pageSpeedScore?: number | null
+  desktopScore?:  number | null
+  mobileCls?:     number | null
+  mobileFcp?:     number | null
+  mobileTbt?:     number | null
+  desktopLcp?:    number | null
+  desktopCls?:    number | null
+  desktopFcp?:    number | null
+  desktopTbt?:    number | null
+  pageWeightKb?:  number | null
+  lighthouseAccessibility?: number | null
+  lighthouseBestPractices?: number | null
   grade:          string
   overallScore:   number
-  ssl:            boolean
-  hasSitemap:     boolean
+  subScores?: {
+    onPage:      number
+    performance: number
+    usability:   number
+    social:      number
+  }
+  ssl:          boolean
+  hasSitemap:   boolean
+  hasRobotsTxt?: boolean
+  hasLlmsTxt?:  boolean
   content: {
     metaTitle:       string | null
     metaDesc:        string | null
@@ -18,11 +37,18 @@ export interface AuditReportData {
     hasCta:          boolean
     hasTapToCall?:   boolean
     hasSchema?:      boolean
+    hasCanonical?:   boolean
+    hasFavicon?:     boolean
+    hasLang?:        boolean
     hasAnalytics?:   boolean
     hasMetaPixel?:   boolean
     hasGoogleAds?:   boolean
+    hasOpenGraph?:   boolean
+    hasTwitterCard?: boolean
+    hasViewport?:    boolean
     imagesTotal?:    number
     imagesMissingAlt?: number
+    linkCount?:      number
   }
   url: string
 }
@@ -45,6 +71,12 @@ const C = {
 
 function gradeColor(grade: string): string {
   return { A: C.pass, B: C.lime, C: C.amber, D: C.fail }[grade] ?? C.indigo
+}
+
+function subScoreColor(score: number): string {
+  if (score >= 80) return C.pass
+  if (score >= 60) return C.amber
+  return C.fail
 }
 
 function coverHeadline(grade: string): string {
@@ -82,6 +114,10 @@ const s = StyleSheet.create({
   scoreBlock:      { flexDirection: 'column' },
   scoreNumber:     { fontSize: 36, fontFamily: 'Helvetica-Bold', lineHeight: 1 },
   scoreLabel:      { fontSize: 11, fontFamily: 'Helvetica', color: C.slate, marginTop: 2 },
+  subScoreRow:     { flexDirection: 'row', marginTop: 20, gap: 12 },
+  subScoreItem:    { alignItems: 'center', backgroundColor: '#0F1729', borderRadius: 6, paddingVertical: 10, paddingHorizontal: 12 },
+  subScoreNum:     { fontSize: 18, fontFamily: 'Helvetica-Bold' },
+  subScoreLabel:   { fontSize: 8, fontFamily: 'Helvetica', color: C.slate, marginTop: 2 },
   coverFooterRow:  { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#1E293B', paddingTop: 16 },
   coverFooterText: { fontSize: 9, fontFamily: 'Helvetica', color: C.slate },
 
@@ -95,6 +131,12 @@ const s = StyleSheet.create({
   summaryRow:  { flexDirection: 'row', alignItems: 'center', backgroundColor: C.light, borderRadius: 8, padding: 14, marginBottom: 20 },
   summaryScore:{ fontSize: 28, fontFamily: 'Helvetica-Bold', marginRight: 12 },
   summaryLabel:{ fontSize: 11, fontFamily: 'Helvetica', color: C.slate },
+
+  // Metrics grid
+  metricsGrid: { flexDirection: 'row', gap: 8, marginBottom: 4 },
+  metricBox:   { flex: 1, backgroundColor: C.light, borderRadius: 6, padding: 8, alignItems: 'center' },
+  metricVal:   { fontSize: 14, fontFamily: 'Helvetica-Bold' },
+  metricLbl:   { fontSize: 7, fontFamily: 'Helvetica', color: C.slate, marginTop: 2 },
 
   sectionTitle:{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: C.indigo, letterSpacing: 1.5, marginBottom: 8, marginTop: 16 },
   sectionLine: { borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 4 },
@@ -130,12 +172,33 @@ function CheckRow({ pass, label, detail, tag }: { pass: boolean; label: string; 
   )
 }
 
+function InfoRow({ label, detail }: { label: string; detail: string }) {
+  return (
+    <View style={[s.checkRow, { borderBottomColor: '#F1F5F9' }]}>
+      <View style={[s.checkDot, { backgroundColor: C.slate }]} />
+      <View style={{ flex: 1 }}>
+        <Text style={[s.checkLabel, { color: C.dark }]}>{label}</Text>
+        <Text style={s.checkDetail}>{detail}</Text>
+      </View>
+    </View>
+  )
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View>
       <Text style={s.sectionTitle}>{title.toUpperCase()}</Text>
       <View style={s.sectionLine} />
       {children}
+    </View>
+  )
+}
+
+function MetricBox({ val, label, color }: { val: string; label: string; color?: string }) {
+  return (
+    <View style={s.metricBox}>
+      <Text style={[s.metricVal, { color: color ?? C.dark }]}>{val}</Text>
+      <Text style={s.metricLbl}>{label}</Text>
     </View>
   )
 }
@@ -168,7 +231,26 @@ function CoverPage({ report, biz, date }: { report: AuditReportData; biz: string
           </View>
         </View>
 
-        <Text style={s.coverSubline}>{coverSubline(report.grade)}</Text>
+        {/* Sub-score tiles */}
+        {report.subScores && (
+          <View style={s.subScoreRow}>
+            {([
+              ['On-Page', report.subScores.onPage],
+              ['Performance', report.subScores.performance],
+              ['Usability', report.subScores.usability],
+              ['Social', report.subScores.social],
+            ] as [string, number][]).map(([label, score]) => (
+              <View key={label} style={s.subScoreItem}>
+                <Text style={[s.subScoreNum, { color: subScoreColor(score) }]}>{score}</Text>
+                <Text style={s.subScoreLabel}>{label}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={{ marginTop: 20 }}>
+          <Text style={s.coverSubline}>{coverSubline(report.grade)}</Text>
+        </View>
       </View>
 
       {/* Footer */}
@@ -182,8 +264,19 @@ function CoverPage({ report, biz, date }: { report: AuditReportData; biz: string
 
 function FindingsPage({ report, biz }: { report: AuditReportData; biz: string }) {
   const { lcp, ssl, hasSitemap, content } = report
-  const allImagesAlt = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
-  const speedPass = lcp < 4
+  const allImagesAlt  = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
+  const mobilePass    = lcp < 4
+  const desktopPass   = (report.desktopScore ?? 0) >= 80
+  const accessPass    = (report.lighthouseAccessibility ?? 0) >= 80
+  const bestPractPass = (report.lighthouseBestPractices ?? 0) >= 80
+  const gc = gradeColor(report.grade)
+
+  const speedColor = (v: number | null | undefined, good: number, ok: number) => {
+    if (v == null) return C.slate
+    if (v <= good) return C.pass
+    if (v <= ok)   return C.amber
+    return C.fail
+  }
 
   const lcpDetail = lcp < 2.5
     ? `${lcp.toFixed(1)}s — fast. Visitors stay and explore.`
@@ -191,15 +284,16 @@ function FindingsPage({ report, biz }: { report: AuditReportData; biz: string })
     ? `${lcp.toFixed(1)}s — acceptable but can be improved.`
     : `${lcp.toFixed(1)}s — slow. Many mobile visitors leave before the page finishes loading.`
 
-  const totalChecks = 14
-  const passCount = [
-    ssl, speedPass, !!content.metaTitle, !!content.metaDesc, !!content.h1,
-    !!hasSitemap, !!content.hasSchema, allImagesAlt,
+  // Count for summary
+  const checksForSummary = [
+    ssl, mobilePass, desktopPass, !!content.metaTitle, !!content.metaDesc, !!content.h1,
+    content.hasCanonical, !!hasSitemap, !!report.hasRobotsTxt, !!content.hasSchema, allImagesAlt,
+    !!content.hasOpenGraph, !!content.hasTwitterCard,
     !!content.hasAnalytics, !!content.hasMetaPixel, !!content.hasGoogleAds,
-    !!content.hasTapToCall, content.hasContact, content.hasCta,
-  ].filter(Boolean).length
-
-  const gc = gradeColor(report.grade)
+    accessPass, !!content.hasTapToCall, content.hasContact, content.hasCta,
+  ]
+  const passCount  = checksForSummary.filter(Boolean).length
+  const totalChecks = checksForSummary.length
 
   return (
     <Page size="A4" style={s.reportPage}>
@@ -221,94 +315,75 @@ function FindingsPage({ report, biz }: { report: AuditReportData; biz: string })
         </View>
       </View>
 
-      {/* Mobile Speed */}
-      <Section title="Mobile Speed">
-        <CheckRow
-          pass={speedPass}
-          label={`Load time — ${lcp.toFixed(1)}s`}
-          tag={report.pageSpeedScore != null ? `PageSpeed ${report.pageSpeedScore}/100` : undefined}
-          detail={lcpDetail}
-        />
+      {/* Performance */}
+      <Section title="Performance">
+        {/* Core Web Vitals grid */}
+        <View style={[s.metricsGrid, { marginBottom: 8 }]}>
+          <MetricBox val={`${lcp.toFixed(1)}s`}  label="Mobile LCP"  color={speedColor(lcp, 2.5, 4)} />
+          <MetricBox val={report.mobileFcp != null ? `${report.mobileFcp.toFixed(1)}s` : '—'}  label="Mobile FCP"  color={speedColor(report.mobileFcp, 1.8, 3)} />
+          <MetricBox val={report.mobileCls != null ? report.mobileCls.toFixed(3) : '—'}         label="Mobile CLS"  color={speedColor(report.mobileCls, 0.1, 0.25)} />
+          <MetricBox val={report.mobileTbt != null ? `${Math.round(report.mobileTbt)}ms` : '—'} label="Mobile TBT"  color={speedColor(report.mobileTbt, 200, 600)} />
+        </View>
+        <View style={[s.metricsGrid, { marginBottom: 8 }]}>
+          <MetricBox val={report.desktopLcp != null ? `${report.desktopLcp.toFixed(1)}s` : '—'} label="Desktop LCP" color={speedColor(report.desktopLcp, 2.5, 4)} />
+          <MetricBox val={report.desktopFcp != null ? `${report.desktopFcp.toFixed(1)}s` : '—'} label="Desktop FCP" color={speedColor(report.desktopFcp, 1.8, 3)} />
+          <MetricBox val={report.desktopCls != null ? report.desktopCls.toFixed(3) : '—'}        label="Desktop CLS" color={speedColor(report.desktopCls, 0.1, 0.25)} />
+          <MetricBox val={report.pageWeightKb != null ? `${report.pageWeightKb} KB` : '—'}        label="Page Weight" color={report.pageWeightKb != null ? (report.pageWeightKb < 1024 ? C.pass : report.pageWeightKb < 2048 ? C.amber : C.fail) : C.slate} />
+        </View>
+        <CheckRow pass={mobilePass}   label={`Mobile PageSpeed — ${report.pageSpeedScore ?? '—'}/100`}  tag={`LCP ${lcp.toFixed(1)}s`}      detail={lcpDetail} />
+        <CheckRow pass={desktopPass}  label={`Desktop PageSpeed — ${report.desktopScore ?? '—'}/100`}   tag={report.desktopLcp != null ? `LCP ${report.desktopLcp.toFixed(1)}s` : undefined} detail={desktopPass ? 'Desktop speed is good.' : 'Desktop score is below 80 — check image sizes and render-blocking resources.'} />
+        <CheckRow pass={ssl}          label="Secure connection (HTTPS)"                                                                       detail={ssl ? 'Your site is secure. Visitors and Google trust it.' : 'Browsers display a "Not Secure" warning — this loses visitors and hurts your Google ranking.'} />
       </Section>
 
-      {/* Search & SEO */}
-      <Section title="Search &amp; SEO">
-        <CheckRow
-          pass={ssl}
-          label="Secure connection (HTTPS)"
-          detail={ssl ? 'Your site is secure. Visitors and Google trust it.' : 'Browsers display a "Not Secure" warning — this loses visitors and hurts your Google ranking.'}
-        />
-        <CheckRow
-          pass={!!content.metaTitle}
-          label="Page title"
-          tag={content.metaTitleLen != null ? `${content.metaTitleLen} chars` : undefined}
-          detail={content.metaTitle ? `"${content.metaTitle}"` : 'Missing — Google has nothing to show in search results.'}
-        />
-        <CheckRow
-          pass={!!content.metaDesc}
-          label="Meta description"
-          tag={content.metaDescLen != null ? `${content.metaDescLen} chars${content.metaDescLen < 120 || content.metaDescLen > 155 ? ' · aim 120–155' : ' · good'}` : undefined}
-          detail={content.metaDesc ? 'Set — you control what people read before clicking your result.' : 'Missing — Google will choose what to display instead of you.'}
-        />
-        <CheckRow
-          pass={!!content.h1}
-          label="Page heading (H1)"
-          detail={content.h1 ? `"${content.h1}"` : 'Missing — no clear message for visitors or search engines.'}
-        />
-        <CheckRow
-          pass={!!hasSitemap}
-          label="XML sitemap"
-          detail={hasSitemap ? 'Found — Google can discover every page on your site.' : 'Not found — Google has a harder time finding and indexing all your pages.'}
-        />
-        <CheckRow
-          pass={!!content.hasSchema}
-          label="Structured data (schema)"
-          detail={content.hasSchema ? 'Found — Google and AI assistants can read your business details.' : 'Not found — adding LocalBusiness schema helps you appear in local results and AI assistant answers.'}
-        />
-        <CheckRow
-          pass={allImagesAlt}
-          label="Image alt text"
-          tag={content.imagesTotal != null ? `${(content.imagesTotal ?? 0) - (content.imagesMissingAlt ?? 0)}/${content.imagesTotal} described` : undefined}
-          detail={allImagesAlt ? 'All images are described — good for accessibility and search engines.' : `${content.imagesMissingAlt} image${(content.imagesMissingAlt ?? 0) > 1 ? 's' : ''} missing alt text — screen readers and Google can't read these.`}
-        />
+      {/* On-Page SEO */}
+      <Section title="On-Page SEO">
+        <CheckRow pass={!!content.metaTitle}   label="Page title"              tag={content.metaTitleLen != null ? `${content.metaTitleLen} chars` : undefined} detail={content.metaTitle ? `"${content.metaTitle}"` : 'Missing — Google has nothing to show in search results.'} />
+        <CheckRow pass={!!content.metaDesc}    label="Meta description"        tag={content.metaDescLen != null ? `${content.metaDescLen} chars${(content.metaDescLen < 120 || content.metaDescLen > 155) ? ' · aim 120–155' : ' · good'}` : undefined} detail={content.metaDesc ? 'Set — you control what people read before clicking your result.' : 'Missing — Google will choose what to display instead of you.'} />
+        <CheckRow pass={!!content.h1}          label="Page heading (H1)"                                                                      detail={content.h1 ? `"${content.h1}"` : 'Missing — no clear message for visitors or search engines.'} />
+        <CheckRow pass={!!content.hasCanonical} label="Canonical tag"                                                                         detail={content.hasCanonical ? 'Set — prevents duplicate-content issues.' : 'Missing — add a canonical tag to tell Google which URL is authoritative.'} />
+        <CheckRow pass={!!hasSitemap}           label="XML sitemap"                                                                           detail={hasSitemap ? 'Found — Google can discover every page on your site.' : 'Not found — Google has a harder time finding and indexing all your pages.'} />
+        <CheckRow pass={!!report.hasRobotsTxt}  label="robots.txt"                                                                           detail={report.hasRobotsTxt ? 'Found — search engine crawlers have guidance on your site.' : 'Not found — add a robots.txt file to guide crawlers.'} />
+        <CheckRow pass={!!content.hasSchema}    label="Structured data (schema)"                                                              detail={content.hasSchema ? 'Found — Google and AI assistants can read your business details.' : 'Not found — adding LocalBusiness schema helps you appear in local results and AI assistant answers.'} />
+        <CheckRow pass={allImagesAlt}           label="Image alt text"          tag={content.imagesTotal != null ? `${(content.imagesTotal ?? 0) - (content.imagesMissingAlt ?? 0)}/${content.imagesTotal} described` : undefined} detail={allImagesAlt ? 'All images are described — good for accessibility and search engines.' : `${content.imagesMissingAlt} image${(content.imagesMissingAlt ?? 0) > 1 ? 's' : ''} missing alt text.`} />
+        {content.hasFavicon != null && (
+          <CheckRow pass={!!content.hasFavicon}  label="Favicon"                                                                              detail={content.hasFavicon ? 'Favicon set — adds brand recognition in browser tabs and search results.' : 'No favicon detected — a small icon builds recognition in tabs and bookmarks.'} />
+        )}
+        {content.hasLang != null && (
+          <CheckRow pass={!!content.hasLang}     label="Language declaration"                                                                 detail={content.hasLang ? 'Page declares its language — helps search engines serve the right audience.' : 'No lang attribute on <html> — add lang="en" or the appropriate language code.'} />
+        )}
+        {content.linkCount != null && (
+          <InfoRow label={`${content.linkCount} links on page`} detail="Total anchor links found — internal and external." />
+        )}
+        {report.hasLlmsTxt != null && (
+          <CheckRow pass={!!report.hasLlmsTxt}  label="llms.txt (AI readiness)"                                                              detail={report.hasLlmsTxt ? 'llms.txt found — helps AI assistants understand your site content.' : 'No llms.txt file. This emerging standard helps AI models like ChatGPT better understand your business.'} />
+        )}
+      </Section>
+
+      {/* Usability */}
+      <Section title="Usability">
+        <CheckRow pass={accessPass}      label={`Accessibility — ${report.lighthouseAccessibility ?? '—'}/100`}    detail={accessPass ? 'Good accessibility score — your site works well for all users and search engines.' : 'Accessibility score below 80 — fix contrast, missing labels, and alt text to help all visitors and improve search rankings.'} />
+        <CheckRow pass={bestPractPass}   label={`Best Practices — ${report.lighthouseBestPractices ?? '—'}/100`}   detail={bestPractPass ? 'Site follows best practices.' : 'Some best-practice issues detected — check browser console errors, HTTPS, and deprecated APIs.'} />
+        <CheckRow pass={!!content.hasViewport} label="Mobile viewport"                                             detail={content.hasViewport ? 'Responsive viewport is set — the site scales correctly on mobile.' : 'No viewport meta tag — the site may not display correctly on mobile devices.'} />
+        <CheckRow pass={!!content.hasTapToCall} label="Tap-to-call phone link"                                     detail={content.hasTapToCall ? 'A tap-to-call link is in place — mobile visitors can call with one tap.' : 'Not found — mobile visitors have to manually copy-paste your number, and most won\'t bother.'} />
+      </Section>
+
+      {/* Social */}
+      <Section title="Social &amp; Sharing">
+        <CheckRow pass={!!content.hasOpenGraph}   label="Open Graph tags"      detail={content.hasOpenGraph   ? 'Set — your site shows a rich preview when shared on Facebook, LinkedIn, and iMessage.' : 'Missing — without OG tags, shared links show a plain URL. Add og:title, og:description, and og:image.'} />
+        <CheckRow pass={!!content.hasTwitterCard} label="Twitter / X card tags" detail={content.hasTwitterCard ? 'Set — links shared on X/Twitter show a rich card.' : 'Missing — add Twitter card meta tags for better link previews on X and Twitter.'} />
+        <CheckRow pass={!!content.hasMetaPixel}   label="Meta (Facebook) Pixel" detail={content.hasMetaPixel   ? 'Found — you can retarget visitors with Facebook and Instagram ads.' : 'Not found — adding the Pixel lets you retarget website visitors with social ads.'} />
       </Section>
 
       {/* Tracking */}
       <Section title="Tracking">
-        <CheckRow
-          pass={!!content.hasAnalytics}
-          label="Google Analytics / Tag Manager"
-          detail={content.hasAnalytics ? 'Found — you can see which pages and sources bring in enquiries.' : 'Not found — without analytics there is no way to know what brings in enquiries.'}
-        />
-        <CheckRow
-          pass={!!content.hasMetaPixel}
-          label="Meta (Facebook) Pixel"
-          detail={content.hasMetaPixel ? 'Found — you can retarget visitors with Facebook and Instagram ads.' : 'Not found — adding the Pixel lets you retarget website visitors with social ads.'}
-        />
-        <CheckRow
-          pass={!!content.hasGoogleAds}
-          label="Google Ads conversion tag"
-          detail={content.hasGoogleAds ? 'Found — you can measure which ad clicks become enquiries.' : 'Not found — if you run Google Ads, a conversion tag shows which keywords generate leads.'}
-        />
+        <CheckRow pass={!!content.hasAnalytics} label="Google Analytics / Tag Manager" detail={content.hasAnalytics ? 'Found — you can see which pages and sources bring in enquiries.' : 'Not found — without analytics there is no way to know what brings in enquiries.'} />
+        <CheckRow pass={!!content.hasGoogleAds} label="Google Ads conversion tag"      detail={content.hasGoogleAds ? 'Found — you can measure which ad clicks become enquiries.' : 'Not found — if you run Google Ads, a conversion tag shows which keywords generate leads.'} />
       </Section>
 
       {/* Enquiry Path */}
       <Section title="Enquiry Path">
-        <CheckRow
-          pass={!!content.hasTapToCall}
-          label="Tap-to-call phone link"
-          detail={content.hasTapToCall ? 'A tap-to-call link is in place — mobile visitors can call with one tap.' : 'Not found — mobile visitors have to manually copy-paste your number, and most won\'t bother.'}
-        />
-        <CheckRow
-          pass={content.hasContact}
-          label="Contact details on page"
-          detail={content.hasContact ? 'Contact details are visible on the page.' : 'Not found — visitors who can\'t reach you quickly will call your competitor.'}
-        />
-        <CheckRow
-          pass={content.hasCta}
-          label="Clear call to action"
-          detail={content.hasCta ? 'Your page has a clear next step for visitors.' : 'Not found — visitors who are ready to enquire may not know what to do next.'}
-        />
+        <CheckRow pass={content.hasContact} label="Contact details on page" detail={content.hasContact ? 'Contact details are visible on the page.' : 'Not found — visitors who can\'t reach you quickly will call your competitor.'} />
+        <CheckRow pass={content.hasCta}     label="Clear call to action"    detail={content.hasCta ? 'Your page has a clear next step for visitors.' : 'Not found — visitors who are ready to enquire may not know what to do next.'} />
       </Section>
 
       {/* CTA */}

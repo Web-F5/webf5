@@ -6,6 +6,12 @@ function gradeColor(grade: string): string {
   return { A: '#22C55E', B: '#84CC16', C: '#F59E0B', D: '#EF4444' }[grade] ?? '#6366F1'
 }
 
+function subScoreColor(score: number): string {
+  if (score >= 80) return '#22C55E'
+  if (score >= 60) return '#F59E0B'
+  return '#EF4444'
+}
+
 function coverHeadline(grade: string): string {
   return { A: 'Looking good.', B: 'A solid start.', C: 'Room to improve.', D: 'Action needed.' }[grade] ?? 'Here are your results.'
 }
@@ -34,6 +40,21 @@ function checkRow(pass: boolean, label: string, detail: string, tag?: string): s
     </tr>`
 }
 
+function infoRow(label: string, detail: string): string {
+  return `
+    <tr>
+      <td style="padding:10px 16px;border-bottom:1px solid #F1F5F9;vertical-align:top;">
+        <table cellpadding="0" cellspacing="0" width="100%"><tr>
+          <td style="width:24px;padding-top:1px;vertical-align:top;"><span style="color:#94A3B8;font-size:14px;">●</span></td>
+          <td>
+            <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:2px;">${label}</div>
+            <div style="font-size:12px;color:#64748B;line-height:1.5;">${detail}</div>
+          </td>
+        </tr></table>
+      </td>
+    </tr>`
+}
+
 function sectionHeader(title: string): string {
   return `
     <tr>
@@ -44,6 +65,20 @@ function sectionHeader(title: string): string {
     </tr>`
 }
 
+function metricCell(val: string, label: string, color: string): string {
+  return `<td style="width:25%;text-align:center;padding:10px 6px;background:#F8FAFC;border-radius:6px;">
+    <div style="font-size:16px;font-weight:800;color:${color};">${val}</div>
+    <div style="font-size:10px;color:#94A3B8;margin-top:2px;">${label}</div>
+  </td>`
+}
+
+function speedColor(v: number | null | undefined, good: number, ok: number): string {
+  if (v == null) return '#94A3B8'
+  if (v <= good) return '#22C55E'
+  if (v <= ok)   return '#F59E0B'
+  return '#EF4444'
+}
+
 // ── Main builder ───────────────────────────────────────────────────────────
 
 export function buildAuditEmailHtml(
@@ -51,18 +86,13 @@ export function buildAuditEmailHtml(
   biz: string,
   report: AuditReportData,
 ): string {
-  const { lcp, ssl, hasSitemap, content, grade, overallScore } = report
+  const { lcp, ssl, hasSitemap, content, grade, overallScore, subScores } = report
   const gc = gradeColor(grade)
-  const allImagesAlt = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
-  const speedPass = lcp < 4
-
-  const totalChecks = 14
-  const passCount = [
-    ssl, speedPass, !!content.metaTitle, !!content.metaDesc, !!content.h1,
-    !!hasSitemap, !!content.hasSchema, allImagesAlt,
-    !!content.hasAnalytics, !!content.hasMetaPixel, !!content.hasGoogleAds,
-    !!content.hasTapToCall, content.hasContact, content.hasCta,
-  ].filter(Boolean).length
+  const allImagesAlt  = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
+  const mobilePass    = lcp < 4
+  const desktopPass   = (report.desktopScore ?? 0) >= 80
+  const accessPass    = (report.lighthouseAccessibility ?? 0) >= 80
+  const bestPractPass = (report.lighthouseBestPractices ?? 0) >= 80
 
   const lcpDetail = lcp < 2.5
     ? `${lcp.toFixed(1)}s — fast. Visitors stay and explore.`
@@ -112,10 +142,28 @@ export function buildAuditEmailHtml(
           </td>
           <td style="vertical-align:middle;">
             <div style="font-size:42px;font-weight:900;color:${gc};line-height:1;">${overallScore}</div>
-            <div style="font-size:13px;color:#64748B;margin-top:2px;">out of 100 · ${passCount}/${totalChecks} checks passed</div>
+            <div style="font-size:13px;color:#64748B;margin-top:2px;">out of 100</div>
           </td>
         </tr>
       </table>
+
+      ${subScores ? `<!-- Sub-scores -->
+      <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;width:100%;">
+        <tr>
+          ${[
+            ['On-Page', subScores.onPage],
+            ['Performance', subScores.performance],
+            ['Usability', subScores.usability],
+            ['Social', subScores.social],
+          ].map(([label, score]) => `
+          <td style="width:25%;padding:2px;">
+            <div style="background:#0F1729;border-radius:8px;padding:12px 8px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:${subScoreColor(score as number)};">${score}</div>
+              <div style="font-size:10px;color:#475569;margin-top:3px;">${label}</div>
+            </div>
+          </td>`).join('')}
+        </tr>
+      </table>` : ''}
 
       <!-- Headline -->
       <div style="font-size:28px;font-weight:800;color:#FFFFFF;margin-bottom:8px;">${coverHeadline(grade)}</div>
@@ -129,25 +177,58 @@ export function buildAuditEmailHtml(
     <tr><td style="background:#FFFFFF;padding:0;">
       <table width="100%" cellpadding="0" cellspacing="0">
 
-        ${sectionHeader('Mobile Speed')}
-        ${checkRow(speedPass, `Load time — ${lcp.toFixed(1)}s`, lcpDetail, report.pageSpeedScore != null ? `PageSpeed ${report.pageSpeedScore}/100` : undefined)}
-
-        ${sectionHeader('Search &amp; SEO')}
+        ${sectionHeader('Performance')}
+        <!-- Core Web Vitals grid -->
+        <tr><td style="padding:12px 16px 4px;">
+          <table width="100%" cellpadding="4" cellspacing="4">
+            <tr>
+              ${metricCell(`${lcp.toFixed(1)}s`,  'Mobile LCP',  speedColor(lcp, 2.5, 4))}
+              ${metricCell(report.mobileFcp != null ? `${report.mobileFcp.toFixed(1)}s` : '—', 'Mobile FCP', speedColor(report.mobileFcp, 1.8, 3))}
+              ${metricCell(report.mobileCls != null ? report.mobileCls.toFixed(3) : '—',        'Mobile CLS', speedColor(report.mobileCls, 0.1, 0.25))}
+              ${metricCell(report.mobileTbt != null ? `${Math.round(report.mobileTbt)}ms` : '—','Mobile TBT', speedColor(report.mobileTbt, 200, 600))}
+            </tr>
+            <tr>
+              ${metricCell(report.desktopLcp != null ? `${report.desktopLcp.toFixed(1)}s` : '—', 'Desktop LCP', speedColor(report.desktopLcp, 2.5, 4))}
+              ${metricCell(report.desktopFcp != null ? `${report.desktopFcp.toFixed(1)}s` : '—', 'Desktop FCP', speedColor(report.desktopFcp, 1.8, 3))}
+              ${metricCell(report.desktopCls != null ? report.desktopCls.toFixed(3) : '—',        'Desktop CLS', speedColor(report.desktopCls, 0.1, 0.25))}
+              ${metricCell(report.pageWeightKb != null ? `${report.pageWeightKb} KB` : '—',       'Page Weight', report.pageWeightKb != null ? (report.pageWeightKb < 1024 ? '#22C55E' : report.pageWeightKb < 2048 ? '#F59E0B' : '#EF4444') : '#94A3B8')}
+            </tr>
+          </table>
+        </td></tr>
+        ${checkRow(mobilePass,  `Mobile PageSpeed — ${report.pageSpeedScore ?? '—'}/100`,  lcpDetail,                        `LCP ${lcp.toFixed(1)}s`)}
+        ${checkRow(desktopPass, `Desktop PageSpeed — ${report.desktopScore ?? '—'}/100`,   desktopPass ? 'Desktop speed is good.' : 'Desktop score is below 80 — check image sizes and render-blocking resources.', report.desktopLcp != null ? `LCP ${report.desktopLcp.toFixed(1)}s` : undefined)}
         ${checkRow(ssl, 'Secure connection (HTTPS)', ssl ? 'Your site is secure. Visitors and Google trust it.' : 'Browsers display a "Not Secure" warning — this loses visitors and hurts your Google ranking.')}
+
+        ${sectionHeader('On-Page SEO')}
         ${checkRow(!!content.metaTitle, 'Page title', content.metaTitle ? `"${content.metaTitle}"` : 'Missing — Google has nothing to show in search results.', content.metaTitleLen != null ? `${content.metaTitleLen} chars` : undefined)}
         ${checkRow(!!content.metaDesc, 'Meta description', content.metaDesc ? 'Set — you control what people read before clicking your result.' : 'Missing — Google will choose what to display instead of you.', content.metaDescLen != null ? `${content.metaDescLen} chars${(content.metaDescLen < 120 || content.metaDescLen > 155) ? ' · aim 120–155' : ' · good'}` : undefined)}
         ${checkRow(!!content.h1, 'Page heading (H1)', content.h1 ? `"${content.h1}"` : 'Missing — no clear message for visitors or search engines.')}
+        ${checkRow(!!content.hasCanonical, 'Canonical tag', content.hasCanonical ? 'Set — prevents duplicate-content issues.' : 'Missing — add a canonical tag to tell Google which URL is authoritative.')}
         ${checkRow(!!hasSitemap, 'XML sitemap', hasSitemap ? 'Found — Google can discover every page on your site.' : 'Not found — Google has a harder time finding and indexing all your pages.')}
+        ${checkRow(!!report.hasRobotsTxt, 'robots.txt', report.hasRobotsTxt ? 'Found — search engine crawlers have guidance on your site.' : 'Not found — add a robots.txt file to guide crawlers.')}
         ${checkRow(!!content.hasSchema, 'Structured data (schema)', content.hasSchema ? 'Found — Google and AI assistants can read your business details.' : 'Not found — adding LocalBusiness schema helps you appear in local results and AI assistant answers.')}
         ${checkRow(allImagesAlt, 'Image alt text', allImagesAlt ? 'All images are described — good for accessibility and search engines.' : `${content.imagesMissingAlt} image${(content.imagesMissingAlt ?? 0) > 1 ? 's' : ''} missing alt text — screen readers and Google can't read these.`, content.imagesTotal != null ? `${(content.imagesTotal ?? 0) - (content.imagesMissingAlt ?? 0)}/${content.imagesTotal} described` : undefined)}
+        ${content.hasFavicon != null ? checkRow(!!content.hasFavicon, 'Favicon', content.hasFavicon ? 'Favicon set — adds brand recognition in browser tabs and search results.' : 'No favicon detected — a small icon builds recognition in tabs and bookmarks.') : ''}
+        ${content.hasLang != null ? checkRow(!!content.hasLang, 'Language declaration', content.hasLang ? 'Page declares its language — helps search engines serve the right audience.' : 'No lang attribute on <html> — add lang="en" or the appropriate language code.') : ''}
+        ${content.linkCount != null ? infoRow(`${content.linkCount} links on page`, 'Total anchor links found — internal and external combined.') : ''}
+        ${report.hasLlmsTxt != null ? checkRow(!!report.hasLlmsTxt, 'llms.txt (AI readiness)', report.hasLlmsTxt ? 'llms.txt found — helps AI assistants understand your site content.' : 'No llms.txt file. This emerging standard helps AI models like ChatGPT better understand your business.') : ''}
+
+        ${sectionHeader('Usability')}
+        ${checkRow(accessPass,    `Accessibility — ${report.lighthouseAccessibility ?? '—'}/100`,   accessPass    ? 'Good accessibility score — your site works well for all users and search engines.' : 'Accessibility score below 80 — fix contrast, missing labels, and alt text to help all visitors.')}
+        ${checkRow(bestPractPass, `Best Practices — ${report.lighthouseBestPractices ?? '—'}/100`, bestPractPass ? 'Site follows best practices.' : 'Some best-practice issues detected — check browser console errors, HTTPS, and deprecated APIs.')}
+        ${content.hasViewport != null ? checkRow(!!content.hasViewport, 'Mobile viewport', content.hasViewport ? 'Responsive viewport is set — the site scales correctly on mobile.' : 'No viewport meta tag — the site may not display correctly on mobile devices.') : ''}
+        ${checkRow(!!content.hasTapToCall, 'Tap-to-call phone link', content.hasTapToCall ? 'A tap-to-call link is in place — mobile visitors can call with one tap.' : 'Not found — mobile visitors have to manually copy-paste your number, and most won\'t bother.')}
+
+        ${sectionHeader('Social &amp; Sharing')}
+        ${checkRow(!!content.hasOpenGraph,   'Open Graph tags',      content.hasOpenGraph   ? 'Set — your site shows a rich preview when shared on Facebook, LinkedIn, and iMessage.' : 'Missing — without OG tags, shared links show a plain URL. Add og:title, og:description, and og:image.')}
+        ${checkRow(!!content.hasTwitterCard, 'Twitter / X card tags', content.hasTwitterCard ? 'Set — links shared on X/Twitter show a rich card.' : 'Missing — add Twitter card meta tags for better link previews on X and Twitter.')}
+        ${checkRow(!!content.hasMetaPixel,   'Meta (Facebook) Pixel', content.hasMetaPixel   ? 'Found — you can retarget visitors with Facebook and Instagram ads.' : 'Not found — adding the Pixel lets you retarget website visitors with social ads.')}
 
         ${sectionHeader('Tracking')}
         ${checkRow(!!content.hasAnalytics, 'Google Analytics / Tag Manager', content.hasAnalytics ? 'Found — you can see which pages and sources bring in enquiries.' : 'Not found — without analytics there is no way to know what brings in enquiries.')}
-        ${checkRow(!!content.hasMetaPixel, 'Meta (Facebook) Pixel', content.hasMetaPixel ? 'Found — you can retarget visitors with Facebook and Instagram ads.' : 'Not found — adding the Pixel lets you retarget website visitors with social ads.')}
         ${checkRow(!!content.hasGoogleAds, 'Google Ads conversion tag', content.hasGoogleAds ? 'Found — you can measure which ad clicks become enquiries.' : 'Not found — if you run Google Ads, a conversion tag shows which keywords generate leads.')}
 
         ${sectionHeader('Enquiry Path')}
-        ${checkRow(!!content.hasTapToCall, 'Tap-to-call phone link', content.hasTapToCall ? 'A tap-to-call link is in place — mobile visitors can call with one tap.' : 'Not found — mobile visitors have to manually copy-paste your number, and most won\'t bother.')}
         ${checkRow(content.hasContact, 'Contact details on page', content.hasContact ? 'Contact details are visible on the page.' : 'Not found — visitors who can\'t reach you quickly will call your competitor.')}
         ${checkRow(content.hasCta, 'Clear call to action', content.hasCta ? 'Your page has a clear next step for visitors.' : 'Not found — visitors who are ready to enquire may not know what to do next.')}
 
