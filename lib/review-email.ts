@@ -76,11 +76,18 @@ export function buildReviewEmailHtml(d: ReviewEmailData): string {
 
     <!-- ═══ HEADER ═══ -->
     <tr><td style="background:#0A0F1E;border-radius:16px 16px 0 0;padding:36px 40px 32px;">
-      ${logoBase64
-        ? `<img src="${logoBase64}" alt="${fromBusiness}" height="60" style="display:block;max-width:200px;height:60px;object-fit:contain;margin-bottom:16px;border:0;" />`
-        : `<div style="font-size:22px;font-weight:800;color:#FFFFFF;margin-bottom:6px;">${fromBusiness}</div>`
-      }
-      <div style="font-size:14px;color:#64748B;">A quick favour</div>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:middle;">
+            <div style="font-size:22px;font-weight:800;color:#FFFFFF;line-height:1.2;">${fromBusiness}</div>
+            <div style="font-size:14px;color:#64748B;margin-top:5px;">A quick favour</div>
+          </td>
+          ${logoBase64 ? `<td style="vertical-align:middle;text-align:right;padding-left:20px;width:1%;">
+            <img src="${logoBase64}" alt="${fromBusiness} logo" height="56"
+              style="display:block;max-width:140px;height:56px;object-fit:contain;border:0;" />
+          </td>` : ''}
+        </tr>
+      </table>
     </td></tr>
 
     <!-- ═══ BODY ═══ -->

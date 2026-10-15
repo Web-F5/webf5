@@ -100,9 +100,14 @@ function SendForm() {
   const [fromBusiness, setFromBusiness]   = useState('')
   const [platform, setPlatform]           = useState<Platform>('google')
   const [reviewUrl, setReviewUrl]         = useState('')
-  const [customMessage, setCustomMessage] = useState('')
-  const [useFilter, setUseFilter]         = useState(false)
-  const [logoBase64, setLogoBase64]       = useState<string | null>(null)
+  const [customMessage, setCustomMessage] = useState('It was a pleasure working with you.')
+  const [useFilter, setUseFilter]             = useState(false)
+  const [logoBase64, setLogoBase64]           = useState<string | null>(null)
+  const [placeSearch, setPlaceSearch]         = useState('')
+  const [placeResults, setPlaceResults]       = useState<{ placeId: string; name: string; address: string; reviewUrl: string }[]>([])
+  const [placesLoading, setPlacesLoading]     = useState(false)
+  const [placesError, setPlacesError]         = useState('')
+  const [placesEnabled, setPlacesEnabled]     = useState<boolean | null>(null) // null = unknown
   const [recipients, setRecipients]       = useState<Recipient[]>([{ name: '', email: '' }])
   const [mode, setMode]                   = useState<'single' | 'bulk'>('single')
   const [csvText, setCsvText]             = useState('')
@@ -158,6 +163,23 @@ function SendForm() {
       }
     } finally {
       setSending(false)
+    }
+  }
+
+  async function searchPlaces() {
+    if (!placeSearch.trim()) return
+    setPlacesLoading(true)
+    setPlacesError('')
+    setPlaceResults([])
+    const res  = await fetch(`/api/admin/places?q=${encodeURIComponent(placeSearch.trim())}`)
+    const data = await res.json()
+    setPlacesLoading(false)
+    if (data.error) {
+      setPlacesError(data.error)
+      if (res.status === 503) setPlacesEnabled(false)
+    } else {
+      setPlacesEnabled(true)
+      setPlaceResults(data.results || [])
     }
   }
 
@@ -286,6 +308,54 @@ function SendForm() {
             className="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
           />
           <p className="text-xs text-slate-500 mt-1.5">Direct link to the review form. Customers click this in the email.</p>
+
+          {/* Google Places autofill — only shown for Google platform */}
+          {platform === 'google' && placesEnabled !== false && (
+            <div className="mt-3 bg-[#111827] border border-white/10 rounded-xl p-4">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Find Google review link</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={placeSearch}
+                  onChange={e => setPlaceSearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && searchPlaces()}
+                  placeholder="Business name + suburb, e.g. Acme Electrical Bendigo"
+                  className="flex-1 bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={searchPlaces}
+                  disabled={placesLoading || !placeSearch.trim()}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {placesLoading ? 'Searching…' : 'Find'}
+                </button>
+              </div>
+              {placesError && <p className="text-xs text-red-400 mt-2">{placesError}</p>}
+              {placeResults.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {placeResults.map(r => (
+                    <button
+                      key={r.placeId}
+                      type="button"
+                      onClick={() => {
+                        setReviewUrl(r.reviewUrl)
+                        setPlaceResults([])
+                        setPlaceSearch('')
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors border border-white/5"
+                    >
+                      <div className="text-sm font-medium text-white">{r.name}</div>
+                      <div className="text-xs text-slate-500 mt-0.5">{r.address}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {placeResults.length === 0 && !placesLoading && placeSearch && (
+                <p className="text-xs text-slate-600 mt-2">No results yet — press Find to search.</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Personal note */}
