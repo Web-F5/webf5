@@ -122,7 +122,7 @@ export function buildAuditEmailHtml(
       <table cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
         <tr>
           <td style="padding-right:10px;vertical-align:middle;">
-            <img src="https://webf5.com.au/images/Web-F5-logo-bw.png" alt="Web F5" width="36" height="36"
+            <img src="https://webf5.com.au/images/web-app-manifest-512x512.png" alt="Web F5" width="36" height="36"
               style="display:block;border:0;" />
           </td>
           <td style="vertical-align:middle;">
