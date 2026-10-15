@@ -108,7 +108,7 @@ export function RatingWidget({ token, recipientName, fromBusiness, platform, rev
             className="text-6xl font-extrabold tabular-nums transition-colors duration-150"
             style={{ color }}
           >
-            {hasInteracted ? sliderValue : '—'}
+            {hasInteracted ? sliderValue : '←→'}
           </span>
         </div>
 
@@ -241,13 +241,13 @@ export function RatingWidget({ token, recipientName, fromBusiness, platform, rev
         <button
           onClick={submitFeedback}
           disabled={!feedback.trim() || stage === 'feedback_submitting'}
-          className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-semibold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed mb-6"
+          className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-semibold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed mb-6"
         >
           {stage === 'feedback_submitting' ? 'Sending…' : 'Submit feedback'}
         </button>
 
         <div className="border-t border-slate-100 pt-6">
-          <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+          <p className="text-sm text-slate-600 mb-4 leading-relaxed">
             If you can give us a chance to address your concerns, it would be very much appreciated. If you'd like to share publicly, you still can here.
           </p>
           <ReviewButton />
