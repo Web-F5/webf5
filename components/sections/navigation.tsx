@@ -112,8 +112,14 @@ export function Navigation() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="hidden md:block"
+          className="hidden md:flex items-center gap-4"
         >
+          <a
+            href="tel:+61419510206"
+            className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+          >
+            0419 510 206
+          </a>
           {isBrief ? (
             <BriefAuthButton />
           ) : (
