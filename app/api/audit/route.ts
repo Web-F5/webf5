@@ -485,8 +485,13 @@ export async function POST(req: NextRequest) {
       resend.emails.send({
         from:    FROM,
         to:      NOTIFY,
-        subject: `Audit lead — ${bizDisplay} (Grade ${grade} · ${overallScore}/100)`,
-        text:    buildNotifyEmail(name.trim(), bizDisplay, email.trim(), normUrl, industry, biggestFrustration, report),
+        replyTo: email.trim(),
+        subject: `Audit lead — ${name.trim()} · ${bizDisplay} (Grade ${grade} · ${overallScore}/100)`,
+        html:    emailHtml,
+        attachments: [{
+          filename: `website-audit-${bizDisplay.toLowerCase().replace(/\s+/g, '-')}.pdf`,
+          content:  pdfBuffer,
+        }],
       }),
     ])
 
