@@ -48,6 +48,31 @@ export const metadata: Metadata = {
   },
 }
 
+const schemaOrg = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'ProfessionalService'],
+  name: 'Web F5',
+  description: 'Web design and development for trades, local businesses, and ecommerce brands across Central Victoria. Fixed-price quotes, no lock-in contracts.',
+  url: 'https://webf5.com.au',
+  telephone: '+61419510206',
+  email: 'contact@webf5.au',
+  address: {
+    '@type': 'PostalAddress',
+    addressRegion: 'Victoria',
+    addressCountry: 'AU',
+  },
+  areaServed: {
+    '@type': 'State',
+    name: 'Victoria',
+    addressCountry: 'AU',
+  },
+  priceRange: '$$',
+  image: 'https://webf5.com.au/images/web-app-manifest-512x512.png',
+  sameAs: [
+    'https://webf5.com.au',
+  ],
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -56,6 +81,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+        />
         <Script
           id="gtm-head"
           strategy="afterInteractive"
