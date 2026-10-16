@@ -1,4 +1,4 @@
-import { pgTable, text, integer, boolean, timestamp, jsonb, uuid } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, boolean, timestamp, jsonb, uuid, date, char } from 'drizzle-orm/pg-core'
 
 export const briefDrafts = pgTable('brief_drafts', {
   id:                    uuid('id').primaryKey().defaultRandom(),
@@ -64,6 +64,65 @@ export const reviewSends = pgTable('review_sends', {
   customMessage:  text('custom_message'),
   recipientCount: integer('recipient_count').notNull().default(0),
   createdAt:      timestamp('created_at').notNull().defaultNow(),
+})
+
+// ── TRIPLE CRM ─────────────────────────────────────────────────────────────
+
+export const crmAccounts = pgTable('crm_accounts', {
+  id:           uuid('id').primaryKey().defaultRandom(),
+  name:         text('name').notNull(),
+  tier:         char('tier', { length: 1 }).notNull().default('B'), // A | B | C
+  triggerText:  text('trigger_text'),
+  triggerDate:  date('trigger_date'),
+  currentStage: integer('current_stage').notNull().default(1),
+  notes:        text('notes'),
+  createdAt:    timestamp('created_at').notNull().defaultNow(),
+  updatedAt:    timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const crmContacts = pgTable('crm_contacts', {
+  id:        uuid('id').primaryKey().defaultRandom(),
+  accountId: uuid('account_id').notNull().references(() => crmAccounts.id, { onDelete: 'cascade' }),
+  name:      text('name').notNull(),
+  title:     text('title'),
+  linkedIn:  text('linked_in'),
+  // role: economic_buyer | champion | user | blocker | coach
+  role:      text('role').notNull(),
+  notes:     text('notes'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const crmDeals = pgTable('crm_deals', {
+  id:           uuid('id').primaryKey().defaultRandom(),
+  accountId:    uuid('account_id').notNull().references(() => crmAccounts.id, { onDelete: 'cascade' }),
+  name:         text('name').notNull(),
+  stage:        integer('stage').notNull().default(2),
+  // status: active | signed | lost | paused
+  status:       text('status').notNull().default('active'),
+  nextStep:     text('next_step'),
+  nextStepDate: date('next_step_date'),
+  problemText:  text('problem_text'),   // quantified problem in buyer's words
+  problemValue: text('problem_value'),  // dollar figure
+  compellingEvent: text('compelling_event'),
+  compellingDate:  date('compelling_date'),
+  signedAt:     timestamp('signed_at'),
+  notes:        text('notes'),
+  createdAt:    timestamp('created_at').notNull().defaultNow(),
+  updatedAt:    timestamp('updated_at').notNull().defaultNow(),
+})
+
+// scope_type: 'workspace' (Stage 1 tasks) | 'deal' (Stages 2–6 tasks)
+// scope_id: deal id for 'deal' scope, or 'workspace' literal for workspace scope
+export const crmTaskProgress = pgTable('crm_task_progress', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  scopeType:   text('scope_type').notNull(), // 'workspace' | 'deal'
+  scopeId:     text('scope_id').notNull(),   // deal UUID or 'workspace'
+  taskId:      text('task_id').notNull(),    // e.g. 't-1', 'rc-1', 'sc-4__1'
+  checked:     boolean('checked').notNull().default(false),
+  answer:      text('answer'),
+  aiFeedback:  text('ai_feedback'),
+  feedbackFor: text('feedback_for'), // the answer text the feedback was generated for
+  updatedAt:   timestamp('updated_at').notNull().defaultNow(),
 })
 
 export const courseEntitlements = pgTable('course_entitlements', {

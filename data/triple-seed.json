@@ -1,0 +1,1807 @@
+{
+ "stages": [
+  {
+   "n": 1,
+   "name": "Target",
+   "job": "Choose the right accounts before you spend a single call. Reps miss quota twelve weeks before close, in a list that was never built properly.",
+   "blocks": [
+    {
+     "type": "group",
+     "title": "Value proposition",
+     "tasks": [
+      {
+       "id": "t-1",
+       "text": "Write the formula sentence: \"We help [ICP] fix [problem] so they get [outcome]\", no product names, no adjectives",
+       "fields": []
+      },
+      {
+       "id": "t-2",
+       "text": "Name the three problems your product removes, in the buyer's own words, not marketing language",
+       "fields": [
+        {
+         "id": "t-2__1",
+         "label": "Problem 1"
+        },
+        {
+         "id": "t-2__2",
+         "label": "Problem 2"
+        },
+        {
+         "id": "t-2__3",
+         "label": "Problem 3"
+        }
+       ]
+      },
+      {
+       "id": "t-3",
+       "text": "Attach one proof point (customer, number, outcome) to each of the three problems, and know where each number came from",
+       "fields": [
+        {
+         "id": "t-3__1",
+         "label": "Proof point for problem 1"
+        },
+        {
+         "id": "t-3__2",
+         "label": "Proof point for problem 2"
+        },
+        {
+         "id": "t-3__3",
+         "label": "Proof point for problem 3"
+        }
+       ]
+      },
+      {
+       "id": "t-4",
+       "text": "Translate every feature you're likely to mention into a business outcome, before the call, never live",
+       "fields": []
+      },
+      {
+       "id": "t-5",
+       "text": "Run the \"so what\" test out loud, twice in a row, without folding back into features",
+       "fields": []
+      },
+      {
+       "id": "t-6",
+       "text": "Rehearse the value prop out loud ~10 times so it's available under pressure",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Ideal Customer Profile",
+     "tasks": [
+      {
+       "id": "t-7",
+       "text": "Document the ICP across six dimensions: company size, industry, tech stack, GTM motion, the specific pain, disqualifiers",
+       "fields": [
+        {
+         "id": "t-7__1",
+         "label": "Company size"
+        },
+        {
+         "id": "t-7__2",
+         "label": "Industry"
+        },
+        {
+         "id": "t-7__3",
+         "label": "Tech stack"
+        },
+        {
+         "id": "t-7__4",
+         "label": "GTM motion"
+        },
+        {
+         "id": "t-7__5",
+         "label": "The specific pain"
+        },
+        {
+         "id": "t-7__6",
+         "label": "Disqualifiers"
+        }
+       ]
+      },
+      {
+       "id": "t-8",
+       "text": "Write disqualifiers in advance, so a polite maybe has a reason to come off the list",
+       "fields": []
+      },
+      {
+       "id": "t-9",
+       "text": "Learn the five trigger events that mean \"now\": funding/acquisition, hiring spike, new leadership, competitor switch or renewal, compliance deadline",
+       "fields": []
+      },
+      {
+       "id": "t-10",
+       "text": "Map five humans per account by name: economic buyer, champion candidate, day-to-day user, likely blocker, coach",
+       "fields": [
+        {
+         "id": "t-10__1",
+         "label": "Economic buyer"
+        },
+        {
+         "id": "t-10__2",
+         "label": "Champion candidate"
+        },
+        {
+         "id": "t-10__3",
+         "label": "Day-to-day user"
+        },
+        {
+         "id": "t-10__4",
+         "label": "Likely blocker"
+        },
+        {
+         "id": "t-10__5",
+         "label": "Coach"
+        }
+       ]
+      },
+      {
+       "id": "t-11",
+       "text": "Write one sentence of pain per persona, five different messages, not one message to five people",
+       "fields": [
+        {
+         "id": "t-11__1",
+         "label": "Economic buyer — pain sentence"
+        },
+        {
+         "id": "t-11__2",
+         "label": "Champion candidate — pain sentence"
+        },
+        {
+         "id": "t-11__3",
+         "label": "Day-to-day user — pain sentence"
+        },
+        {
+         "id": "t-11__4",
+         "label": "Likely blocker — pain sentence"
+        },
+        {
+         "id": "t-11__5",
+         "label": "Coach — pain sentence"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Tiering the list",
+     "tasks": [
+      {
+       "id": "t-12",
+       "text": "Set tier definitions: A = perfect fit + live trigger, B = fit without a trigger, C = neither (cut from the list)",
+       "fields": []
+      },
+      {
+       "id": "t-13",
+       "text": "Build your own quota-backward ladder: revenue needed → deals → opportunities → meetings → accounts → contacts, using your real conversion rates",
+       "fields": []
+      },
+      {
+       "id": "t-14",
+       "text": "Build the 25 A-tier account list, ten minutes per account (trigger + five humans + one opening observation)",
+       "fields": []
+      },
+      {
+       "id": "t-15",
+       "text": "Log every trigger with a date and all five names per account in the CRM",
+       "fields": []
+      },
+      {
+       "id": "t-16",
+       "text": "Give A-tier 80% of the week; B-tier gets one value touch a month and monitoring",
+       "fields": []
+      },
+      {
+       "id": "t-17",
+       "text": "Rebuild the list every Monday, drop converted or dead accounts, add new triggers",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Territory planning",
+     "tasks": [
+      {
+       "id": "tp-1",
+       "text": "Review previous engagement per account before prospecting: past touchpoints, existing customer relationships, prior stalled/lost deals and why, partner relationships, check the CRM, Slack history, LinkedIn, the partner network, and your manager or predecessor",
+       "fields": []
+      },
+      {
+       "id": "tp-2",
+       "text": "Segment the territory into three tiers: Tier 1 Value Motion (ICP fit + current signal, 15-25 accounts for an AE / 30-50 for an SDR), Tier 2 Targeted Motion (fit, no signal yet), Tier 3 Volume Motion (broad fit, templated)",
+       "fields": []
+      },
+      {
+       "id": "tp-3",
+       "text": "Apply the time split: 70% of selling time on Tier 1, 20% on Tier 2, 10% on Tier 3",
+       "fields": []
+      },
+      {
+       "id": "tp-4",
+       "text": "Score Tier 1 accounts 1-5 on ICP fit, buying-signal strength, deal size, and access/relationships, re-score monthly",
+       "fields": []
+      },
+      {
+       "id": "tp-5",
+       "text": "Decide Value Motion vs. Volume Motion per account from that score, bespoke research + org map + named plan, or a templated sequence with light personalisation",
+       "fields": []
+      },
+      {
+       "id": "tp-6",
+       "text": "Set weekly coverage targets: Tier 1 accounts touched, new Tier 2 added to sequence, Tier 3 automated touches",
+       "fields": []
+      },
+      {
+       "id": "tp-7",
+       "text": "Work out your pipeline coverage ratio (3-4x quota) and back-solve how many accounts need to be in play",
+       "fields": []
+      },
+      {
+       "id": "tp-8",
+       "text": "Block protected outbound/calling hours before anything else fills the calendar",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "The exercise, build it for the job you want",
+     "tasks": [
+      {
+       "id": "ex-1",
+       "text": "Pick a company from LinkedIn Jobs: sells to businesses, you can explain what they sell in under two minutes, the ad is live",
+       "fields": []
+      },
+      {
+       "id": "ex-2",
+       "text": "Write the \"What You Sell\" sentence, the problem they remove, in your own words, not their tagline",
+       "fields": []
+      },
+      {
+       "id": "ex-3",
+       "text": "Write the ICP Summary, size, industry, the operational condition that means they need it",
+       "fields": []
+      },
+      {
+       "id": "ex-4",
+       "text": "Note who owns the budget vs. who feels the pain, usually different job titles",
+       "fields": []
+      },
+      {
+       "id": "ex-5",
+       "text": "Run the prompt in Claude with your Selection Criteria tab attached, let it rate your ICP before it generates anything",
+       "fields": []
+      },
+      {
+       "id": "ex-6",
+       "text": "Get the 25-row tiered table (10 A / 8 B / 7 C), triggers named, confidence rated",
+       "fields": []
+      },
+      {
+       "id": "ex-7",
+       "text": "Research one A-tier account yourself, no AI: press page, careers page (8+ open roles in one function = a process breaking), the problem-owner's LinkedIn tenure, Google News last 90 days",
+       "fields": []
+      },
+      {
+       "id": "ex-8",
+       "text": "Write what you found, or \"no trigger found\", into the Entry Point / Trigger column; demote to B if nothing turns up",
+       "fields": []
+      },
+      {
+       "id": "ex-9",
+       "text": "Map five humans on that account via LinkedIn: economic buyer, champion candidate, day-to-day user, likely blocker, coach",
+       "fields": [
+        {
+         "id": "ex-9__1",
+         "label": "Economic buyer"
+        },
+        {
+         "id": "ex-9__2",
+         "label": "Champion candidate"
+        },
+        {
+         "id": "ex-9__3",
+         "label": "Day-to-day user"
+        },
+        {
+         "id": "ex-9__4",
+         "label": "Likely blocker"
+        },
+        {
+         "id": "ex-9__5",
+         "label": "Coach"
+        }
+       ]
+      },
+      {
+       "id": "ex-10",
+       "text": "For each: name, title, LinkedIn URL, one line on what they personally care about",
+       "fields": []
+      },
+      {
+       "id": "ex-11",
+       "text": "Fill the blocker row even if you have to guess, it's the row people skip and the one that saves deals",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "gate",
+     "title": "Exercise gate · green light (Practice run, not the full Gate 1)",
+     "tasks": [
+      {
+       "id": "gex-1",
+       "text": "Ten accounts tiered A/B/C by your own judgement, not the AI's",
+       "fields": []
+      },
+      {
+       "id": "gex-2",
+       "text": "At least one A-tier account with a trigger you found yourself",
+       "fields": []
+      },
+      {
+       "id": "gex-3",
+       "text": "Five humans mapped on that account, including a named blocker",
+       "fields": []
+      }
+     ],
+     "note": "Reps don't miss quota in the closing stage, they miss it twelve weeks earlier, in a list they never built properly."
+    },
+    {
+     "type": "gate",
+     "title": "Gate 1 (Partial evidence counts as not passed)",
+     "tasks": [
+      {
+       "id": "g1-1",
+       "text": "25 A-tier accounts on the list",
+       "fields": []
+      },
+      {
+       "id": "g1-2",
+       "text": "Every A-tier account has a named, dated trigger",
+       "fields": []
+      },
+      {
+       "id": "g1-3",
+       "text": "Five mapped humans per account, logged in the CRM",
+       "fields": []
+      },
+      {
+       "id": "g1-4",
+       "text": "Value prop delivered out loud, from memory, without notes",
+       "fields": []
+      }
+     ],
+     "note": "Passed = triggers dated and in the CRM, five names per account on file, value prop said unscripted. Anything less is not a territory, it's a wish."
+    }
+   ],
+   "pitfalls": [
+    "Spray and pray, volume with no fit",
+    "Big logo worship, chasing a name you can't service or reach",
+    "An opener about you, not them",
+    "One lonely contact per account instead of five",
+    "Research theatre, sixty minutes per account because research doesn't reject you, the phone does",
+    "A static list nobody has reviewed in a month"
+   ]
+  },
+  {
+   "n": 2,
+   "name": "Reach",
+   "job": "Earn the meeting, not the conversation. A friendly reply is the cheapest thing a buyer can give you, a date, an agenda and a second name on the invite is the actual result.",
+   "blocks": [
+    {
+     "type": "group",
+     "title": "Channels",
+     "tasks": [
+      {
+       "id": "rc-1",
+       "text": "Map each of the five personas to the channel that actually reaches them, and write the mapping down, executives answer phones, users answer LinkedIn, technical buyers read email properly",
+       "fields": []
+      },
+      {
+       "id": "rc-2",
+       "text": "Use the phone for urgency and tone, the only channel where a brush-off can be handled in the same breath it was given",
+       "fields": []
+      },
+      {
+       "id": "rc-3",
+       "text": "Use email for detail and forwardability, it survives being passed on by your champion",
+       "fields": []
+      },
+      {
+       "id": "rc-4",
+       "text": "Use LinkedIn for credibility, let them see who you are before they decide to reply",
+       "fields": []
+      },
+      {
+       "id": "rc-5",
+       "text": "Reserve video (60 seconds, their name on screen, one insight, one ask, never a product tour) for the account you can't afford to lose",
+       "fields": []
+      },
+      {
+       "id": "rc-6",
+       "text": "Chase the internal referral before any external channel, a forwarded note from a colleague beats your best cold sequence",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Multithreading",
+     "tasks": [
+      {
+       "id": "mt-1",
+       "text": "Write a different message for each persona: economic buyer gets cost and risk, champion gets their day and reputation, user gets the task they hate, blocker gets what you won't break, coach gets a question and nothing else",
+       "fields": []
+      },
+      {
+       "id": "mt-2",
+       "text": "Reach two contacts at the same time, not one then the other two weeks later",
+       "fields": []
+      },
+      {
+       "id": "mt-3",
+       "text": "When one replies, ask them to bring the other onto the call",
+       "fields": []
+      },
+      {
+       "id": "mt-4",
+       "text": "Ask your champion who else this affects, then ask for the introduction, not just the email address",
+       "fields": []
+      },
+      {
+       "id": "mt-5",
+       "text": "Track champions who change companies, congratulate in week one, sell in week six",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Sequences",
+     "tasks": [
+      {
+       "id": "sq-1",
+       "text": "Run the 3×3 per contact: three channels, three touches, three business days",
+       "fields": []
+      },
+      {
+       "id": "sq-2",
+       "text": "Day 1: call with the permission opener + problem statement + direct ask, then send the three-sentence email referencing the trigger",
+       "fields": []
+      },
+      {
+       "id": "sq-3",
+       "text": "Day 3: call at a different hour, then LinkedIn message or video with one specific observation",
+       "fields": []
+      },
+      {
+       "id": "sq-4",
+       "text": "Day 5: call the second contact at the account, then send the close-the-loop email",
+       "fields": []
+      },
+      {
+       "id": "sq-5",
+       "text": "Run both contacts in parallel, never sequentially",
+       "fields": []
+      },
+      {
+       "id": "sq-6",
+       "text": "No reply by the end of the sequence → move the account to B-tier monitoring, set a 60-day re-trigger, and stop nudging",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Scripts",
+     "tasks": [
+      {
+       "id": "sc-1",
+       "text": "Write the opener: ask permission, open on their trigger, never on your product",
+       "fields": []
+      },
+      {
+       "id": "sc-2",
+       "text": "Write the problem statement: what people in their role tell you, what it costs, an honest \"I don't know yet if that's true for you\"",
+       "fields": []
+      },
+      {
+       "id": "sc-3",
+       "text": "Ask directly for the meeting and offer two specific times, never ask if it \"sounds interesting\"",
+       "fields": []
+      },
+      {
+       "id": "sc-4",
+       "text": "Write the three-sentence cold email: trigger, problem it creates, ask, no attachments or links on touch one",
+       "fields": [
+        {
+         "id": "sc-4__1",
+         "label": "Trigger sentence"
+        },
+        {
+         "id": "sc-4__2",
+         "label": "Problem-it-creates sentence"
+        },
+        {
+         "id": "sc-4__3",
+         "label": "Ask sentence"
+        }
+       ]
+      },
+      {
+       "id": "sc-5",
+       "text": "Write one LinkedIn message with a specific observation and no pitch; comment on their content before connecting",
+       "fields": []
+      },
+      {
+       "id": "sc-6",
+       "text": "Prepare the four brush-off responses and rehearse asking again once, after handling, two attempts is professional, four is a problem",
+       "fields": []
+      },
+      {
+       "id": "sc-7",
+       "text": "Write the close-the-loop email that makes a no easy to give",
+       "fields": []
+      },
+      {
+       "id": "sc-8",
+       "text": "Never send a calendar invite without an agenda in the body; confirm the day before with something worth reading",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Objection handling, the Disarm Method",
+     "tasks": [
+      {
+       "id": "oh-1",
+       "text": "Learn to tell within two seconds which of the four categories, brush-off, situational, product fit, existing solution, an objection falls into",
+       "fields": []
+      },
+      {
+       "id": "oh-2",
+       "text": "Write your own Agree + Ask + Anchor line for the 3-4 objections you hear most often",
+       "fields": []
+      },
+      {
+       "id": "oh-3",
+       "text": "Never re-pitch, argue, or lecture after an objection, agree first, always",
+       "fields": []
+      },
+      {
+       "id": "oh-4",
+       "text": "Remember the rule of thumb: sell the next 15 minutes on a cold call, never the product",
+       "fields": []
+      },
+      {
+       "id": "oh-5",
+       "text": "On a hang-up, log the exact date/time, their last words, and their tone in the CRM",
+       "fields": []
+      },
+      {
+       "id": "oh-6",
+       "text": "Call back in 5-7 business days and open by referencing those specifics",
+       "fields": []
+      },
+      {
+       "id": "oh-7",
+       "text": "Move on after a second hang-up, three calls is roughly where persistence turns into harassment",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Prospecting tips, five moves to run this week",
+     "tasks": [
+      {
+       "id": "pt-1",
+       "text": "Follow the target company page and its key leaders before reaching out cold",
+       "fields": []
+      },
+      {
+       "id": "pt-2",
+       "text": "Send a clean connection request with no pitch attached, and let it sit",
+       "fields": []
+      },
+      {
+       "id": "pt-3",
+       "text": "Like and comment with genuine insight on their posts before your first ask",
+       "fields": []
+      },
+      {
+       "id": "pt-4",
+       "text": "Reference one of their posts in your first real message so it lands warm, not cold",
+       "fields": []
+      },
+      {
+       "id": "pt-5",
+       "text": "Use an event as the opener where you can, \"anyone on your team want to join this webinar?\" beats a cold pitch",
+       "fields": []
+      },
+      {
+       "id": "pt-6",
+       "text": "For an account-based event, send a direct calendar invite from your own email rather than a link",
+       "fields": []
+      },
+      {
+       "id": "pt-7",
+       "text": "Hide the guest list so it stays professional",
+       "fields": []
+      },
+      {
+       "id": "pt-8",
+       "text": "If they accept, RSVP them through the official landing page and forward the details",
+       "fields": []
+      },
+      {
+       "id": "pt-9",
+       "text": "If they decline, follow up immediately, \"is there someone else on your team who'd be a good fit?\"",
+       "fields": []
+      },
+      {
+       "id": "pt-10",
+       "text": "Once two confirmed attendees look like a fit for each other, send a short group message introducing them ahead of the event",
+       "fields": []
+      },
+      {
+       "id": "pt-11",
+       "text": "Use email as the fallback where LinkedIn isn't an option",
+       "fields": []
+      },
+      {
+       "id": "pt-12",
+       "text": "Keep cold emails around 75 words, tight, focused, no fluff",
+       "fields": []
+      },
+      {
+       "id": "pt-13",
+       "text": "Cut gimmicks and fake personalisation; get straight to the point",
+       "fields": []
+      },
+      {
+       "id": "pt-14",
+       "text": "Where your org allows it, try a blunt, human subject line instead of a polished one",
+       "fields": []
+      },
+      {
+       "id": "pt-15",
+       "text": "Before any discovery call, build the account's org chart, who you're meeting, who they report to, who else needs influencing",
+       "fields": []
+      },
+      {
+       "id": "pt-16",
+       "text": "Write a tailored message per stakeholder, tied to what they specifically care about",
+       "fields": []
+      },
+      {
+       "id": "pt-17",
+       "text": "If you're the one booking the meeting, keep researching the exec layer above your contact and hand over a rough org chart before the next person takes it further, the extra homework is what gets noticed",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Sequence library, 8 cadences to pull from",
+     "tasks": [
+      {
+       "id": "seq-1",
+       "text": "Pick one sequence to start with, The Workhorse if unsure, and rebuild it end-to-end with your own product, customer stories and CTAs",
+       "fields": []
+      },
+      {
+       "id": "seq-2",
+       "text": "Replace every placeholder with real content, then read each email out loud and rewrite anything that sounds like a robot wrote it",
+       "fields": []
+      },
+      {
+       "id": "seq-3",
+       "text": "Put your three best customer stories, with the metric attached, in one doc to reuse across sequences",
+       "fields": [
+        {
+         "id": "seq-3__1",
+         "label": "Story 1 (with metric)"
+        },
+        {
+         "id": "seq-3__2",
+         "label": "Story 2 (with metric)"
+        },
+        {
+         "id": "seq-3__3",
+         "label": "Story 3 (with metric)"
+        }
+       ]
+      },
+      {
+       "id": "seq-4",
+       "text": "Write your CTAs in advance, a specific date beats \"worth a chat?\" roughly 2 to 1",
+       "fields": []
+      },
+      {
+       "id": "seq-5",
+       "text": "Send the first 10 touches manually before automating, to catch awkward phrasing",
+       "fields": []
+      },
+      {
+       "id": "seq-6",
+       "text": "Load 25 prospects from your target list and turn the sequence on",
+       "fields": []
+      },
+      {
+       "id": "seq-7",
+       "text": "Track reply rate and meeting-booked rate for two weeks before you judge or iterate it",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "gate",
+     "title": "Stage 2 exit milestone (Measured by: connects → booked meetings, show rate, accounts with two people sequenced)",
+     "tasks": [
+      {
+       "id": "g2-1",
+       "text": "Invite accepted",
+       "fields": []
+      },
+      {
+       "id": "g2-2",
+       "text": "Agenda sent",
+       "fields": []
+      },
+      {
+       "id": "g2-3",
+       "text": "Second contact made in sequence",
+       "fields": []
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "pitfalls": [
+    "Talking about the product instead of the problem",
+    "No agenda in the invite, and no confirmation the day before",
+    "One thread, a single point of failure on the account",
+    "The same message copied across four channels, which reads as automation, not effort",
+    "Stopping the sequence on touch two, where most of them quietly die",
+    "Endless nudging after the sequence ends instead of closing the loop"
+   ]
+  },
+  {
+   "n": 3,
+   "name": "Investigate",
+   "job": "Find the expensive problem and put a number on it. Deals that stall in Lock almost always failed here, and were scored generously at the time.",
+   "blocks": [
+    {
+     "type": "group",
+     "title": "Discovery, the five-part call",
+     "tasks": [
+      {
+       "id": "d-1",
+       "text": "Open human first, then set the meeting contract out loud: the agenda, how long, and what they get",
+       "fields": []
+      },
+      {
+       "id": "d-2",
+       "text": "State the three possible endings up front: it's a fit and you book a next step, it's not and they tell you straight, or you need more people and you work out who",
+       "fields": []
+      },
+      {
+       "id": "d-3",
+       "text": "Run the seven-layer question stack as the majority of the call, following every question with a second one",
+       "fields": []
+      },
+      {
+       "id": "d-4",
+       "text": "Pitch only what maps to what they just told you, enough to earn the next step, not a demo",
+       "fields": []
+      },
+      {
+       "id": "d-5",
+       "text": "Surface likely objections yourself before they have to (layer seven, skepticism)",
+       "fields": []
+      },
+      {
+       "id": "d-6",
+       "text": "Close with a dated next step and get a second name on the invite before you hang up, not after",
+       "fields": []
+      },
+      {
+       "id": "d-7",
+       "text": "Run a full discovery call end to end as a recorded roleplay, meeting contract through to the close",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Qualifying, the seven-layer stack",
+     "tasks": [
+      {
+       "id": "q-1",
+       "text": "Situation, walk me through how [process] runs today; follow up on who touches it and what happens when that person is away",
+       "fields": []
+      },
+      {
+       "id": "q-2",
+       "text": "Struggle, where does it break down most; follow up on which one step they'd delete tomorrow, and why that one",
+       "fields": []
+      },
+      {
+       "id": "q-3",
+       "text": "Size, how often, and how many hours or people it takes to fix; follow up with what that's costing them",
+       "fields": []
+      },
+      {
+       "id": "q-4",
+       "text": "Stakes, what this looks like in 12 months if nothing changes; follow up on who upstairs feels it",
+       "fields": []
+      },
+      {
+       "id": "q-5",
+       "text": "Success, what specifically changes if it's solved, what metric moves, who's watching it",
+       "fields": []
+      },
+      {
+       "id": "q-6",
+       "text": "Structure, how a purchase like this gets approved, who else needs to be comfortable, whether budget is allocated or needs to be found",
+       "fields": []
+      },
+      {
+       "id": "q-7",
+       "text": "Skepticism, what they're least sure about, and what would stop this even if everyone agrees it should happen",
+       "fields": []
+      },
+      {
+       "id": "q-8",
+       "text": "Ask \"what is that costing you\" and go silent, do not rescue the buyer within three seconds",
+       "fields": []
+      },
+      {
+       "id": "q-9",
+       "text": "If they can't give a figure, build one together from units (frequency × hours × people × cost) and play it back for them to confirm",
+       "fields": []
+      },
+      {
+       "id": "q-10",
+       "text": "Map the decision process, budget position and timeline in the same call, not the next one",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Compelling event",
+     "tasks": [
+      {
+       "id": "ce-1",
+       "text": "Look for findable events: compliance/regulatory deadlines, contract renewals, board targets, budget cycles, system end-of-life, funding milestones, headcount plans, product launches",
+       "fields": []
+      },
+      {
+       "id": "ce-2",
+       "text": "Confirm the date, ask what happens on that date and who's accountable when it arrives",
+       "fields": []
+      },
+      {
+       "id": "ce-3",
+       "text": "Where no event exists, build the cost of delay honestly from their own number (from the Size layer), converted to a monthly figure",
+       "fields": []
+      },
+      {
+       "id": "ce-4",
+       "text": "Say the cost of delay out loud, then ask what would need to be true to start earlier",
+       "fields": []
+      },
+      {
+       "id": "ce-5",
+       "text": "Never inflate the number, an honest figure they own beats a large one they'll dispute",
+       "fields": []
+      },
+      {
+       "id": "ce-6",
+       "text": "Log the event, its date, and the cost of delay in the CRM",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "gate",
+     "title": "Stage 3 exit milestone",
+     "tasks": [
+      {
+       "id": "g3-1",
+       "text": "Problem quantified in dollars, in the buyer's own words",
+       "fields": []
+      },
+      {
+       "id": "g3-2",
+       "text": "Compelling event dated, with a cost of delay attached",
+       "fields": []
+      },
+      {
+       "id": "g3-3",
+       "text": "Decision process, budget position and timeline mapped",
+       "fields": []
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "pitfalls": [
+    "Collapsing questions and pitch, demoing four minutes in",
+    "No meeting contract, so the hard questions feel intrusive",
+    "Closing with \"we'll catch up soon\" instead of a date",
+    "Leaving with one contact when a second name could've been added in thirty seconds",
+    "Happy ears, enthusiasm mistaken for intent",
+    "Accepting the first answer, which is always the feature and never the money",
+    "Skipping the approval-process question because it feels presumptuous",
+    "Supplying the number yourself so the buyer never owns it",
+    "Claiming urgency without a date, or inventing a deadline the buyer doesn't recognise",
+    "A cost of delay built on your assumptions rather than their figures"
+   ]
+  },
+  {
+   "n": 4,
+   "name": "Prove",
+   "job": "Prove your solution closes their specific gap, in their words and their metrics. A verbal \"they loved it\" is a memory, \"reply confirmed\" is evidence.",
+   "blocks": [
+    {
+     "type": "group",
+     "title": "Demo, the 3-Act framework",
+     "tasks": [
+      {
+       "id": "dm-1",
+       "text": "Open with the replay, hand their problem back to them more clearly than they said it, and let them correct you",
+       "fields": []
+      },
+      {
+       "id": "dm-2",
+       "text": "Confirm what \"fixed\" looks like using their own success statement and metric before showing anything",
+       "fields": []
+      },
+      {
+       "id": "dm-3",
+       "text": "Demo only the three pains they named, nothing else goes on screen",
+       "fields": []
+      },
+      {
+       "id": "dm-4",
+       "text": "Run every section in the same order: feature, then outcome, then their number",
+       "fields": []
+      },
+      {
+       "id": "dm-5",
+       "text": "Stop and ask after each of the three, silence in a demo is not agreement",
+       "fields": []
+      },
+      {
+       "id": "dm-6",
+       "text": "Close by asking which of the three matters most, then confirm the next step with a date and a second name",
+       "fields": []
+      },
+      {
+       "id": "dm-7",
+       "text": "After each workflow, check in directly: \"does this match what you described earlier?\" / \"is this solving the problem you mentioned with [pain]?\"",
+       "fields": []
+      },
+      {
+       "id": "dm-8",
+       "text": "Watch engagement cues throughout, body language in person, camera/audio on video, and adjust if they check out",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Business case",
+     "tasks": [
+      {
+       "id": "bc-1",
+       "text": "Establish the four numbers: cost today, cost of doing nothing, cost of the fix, and how fast it pays back",
+       "fields": [
+        {
+         "id": "bc-1__1",
+         "label": "Cost today"
+        },
+        {
+         "id": "bc-1__2",
+         "label": "Cost of doing nothing"
+        },
+        {
+         "id": "bc-1__3",
+         "label": "Cost of the fix"
+        },
+        {
+         "id": "bc-1__4",
+         "label": "Payback time"
+        }
+       ]
+      },
+      {
+       "id": "bc-2",
+       "text": "Pull cost today straight from the Size layer, in their own words",
+       "fields": []
+      },
+      {
+       "id": "bc-3",
+       "text": "Pull cost of doing nothing from Stakes plus your cost-of-delay maths",
+       "fields": []
+      },
+      {
+       "id": "bc-4",
+       "text": "State the cost of the fix honestly, including implementation and internal effort",
+       "fields": []
+      },
+      {
+       "id": "bc-5",
+       "text": "Express payback in months, the unit an economic buyer actually approves against",
+       "fields": []
+      },
+      {
+       "id": "bc-6",
+       "text": "Put it on one page in four blocks: the problem and number in their language, the four numbers, why now (the compelling event date), and the first objection with the answer written together",
+       "fields": []
+      },
+      {
+       "id": "bc-7",
+       "text": "Build the case with the champion, not for them, what people help build, they defend",
+       "fields": []
+      },
+      {
+       "id": "bc-8",
+       "text": "Send a short written summary the same day and ask them to reply \"confirmed\"",
+       "fields": []
+      },
+      {
+       "id": "bc-9",
+       "text": "Agree pilot success criteria in writing before any pilot starts, a pilot with no criteria is free consulting",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "ROI model, worked example",
+     "tasks": [
+      {
+       "id": "bc-10",
+       "text": "Build the ROI model collaboratively with the champion, their numbers, not yours",
+       "fields": []
+      },
+      {
+       "id": "bc-11",
+       "text": "Use conservative assumptions throughout, credibility beats optimism",
+       "fields": []
+      },
+      {
+       "id": "bc-12",
+       "text": "Include soft benefits (speed, quality, risk reduction) only after the hard financials are established",
+       "fields": []
+      },
+      {
+       "id": "bc-13",
+       "text": "Present the model to the economic buyer in a dedicated value conversation, never tacked onto the end of a demo",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "POC / proof of concept",
+     "tasks": [
+      {
+       "id": "poc-1",
+       "text": "Write success criteria before the POC starts, not while it's running",
+       "fields": []
+      },
+      {
+       "id": "poc-2",
+       "text": "Set a clear start date and end date",
+       "fields": []
+      },
+      {
+       "id": "poc-3",
+       "text": "Name a technical owner on the prospect's side",
+       "fields": []
+      },
+      {
+       "id": "poc-4",
+       "text": "Agree the definition of \"success\" with them in writing",
+       "fields": []
+      },
+      {
+       "id": "poc-5",
+       "text": "Schedule a formal readout meeting at the end, never end a POC by email",
+       "fields": []
+      },
+      {
+       "id": "poc-6",
+       "text": "Use the readout to convert the outcome into next commercial steps",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Case studies",
+     "tasks": [
+      {
+       "id": "cs-1",
+       "text": "Match proof on three dimensions: same industry, same role, same problem, two of three is usable, one is just a logo",
+       "fields": []
+      },
+      {
+       "id": "cs-2",
+       "text": "Use the five-part story structure: who they were, what was broken, what it cost, what changed (including what was hard), the number twelve months later",
+       "fields": []
+      },
+      {
+       "id": "cs-3",
+       "text": "Always include the hard part, honesty about the difficulty is what makes the rest credible",
+       "fields": []
+      },
+      {
+       "id": "cs-4",
+       "text": "Keep a story bank of three stories per core pain, so you never reach for the wrong one under pressure",
+       "fields": []
+      },
+      {
+       "id": "cs-5",
+       "text": "Treat a reference call as a trade, not a giveaway, ask for a shorter path to signature or a decision date in return",
+       "fields": []
+      },
+      {
+       "id": "cs-6",
+       "text": "Capture new stories at the win moment in Expand, so the bank keeps refilling",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Finding & building a champion",
+     "tasks": [
+      {
+       "id": "ch-1",
+       "text": "Run the EB test, ask them to introduce you to the economic buyer",
+       "fields": []
+      },
+      {
+       "id": "ch-2",
+       "text": "Run the internal-sell test, ask \"how would you describe what we do to your boss?\" and expect a clear answer inside 30 seconds",
+       "fields": []
+      },
+      {
+       "id": "ch-3",
+       "text": "Run the forward test, send a one-page case or customer story and track whether they forward it internally",
+       "fields": []
+      },
+      {
+       "id": "ch-4",
+       "text": "Run the risk test, ask \"what happens if this stalls?\" and listen for real personal stakes, not a shrug",
+       "fields": []
+      },
+      {
+       "id": "ch-5",
+       "text": "Pull up your top 5 active deals and score each against all four tests",
+       "fields": []
+      },
+      {
+       "id": "ch-6",
+       "text": "Any deal passing fewer than three tests: downgrade it in the CRM and forecast from Champion to Coach",
+       "fields": []
+      },
+      {
+       "id": "ch-7",
+       "text": "Where you only have a Coach: coach them to articulate the internal pitch, find a different champion in the account, or be honest the deal isn't as far along as hoped",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "gate",
+     "title": "Stage 4 exit milestone",
+     "tasks": [
+      {
+       "id": "g4-1",
+       "text": "Champion confirms value in writing (\"confirmed\")",
+       "fields": []
+      },
+      {
+       "id": "g4-2",
+       "text": "Economic buyer has personally seen the business case",
+       "fields": []
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "pitfalls": [
+    "Opening with the company slide, funding history and logo wall",
+    "Feature-dumping in product-menu order instead of the three named pains",
+    "Showing eleven things, which produces eleven objections",
+    "Treating silence as agreement instead of asking",
+    "A business case built for the champion instead of with them",
+    "Three of the four numbers, usually missing the cost of doing nothing, the one that creates urgency",
+    "Understating the cost of the fix, which unravels in procurement",
+    "A pilot with no agreed success criteria",
+    "Logo walls presented as proof, or stories with no number in them",
+    "Stories that skip the hard part and end up sounding like marketing",
+    "Giving away reference calls freely, which burns your best customers and buys you nothing",
+    "Assuming a Champion instead of testing for one"
+   ]
+  },
+  {
+   "n": 5,
+   "name": "Lock",
+   "job": "Convert stated agreement into a signed, funded, dated commitment, with every internal obstacle already handled. This is the end of the sale.",
+   "blocks": [
+    {
+     "type": "group",
+     "title": "Mutual action plan",
+     "tasks": [
+      {
+       "id": "map-1",
+       "text": "Start at the date they want to be live, the one you dated in the compelling event",
+       "fields": []
+      },
+      {
+       "id": "map-2",
+       "text": "Work backwards through the steps: business case confirmed with the EB, security/IT review started, legal & procurement engaged, commercials agreed, signature, kickoff and go live",
+       "fields": []
+      },
+      {
+       "id": "map-3",
+       "text": "Put an owner and a date on every step, on both sides, named people, never departments",
+       "fields": []
+      },
+      {
+       "id": "map-4",
+       "text": "Define the specific evidence that proves each step is done (a booked review, a named reviewer, an executed agreement), not \"in progress\"",
+       "fields": []
+      },
+      {
+       "id": "map-5",
+       "text": "Send the plan the same day you build it",
+       "fields": []
+      },
+      {
+       "id": "map-6",
+       "text": "Review it weekly with the champion for 15 minutes, updating owners and dates",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Negotiation",
+     "tasks": [
+      {
+       "id": "neg-1",
+       "text": "Watch what you set as precedent from the very first conversation, not just at the negotiating table",
+       "fields": []
+      },
+      {
+       "id": "neg-2",
+       "text": "Anchor your opening number high enough to leave room to move",
+       "fields": []
+      },
+      {
+       "id": "neg-3",
+       "text": "Bundle any concessions together rather than conceding one at a time",
+       "fields": []
+      },
+      {
+       "id": "neg-4",
+       "text": "Ask about their procurement, legal and finance rules before assuming what's possible",
+       "fields": []
+      },
+      {
+       "id": "neg-5",
+       "text": "If they want a discount, trade for something back, a longer term, more seats, a faster signature, or case study rights",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Closing techniques",
+     "tasks": [
+      {
+       "id": "ct-1",
+       "text": "Cut weak, passive closing language from your vocabulary entirely",
+       "fields": []
+      },
+      {
+       "id": "ct-2",
+       "text": "Use the assumptive close, state the next step as already happening",
+       "fields": []
+      },
+      {
+       "id": "ct-3",
+       "text": "Use the summary close, restate confirmed value and ROI, then ask directly what's holding things back",
+       "fields": []
+      },
+      {
+       "id": "ct-4",
+       "text": "Use the urgency close only when a real deadline exists, never an invented one",
+       "fields": []
+      },
+      {
+       "id": "ct-5",
+       "text": "Use the option close, offer two acceptable paths instead of a plain yes/no",
+       "fields": []
+      },
+      {
+       "id": "ct-6",
+       "text": "If a close feels hard, diagnose backwards instead of pushing harder: missing EB, weak champion, or an unresolved objection",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Procurement",
+     "tasks": [
+      {
+       "id": "pr-1",
+       "text": "Isolate before you concede, find out whether price is the only thing left before you move on it",
+       "fields": []
+      },
+      {
+       "id": "pr-2",
+       "text": "Deliver the price, then stop talking, the first person to speak usually pays for it",
+       "fields": []
+      },
+      {
+       "id": "pr-3",
+       "text": "Trade every give: discount → longer term, monthly → annual upfront or shorter ramp, pilot → written criteria + decision date, smaller scope → faster start, anything → a case study or referrals",
+       "fields": []
+      },
+      {
+       "id": "pr-4",
+       "text": "Never move first, and never move twice without something substantial coming back",
+       "fields": []
+      },
+      {
+       "id": "pr-5",
+       "text": "Never discount a deal with no champion and no business case, that's just a cheaper broken deal",
+       "fields": []
+      },
+      {
+       "id": "pr-6",
+       "text": "Keep a concession log, every give and exactly what it bought; a blank line is a gift, not a trade",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Legal",
+     "tasks": [
+      {
+       "id": "lg-1",
+       "text": "Send paper early, the moment commercials are directionally agreed, get the agreement into their queue",
+       "fields": []
+      },
+      {
+       "id": "lg-2",
+       "text": "Ask the champion who owns legal and what the backlog looks like, it tells you whether your date is realistic",
+       "fields": []
+      },
+      {
+       "id": "lg-3",
+       "text": "Know your three standard red lines and who internally can sign off on each, before their counsel is waiting",
+       "fields": [
+        {
+         "id": "lg-3__1",
+         "label": "Red line 1 (+ who signs off)"
+        },
+        {
+         "id": "lg-3__2",
+         "label": "Red line 2 (+ who signs off)"
+        },
+        {
+         "id": "lg-3__3",
+         "label": "Red line 3 (+ who signs off)"
+        }
+       ]
+      },
+      {
+       "id": "lg-4",
+       "text": "Track every redline in the mutual action plan with an owner and a date, not in an email thread",
+       "fields": []
+      },
+      {
+       "id": "lg-5",
+       "text": "Get the two legal teams talking directly where you can, rather than relaying through you",
+       "fields": []
+      },
+      {
+       "id": "lg-6",
+       "text": "Escalate on time, not on temperature, a redline stuck five days is a scheduling issue, raise it as one",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Security",
+     "tasks": [
+      {
+       "id": "sec-1",
+       "text": "Ask the security question in Investigate, not Lock, who reviews new vendors, and what does that process involve",
+       "fields": []
+      },
+      {
+       "id": "sec-2",
+       "text": "Get the security contact named and the review booked in week one of the mutual action plan",
+       "fields": []
+      },
+      {
+       "id": "sec-3",
+       "text": "Have the pack ready before it's requested: SOC 2/ISO certification, pen test summary, data residency position, DPA, sub-processor list",
+       "fields": []
+      },
+      {
+       "id": "sec-4",
+       "text": "Introduce your own solutions engineer or security lead directly to their contact, peer to peer clears faster than seller to security",
+       "fields": []
+      },
+      {
+       "id": "sec-5",
+       "text": "Answer questionnaires completely and quickly, a half-completed one goes to the back of the queue",
+       "fields": []
+      },
+      {
+       "id": "sec-6",
+       "text": "Track the review as a dated step in the plan, same as any other",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Closed won",
+     "tasks": [
+      {
+       "id": "cw-1",
+       "text": "Debrief within a week, while the detail is still accurate rather than remembered",
+       "fields": []
+      },
+      {
+       "id": "cw-2",
+       "text": "Capture the trigger and the path: what it was, which channel got the first reply, how many touches it took",
+       "fields": [
+        {
+         "id": "cw-2__1",
+         "label": "What the trigger was"
+        },
+        {
+         "id": "cw-2__2",
+         "label": "Which channel got the first reply"
+        },
+        {
+         "id": "cw-2__3",
+         "label": "How many touches it took"
+        }
+       ]
+      },
+      {
+       "id": "cw-3",
+       "text": "Capture the problem and the number in the customer's exact words, that language becomes next quarter's script",
+       "fields": [
+        {
+         "id": "cw-3__1",
+         "label": "The problem, in their words"
+        },
+        {
+         "id": "cw-3__2",
+         "label": "The number, in their words"
+        }
+       ]
+      },
+      {
+       "id": "cw-4",
+       "text": "Capture what nearly killed the deal, who raised it, and what actually resolved it, the lows teach more than the highs",
+       "fields": [
+        {
+         "id": "cw-4__1",
+         "label": "What nearly killed the deal"
+        },
+        {
+         "id": "cw-4__2",
+         "label": "Who raised it"
+        },
+        {
+         "id": "cw-4__3",
+         "label": "What actually resolved it"
+        }
+       ]
+      },
+      {
+       "id": "cw-5",
+       "text": "Brief delivery on the precise promise you made, in the customer's own words, before the handoff call",
+       "fields": []
+      },
+      {
+       "id": "cw-6",
+       "text": "Present the debrief to the group rather than just filing it",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Why deals are actually lost",
+     "tasks": []
+    },
+    {
+     "type": "gate",
+     "title": "Stage 5 exit milestone",
+     "tasks": [
+      {
+       "id": "g5-1",
+       "text": "Signed, with a start date",
+       "fields": []
+      },
+      {
+       "id": "g5-2",
+       "text": "Funded",
+       "fields": []
+      },
+      {
+       "id": "g5-3",
+       "text": "Security and legal cleared",
+       "fields": []
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "pitfalls": [
+    "A plan built forwards from today instead of backwards from go live",
+    "Owners listed as departments rather than named people",
+    "A plan built and never sent, or never reviewed after week one",
+    "Gifting a discount for goodwill, it buys nothing and signals there's more available",
+    "Moving on price before isolating whether price was ever the real issue",
+    "Sending legal paper late because it felt like a formality",
+    "Redlines tracked in an email thread nobody owns",
+    "Discovering the security review in week six, after the date's already public",
+    "A shared inbox instead of a named security contact",
+    "Celebrating a win without ever debriefing it",
+    "Delivery inheriting a contract instead of the promise you actually made"
+   ]
+  },
+  {
+   "n": 6,
+   "name": "Expand",
+   "job": "Turn one signature into retained revenue, a referable reputation and the next pipeline. The cheapest pipeline that exists, and the only pipeline your competitors can't see.",
+   "blocks": [
+    {
+     "type": "group",
+     "title": "Handoff",
+     "tasks": [
+      {
+       "id": "ho-1",
+       "text": "Run a warm handoff call with delivery and the champion in the same room, never by email",
+       "fields": []
+      },
+      {
+       "id": "ho-2",
+       "text": "Cover block 1: why they're doing anything at all, the problem, the number, and the compelling event with its date",
+       "fields": []
+      },
+      {
+       "id": "ho-3",
+       "text": "Cover block 2: why your company, what you were compared against and what tipped it",
+       "fields": []
+      },
+      {
+       "id": "ho-4",
+       "text": "Cover block 3: what success looks like, the agreed criteria in the customer's language, and the metric measured at day 30",
+       "fields": []
+      },
+      {
+       "id": "ho-5",
+       "text": "Cover block 4: the full stakeholder map, every name, role, what they wanted, and especially who nearly blocked it",
+       "fields": []
+      },
+      {
+       "id": "ho-6",
+       "text": "Say the committed promise back out loud with both parties in the room, and let the champion correct you",
+       "fields": []
+      },
+      {
+       "id": "ho-7",
+       "text": "Stay on the account, don't disappear the moment the contract's signed",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "Implementation",
+     "tasks": [
+      {
+       "id": "im-1",
+       "text": "Book day 1, day 30, day 60 and day 90 in the calendar the day the deal closes, not later",
+       "fields": []
+      },
+      {
+       "id": "im-2",
+       "text": "Day 1: the warm handoff call, with success criteria in writing",
+       "fields": []
+      },
+      {
+       "id": "im-3",
+       "text": "Day 30: first value check-in against the promised metric, ask what's slower than expected, never \"how's it going\"",
+       "fields": []
+      },
+      {
+       "id": "im-4",
+       "text": "Day 60: the win moment, capture the numbers and the quote while the result is fresh",
+       "fields": [
+        {
+         "id": "im-4__1",
+         "label": "The numbers"
+        },
+        {
+         "id": "im-4__2",
+         "label": "The quote"
+        }
+       ]
+      },
+      {
+       "id": "im-5",
+       "text": "Day 90: the expansion conversation, with the champion and one new team in the room",
+       "fields": []
+      },
+      {
+       "id": "im-6",
+       "text": "Go onsite for the launch where you can, and celebrate it publicly with the team",
+       "fields": []
+      },
+      {
+       "id": "im-7",
+       "text": "Escalate early, raise problems while they're still problems, not once they've become renewal conversations",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "title": "New use case expansion",
+     "tasks": [
+      {
+       "id": "xp-1",
+       "text": "Ask for the referral at the day-60 win moment, not at renewal, when the emotion has faded",
+       "fields": []
+      },
+      {
+       "id": "xp-2",
+       "text": "Anchor the ask to their own number, so it's specific rather than a favour",
+       "fields": []
+      },
+      {
+       "id": "xp-3",
+       "text": "Map the expansion across all five directions and put a name against each",
+       "fields": [
+        {
+         "id": "xp-3__1",
+         "label": "More use"
+        },
+        {
+         "id": "xp-3__2",
+         "label": "Next team"
+        },
+        {
+         "id": "xp-3__3",
+         "label": "Next region"
+        },
+        {
+         "id": "xp-3__4",
+         "label": "Level up"
+        },
+        {
+         "id": "xp-3__5",
+         "label": "Outside the account"
+        }
+       ]
+      },
+      {
+       "id": "xp-4",
+       "text": "Open at least one of those five directions within the month",
+       "fields": []
+      },
+      {
+       "id": "xp-5",
+       "text": "Capture the case study while the emotion and numbers are both still high",
+       "fields": []
+      },
+      {
+       "id": "xp-6",
+       "text": "Track champions who change companies, congratulate in week one, sell in week six",
+       "fields": []
+      },
+      {
+       "id": "xp-7",
+       "text": "Put the expanded account back on your A-tier list in Target, the cycle restarts here",
+       "fields": []
+      }
+     ]
+    },
+    {
+     "type": "gate",
+     "title": "Stage 6 exit milestone",
+     "tasks": [
+      {
+       "id": "g6-1",
+       "text": "Documented win, captured while fresh",
+       "fields": []
+      },
+      {
+       "id": "g6-2",
+       "text": "One referral asked for and answered",
+       "fields": []
+      },
+      {
+       "id": "g6-3",
+       "text": "One expansion direction opened",
+       "fields": []
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "pitfalls": [
+    "A handoff by email, or worse, a CRM field marked closed won",
+    "Success criteria written in your language instead of theirs",
+    "The blocker left off the stakeholder map, so delivery walks in unprepared",
+    "The rep disappearing after signature, wasting everything built in Investigate and Prove",
+    "Check-ins that ask \"how's it going\" instead of measuring the promised metric",
+    "Assuming a quiet account is a healthy one",
+    "Treating training and education as somebody else's job",
+    "Booking the check-ins \"later,\" which means never",
+    "Closed-won amnesia, treating the account as finished at signature",
+    "Asking for the referral at renewal, once the emotion has faded",
+    "No case study captured, so the next deal has no matched story to sell with",
+    "A champion leaves and nobody notices for six months"
+   ]
+  }
+ ],
+ "laws": [
+  "Evidence over optimism. A good feeling is a signal, not data.",
+  "Let the milestone guide you. If it's not met, the stage is still open, however good the call felt.",
+  "Put a number on it. A problem without a number is still just a conversation.",
+  "A clear no beats an uncertain maybe. Knowing when to walk protects your time for real opportunities.",
+  "Sell the problem, not the product. People buy the removal of a cost they can name.",
+  "You're paid to advance the deal. Close every interaction with a scheduled next step.",
+  "If it's not written down, it's hard to rely on. A date and an owner in the CRM, or it's not real to anyone else."
+ ],
+ "double_rule": [
+  {
+   "name": "Double deep",
+   "text": "Never accept the first answer. The first is the feature; the second is the money and the emotion. Every question has a follow-up, and that's where the deal lives."
+  },
+  {
+   "name": "Double wide",
+   "text": "Never single-thread an account. One champion is a hobby, two is a deal, three is a forecast."
+  }
+ ],
+ "deal_inspection": [
+  "The trigger. What is it, and why this account over any other on the list?",
+  "The stakeholders. Who else at the account is engaged, and what did they actually say?",
+  "The number. What's the problem in dollars and their words, and what's the compelling event?",
+  "The proof. What did the champion confirm in writing, and when?",
+  "The plan. What does the mutual action plan say happens next, who owns it, by when?",
+  "The next deal. What's the referral or expansion path once this one is won?"
+ ]
+}

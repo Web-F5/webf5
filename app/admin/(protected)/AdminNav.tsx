@@ -9,6 +9,7 @@ const tabs = [
   { label: 'Outreach', href: '/admin/outreach' },
   { label: 'Leads', href: '/admin/leads' },
   { label: 'Reviews', href: '/admin/reviews' },
+  { label: 'CRM', href: '/admin/crm' },
 ]
 
 export function AdminNav() {
