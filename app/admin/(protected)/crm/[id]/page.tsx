@@ -424,7 +424,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
 // ── Checklist components ─────────────────────────────────────────────────────
 
 function StageChecklist({ stage, progress, onCheck, onAnswer }: {
-  stage: ReturnType<typeof TRIPLE.stages[0]['blocks'][0]> extends Block ? never : typeof TRIPLE.stages[0]
+  stage:    typeof TRIPLE.stages[0]
   progress: ProgressMap
   onCheck:  (taskId: string, checked: boolean) => void
   onAnswer: (taskId: string, answer: string) => void
