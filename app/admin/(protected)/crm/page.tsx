@@ -16,19 +16,35 @@ interface Account {
   updatedAt:    string
 }
 
+interface NextStepRow {
+  dealId:       string
+  dealName:     string
+  dealStatus:   string
+  nextStep:     string | null
+  nextStepDate: string | null
+  accountId:    string
+  accountName:  string
+  accountTier:  string
+}
+
 const TIERS = ['A', 'B', 'C']
 
 export default function CrmPage() {
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [loading, setLoading]   = useState(true)
-  const [showNew, setShowNew]   = useState(false)
-  const [form, setForm]         = useState({ name: '', tier: 'B', triggerText: '', triggerDate: '' })
-  const [saving, setSaving]     = useState(false)
-  const [filter, setFilter]     = useState<string>('all')
+  const [accounts, setAccounts]   = useState<Account[]>([])
+  const [nextSteps, setNextSteps] = useState<NextStepRow[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [showNew, setShowNew]     = useState(false)
+  const [form, setForm]           = useState({ name: '', tier: 'B', triggerText: '', triggerDate: '' })
+  const [saving, setSaving]       = useState(false)
+  const [filter, setFilter]       = useState<string>('all')
 
   const load = useCallback(async () => {
-    const res = await fetch('/api/admin/crm/accounts')
-    setAccounts(await res.json())
+    const [accRes, nsRes] = await Promise.all([
+      fetch('/api/admin/crm/accounts'),
+      fetch('/api/admin/crm/next-steps'),
+    ])
+    setAccounts(await accRes.json())
+    setNextSteps(await nsRes.json())
     setLoading(false)
   }, [])
 
@@ -209,6 +225,38 @@ export default function CrmPage() {
         </div>
       )}
 
+      {/* Next Steps dashboard */}
+      {nextSteps.length > 0 && (() => {
+        const today = new Date().toISOString().slice(0, 10)
+        const overdue  = nextSteps.filter(r => r.nextStepDate && r.nextStepDate < today)
+        const upcoming = nextSteps.filter(r => !r.nextStepDate || r.nextStepDate >= today)
+        return (
+          <div className="mt-8 bg-[#111827] border border-white/10 rounded-xl p-5">
+            <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-4">Next Steps</p>
+            {overdue.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs text-red-400 font-semibold mb-2">Overdue ({overdue.length})</p>
+                <div className="space-y-2">
+                  {overdue.map(r => (
+                    <NextStepCard key={r.dealId} row={r} overdue />
+                  ))}
+                </div>
+              </div>
+            )}
+            {upcoming.length > 0 && (
+              <div>
+                <p className="text-xs text-slate-500 font-semibold mb-2">Upcoming ({upcoming.length})</p>
+                <div className="space-y-2">
+                  {upcoming.sort((a, b) => (a.nextStepDate ?? '9') < (b.nextStepDate ?? '9') ? -1 : 1).map(r => (
+                    <NextStepCard key={r.dealId} row={r} overdue={false} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
+
       {/* Seven Laws footer */}
       <div className="mt-12 border border-white/5 rounded-xl p-5 bg-[#0D1321]">
         <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-3">Seven Laws</p>
@@ -230,5 +278,31 @@ export default function CrmPage() {
       </div>
 
     </div>
+  )
+}
+
+function NextStepCard({ row, overdue }: { row: NextStepRow; overdue: boolean }) {
+  const tc = TIER_COLORS[row.accountTier] ?? '#64748B'
+  return (
+    <Link
+      href={`/admin/crm/${row.accountId}`}
+      className="flex items-start gap-3 bg-[#0A0F1E] rounded-lg px-4 py-3 hover:bg-[#0d1225] transition-colors group"
+    >
+      <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
+        style={{ backgroundColor: tc + '22', color: tc, border: `1.5px solid ${tc}` }}>
+        {row.accountTier}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">
+          {row.accountName} — <span className="text-slate-400 font-normal">{row.dealName}</span>
+        </div>
+        {row.nextStep && <div className="text-xs text-slate-400 mt-0.5 truncate">{row.nextStep}</div>}
+      </div>
+      {row.nextStepDate && (
+        <div className={`text-xs font-medium flex-shrink-0 ${overdue ? 'text-red-400' : 'text-slate-400'}`}>
+          {new Date(row.nextStepDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
+        </div>
+      )}
+    </Link>
   )
 }

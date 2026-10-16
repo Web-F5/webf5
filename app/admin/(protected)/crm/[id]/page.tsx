@@ -5,6 +5,120 @@ import Link from 'next/link'
 import { TRIPLE, STAGE_NAMES, STAGE_COLORS, TIER_COLORS, ROLE_LABELS } from '@/lib/triple-seed'
 import type { Block, Task } from '@/lib/triple-seed'
 
+// ── Send Tools panel ──────────────────────────────────────────────────────────
+function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
+  const [open, setOpen]           = useState(false)
+  const [type, setType]           = useState<'checklist' | 'audit'>('checklist')
+  const [name, setName]           = useState('')
+  const [email, setEmail]         = useState('')
+  const [bizName, setBizName]     = useState('')
+  const [url, setUrl]             = useState('')
+  const [sending, setSending]     = useState(false)
+  const [result, setResult]       = useState<{ ok: boolean; msg: string } | null>(null)
+
+  // Pre-fill from contacts if one exists
+  const firstContact = contacts[0]
+  useEffect(() => {
+    if (firstContact && !name) setName(firstContact.name)
+  }, [firstContact, name])
+
+  async function send(e: React.FormEvent) {
+    e.preventDefault()
+    setSending(true)
+    setResult(null)
+    try {
+      const body: Record<string, string> = { type, name, email }
+      if (bizName) body.businessName = bizName
+      if (type === 'audit') body.url = url
+      const res = await fetch('/api/admin/crm/send-tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setResult({ ok: true, msg: type === 'audit' ? `Audit sent! Grade ${data.grade} (${data.overallScore}%)` : 'Checklist sent!' })
+      } else {
+        setResult({ ok: false, msg: data.error ?? 'Something went wrong.' })
+      }
+    } catch {
+      setResult({ ok: false, msg: 'Network error.' })
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div className="mb-6 bg-[#111827] border border-white/10 rounded-xl p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Send Tools</p>
+        <button onClick={() => setOpen(o => !o)}
+          className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+          {open ? 'Close' : 'Send checklist or audit →'}
+        </button>
+      </div>
+      {open && (
+        <form onSubmit={send} className="mt-4 space-y-3">
+          {/* Type selector */}
+          <div className="flex gap-2">
+            {(['checklist', 'audit'] as const).map(t => (
+              <button key={t} type="button" onClick={() => setType(t)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                  type === t ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-white/10 text-slate-400 hover:text-white'
+                }`}>
+                {t === 'checklist' ? '12-Point Checklist' : 'Website Audit'}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Contact name *</label>
+              <input value={name} onChange={e => setName(e.target.value)} required
+                list="contact-names"
+                className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                placeholder="Jane Smith" />
+              <datalist id="contact-names">
+                {contacts.map(c => <option key={c.id} value={c.name} />)}
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Email *</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                placeholder="jane@example.com" />
+            </div>
+          </div>
+          {type === 'audit' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Business name</label>
+                <input value={bizName} onChange={e => setBizName(e.target.value)}
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="Acme Corp" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Website URL *</label>
+                <input value={url} onChange={e => setUrl(e.target.value)} required={type === 'audit'}
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="example.com.au" />
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-3">
+            <button type="submit" disabled={sending}
+              className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors">
+              {sending ? (type === 'audit' ? 'Running audit…' : 'Sending…') : `Send ${type === 'audit' ? 'audit' : 'checklist'}`}
+            </button>
+            {result && (
+              <span className={`text-xs ${result.ok ? 'text-green-400' : 'text-red-400'}`}>{result.msg}</span>
+            )}
+          </div>
+        </form>
+      )}
+    </div>
+  )
+}
+
 interface Account {
   id: string; name: string; tier: string; triggerText: string | null
   triggerDate: string | null; currentStage: number; notes: string | null
@@ -46,6 +160,8 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   const [showNewDeal, setShowNewDeal] = useState(false)
   const [dealName, setDealName] = useState('')
   const [saving, setSaving] = useState(false)
+  const [dealNextStep, setDealNextStep]         = useState('')
+  const [dealNextStepDate, setDealNextStepDate] = useState('')
 
   const loadAll = useCallback(async () => {
     const [accRes, conRes, dealRes] = await Promise.all([
@@ -72,6 +188,22 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   }, [])
 
   useEffect(() => { loadAll() }, [loadAll])
+
+  // Sync next step fields when active deal changes
+  useEffect(() => {
+    const deal = deals.find(d => d.id === activeDeal)
+    setDealNextStep(deal?.nextStep ?? '')
+    setDealNextStepDate(deal?.nextStepDate ?? '')
+  }, [activeDeal, deals])
+
+  async function saveDealField(dealId: string, patch: Record<string, string | null>) {
+    await fetch(`/api/admin/crm/deals/${dealId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch),
+    })
+    loadAll()
+  }
 
   useEffect(() => {
     if (activeTab === 'workspace') {
@@ -324,6 +456,9 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
         )}
       </div>
 
+      {/* Send Tools */}
+      <SendToolsPanel contacts={contacts} />
+
       {/* New deal form */}
       {showNewDeal && (
         <form onSubmit={createDeal} className="mb-6 bg-[#111827] border border-indigo-500/30 rounded-xl p-4 flex gap-3">
@@ -397,6 +532,41 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
               Stage 1: Target — workspace level
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Next Step (deal tabs only) */}
+      {activeTab === 'deals' && activeDeal && (
+        <div className="mb-5 bg-[#111827] border border-white/10 rounded-xl p-4 flex flex-wrap gap-3 items-end">
+          <div className="flex-1 min-w-48">
+            <label className="block text-xs text-slate-400 mb-1">Next step</label>
+            <input
+              value={dealNextStep}
+              onChange={e => setDealNextStep(e.target.value)}
+              onBlur={() => saveDealField(activeDeal, { nextStep: dealNextStep || null })}
+              placeholder="e.g. Send proposal draft"
+              className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+          <div className="w-40">
+            <label className="block text-xs text-slate-400 mb-1">Due date</label>
+            <input
+              type="date"
+              value={dealNextStepDate}
+              onChange={e => setDealNextStepDate(e.target.value)}
+              onBlur={() => saveDealField(activeDeal, { nextStepDate: dealNextStepDate || null })}
+              className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+          {dealNextStepDate && (() => {
+            const today = new Date().toISOString().slice(0, 10)
+            const overdue = dealNextStepDate < today
+            return (
+              <span className={`text-xs font-semibold px-2 py-1 rounded-full ${overdue ? 'bg-red-900/40 text-red-400' : 'bg-green-900/30 text-green-400'}`}>
+                {overdue ? 'Overdue' : 'Upcoming'}
+              </span>
+            )
+          })()}
         </div>
       )}
 
