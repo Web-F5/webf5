@@ -145,6 +145,35 @@ export const crmTaskProgress = pgTable('crm_task_progress', {
   updatedAt:   timestamp('updated_at').notNull().defaultNow(),
 })
 
+// ── Cold Outreach ──────────────────────────────────────────────────────────
+
+export const outreachProspects = pgTable('outreach_prospects', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  name:        text('name').notNull(),
+  title:       text('title'),
+  company:     text('company').notNull(),
+  website:     text('website'),
+  email:       text('email').notNull(),
+  linkedin:    text('linkedin'),
+  notes:       text('notes'),         // manual research notes
+  researchData: jsonb('research_data').notNull().default({}), // audit + scraped data
+  createdAt:   timestamp('created_at').notNull().defaultNow(),
+  updatedAt:   timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const outreachSends = pgTable('outreach_sends', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  prospectId:  uuid('prospect_id').references(() => outreachProspects.id, { onDelete: 'cascade' }).notNull(),
+  subject:     text('subject').notNull(),
+  body:        text('body').notNull(),       // plain-text version
+  bodyHtml:    text('body_html').notNull(),  // HTML version sent
+  sequenceName: text('sequence_name'),       // e.g. "The Workhorse"
+  touchType:   text('touch_type'),           // e.g. "Opener"
+  status:      text('status').notNull().default('sent'), // sent | bounced | replied
+  repliedAt:   timestamp('replied_at'),
+  createdAt:   timestamp('created_at').notNull().defaultNow(),
+})
+
 export const courseEntitlements = pgTable('course_entitlements', {
   id:              uuid('id').primaryKey().defaultRandom(),
   userId:          text('user_id').notNull(),

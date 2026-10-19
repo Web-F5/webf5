@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -680,11 +681,19 @@ function buildEmailHtml(touch: Touch): string {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold">Outreach Sequences</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            8 plug-and-play cadences from the Double Triple course · email, LinkedIn, phone, voicemail, and A/B variants
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Outreach Sequences</h1>
+            <p className="text-slate-400 text-sm mt-1">
+              8 plug-and-play cadences from the Double Triple course · email, LinkedIn, phone, voicemail, and A/B variants
+            </p>
+          </div>
+          <Link
+            href="/admin/outreach/sender"
+            className="shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          >
+            ✉ Email Sender →
+          </Link>
         </div>
 
         {/* Golden Rules */}
