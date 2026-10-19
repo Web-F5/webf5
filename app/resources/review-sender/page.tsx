@@ -278,6 +278,47 @@ export default function ReviewSenderPage() {
                   </div>
                 </div>
 
+                {/* Find Google review link (Google platform only) */}
+                {platform === 'google' && (
+                  <div className="bg-[#0A0F1E] border border-white/10 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Find your Google review link</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={placeSearch}
+                        onChange={e => setPlaceSearch(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && searchPlaces()}
+                        placeholder="Business name + suburb, e.g. Acme Electrical Bendigo"
+                        className="flex-1 bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={searchPlaces}
+                        disabled={placesLoading || !placeSearch.trim()}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-40 whitespace-nowrap"
+                      >
+                        {placesLoading ? 'Searching…' : 'Find'}
+                      </button>
+                    </div>
+                    {placesError && <p className="text-xs text-red-400 mt-2">{placesError}</p>}
+                    {placeResults.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {placeResults.map(r => (
+                          <button
+                            key={r.placeId}
+                            type="button"
+                            onClick={() => { setReviewUrl(r.reviewUrl); setPlaceResults([]); setPlaceSearch('') }}
+                            className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors border border-white/5"
+                          >
+                            <div className="text-sm font-medium text-white">{r.name}</div>
+                            <div className="text-xs text-slate-500 mt-0.5">{r.address}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Review link */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Review link *</label>
@@ -289,46 +330,6 @@ export default function ReviewSenderPage() {
                     className="w-full bg-[#0A0F1E] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                   <p className="text-xs text-slate-500 mt-1.5">The link customers click to leave their review</p>
-
-                  {platform === 'google' && (
-                    <div className="mt-3 bg-[#0A0F1E] border border-white/10 rounded-xl p-4">
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Find your Google review link</p>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={placeSearch}
-                          onChange={e => setPlaceSearch(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && searchPlaces()}
-                          placeholder="Business name + suburb, e.g. Acme Electrical Bendigo"
-                          className="flex-1 bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
-                        />
-                        <button
-                          type="button"
-                          onClick={searchPlaces}
-                          disabled={placesLoading || !placeSearch.trim()}
-                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-40 whitespace-nowrap"
-                        >
-                          {placesLoading ? 'Searching…' : 'Find'}
-                        </button>
-                      </div>
-                      {placesError && <p className="text-xs text-red-400 mt-2">{placesError}</p>}
-                      {placeResults.length > 0 && (
-                        <div className="mt-2 space-y-1">
-                          {placeResults.map(r => (
-                            <button
-                              key={r.placeId}
-                              type="button"
-                              onClick={() => { setReviewUrl(r.reviewUrl); setPlaceResults([]); setPlaceSearch('') }}
-                              className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors border border-white/5"
-                            >
-                              <div className="text-sm font-medium text-white">{r.name}</div>
-                              <div className="text-xs text-slate-500 mt-0.5">{r.address}</div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
 
                 {/* Personal note */}
