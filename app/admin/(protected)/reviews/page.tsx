@@ -532,12 +532,12 @@ function platformBadgeColor(p: string): string {
   }[p] ?? 'bg-slate-800 text-slate-400 border-slate-700'
 }
 
-interface Recipient {
+interface RecipientRecord {
   id: string; sendId: string; name: string; email: string
   reviewed: boolean; reviewedAt: string | null; createdAt: string
 }
 
-function RecipientRow({ r, onUpdate }: { r: Recipient; onUpdate: (updated: Recipient) => void }) {
+function RecipientRow({ r, onUpdate }: { r: RecipientRecord; onUpdate: (updated: RecipientRecord) => void }) {
   const [toggling, setToggling]   = useState(false)
   const [resending, setResending] = useState(false)
   const [resent, setResent]       = useState(false)
@@ -599,7 +599,7 @@ function RecipientRow({ r, onUpdate }: { r: Recipient; onUpdate: (updated: Recip
 
 function SendLog() {
   const [logs, setLogs]             = useState<SendLog[] | null>(null)
-  const [recipients, setRecipients] = useState<Record<string, Recipient[]>>({})
+  const [recipients, setRecipients] = useState<Record<string, RecipientRecord[]>>({})
   const [loading, setLoading]       = useState(false)
   const [loaded, setLoaded]         = useState(false)
   const [expanded, setExpanded]     = useState<Record<string, boolean>>({})
@@ -614,7 +614,7 @@ function SendLog() {
     setLoading(false)
   }
 
-  function updateRecipient(sendId: string, updated: Recipient) {
+  function updateRecipient(sendId: string, updated: RecipientRecord) {
     setRecipients(prev => ({
       ...prev,
       [sendId]: (prev[sendId] || []).map(r => r.id === updated.id ? updated : r),
@@ -674,7 +674,7 @@ function SendLog() {
                 {rows.length === 0 ? (
                   <p className="text-xs text-slate-600 italic">Recipients not tracked for this batch (sent before tracking was added).</p>
                 ) : (
-                  rows.map(r => (
+                  (rows as RecipientRecord[]).map(r => (
                     <RecipientRow
                       key={r.id}
                       r={r}
