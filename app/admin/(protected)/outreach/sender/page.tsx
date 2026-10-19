@@ -454,7 +454,6 @@ webf5.com.au`)
                           key={email}
                           onClick={() => {
                             setPEmail(email)
-                            setSelectedEmails(new Set([email]))
                           }}
                           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                             pEmail === email
