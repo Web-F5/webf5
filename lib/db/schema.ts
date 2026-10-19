@@ -66,6 +66,16 @@ export const reviewSends = pgTable('review_sends', {
   createdAt:      timestamp('created_at').notNull().defaultNow(),
 })
 
+export const reviewRecipients = pgTable('review_recipients', {
+  id:         uuid('id').primaryKey().defaultRandom(),
+  sendId:     uuid('send_id').references(() => reviewSends.id, { onDelete: 'cascade' }).notNull(),
+  name:       text('name').notNull(),
+  email:      text('email').notNull(),
+  reviewed:   boolean('reviewed').notNull().default(false),
+  reviewedAt: timestamp('reviewed_at'),
+  createdAt:  timestamp('created_at').notNull().defaultNow(),
+})
+
 export const reviewSenderLeads = pgTable('review_sender_leads', {
   id:             uuid('id').primaryKey().defaultRandom(),
   senderName:     text('sender_name').notNull(),

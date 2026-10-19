@@ -532,18 +532,93 @@ function platformBadgeColor(p: string): string {
   }[p] ?? 'bg-slate-800 text-slate-400 border-slate-700'
 }
 
+interface Recipient {
+  id: string; sendId: string; name: string; email: string
+  reviewed: boolean; reviewedAt: string | null; createdAt: string
+}
+
+function RecipientRow({ r, onUpdate }: { r: Recipient; onUpdate: (updated: Recipient) => void }) {
+  const [toggling, setToggling]   = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent]       = useState(false)
+
+  async function toggleReviewed() {
+    setToggling(true)
+    const res = await fetch(`/api/admin/reviews/recipients/${r.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reviewed: !r.reviewed }),
+    })
+    if (res.ok) onUpdate(await res.json())
+    setToggling(false)
+  }
+
+  async function resend() {
+    setResending(true)
+    const res = await fetch(`/api/admin/reviews/recipients/${r.id}`, { method: 'POST' })
+    if (res.ok) setResent(true)
+    else alert('Resend failed.')
+    setResending(false)
+  }
+
+  return (
+    <div className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${r.reviewed ? 'bg-green-900/10' : 'bg-[#0A0F1E]'}`}>
+      {/* Reviewed checkbox */}
+      <button
+        onClick={toggleReviewed}
+        disabled={toggling}
+        title={r.reviewed ? 'Mark as not reviewed' : 'Mark as reviewed'}
+        className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+          r.reviewed ? 'bg-green-500 border-green-500 text-white' : 'border-white/20 hover:border-green-400'
+        }`}
+      >
+        {r.reviewed && <span className="text-xs leading-none">✓</span>}
+      </button>
+
+      {/* Name + email */}
+      <div className="flex-1 min-w-0">
+        <span className={`text-xs font-medium ${r.reviewed ? 'text-slate-400' : 'text-slate-200'}`}>{r.name}</span>
+        <span className="text-xs text-slate-600 ml-2">{r.email}</span>
+      </div>
+
+      {/* Status / resend */}
+      {r.reviewed ? (
+        <span className="text-xs text-green-500 flex-shrink-0">Reviewed</span>
+      ) : (
+        <button
+          onClick={resend}
+          disabled={resending || resent}
+          className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0 transition-colors disabled:opacity-50"
+        >
+          {resending ? 'Sending…' : resent ? 'Sent ✓' : 'Resend'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 function SendLog() {
-  const [logs, setLogs]     = useState<SendLog[] | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const [logs, setLogs]             = useState<SendLog[] | null>(null)
+  const [recipients, setRecipients] = useState<Record<string, Recipient[]>>({})
+  const [loading, setLoading]       = useState(false)
+  const [loaded, setLoaded]         = useState(false)
+  const [expanded, setExpanded]     = useState<Record<string, boolean>>({})
 
   async function load() {
     setLoading(true)
-    const res = await fetch('/api/admin/reviews')
+    const res  = await fetch('/api/admin/reviews')
     const data = await res.json()
     setLogs(data.logs || [])
+    setRecipients(data.recipients || {})
     setLoaded(true)
     setLoading(false)
+  }
+
+  function updateRecipient(sendId: string, updated: Recipient) {
+    setRecipients(prev => ({
+      ...prev,
+      [sendId]: (prev[sendId] || []).map(r => r.id === updated.id ? updated : r),
+    }))
   }
 
   if (!loaded) {
@@ -561,32 +636,57 @@ function SendLog() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-white/10">
-            {['Business', 'Platform', 'Sent to', 'Date'].map(h => (
-              <th key={h} className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider pb-3 pr-4">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {logs.map(log => (
-            <tr key={log.id} className="border-b border-white/5">
-              <td className="py-3 pr-4 text-white font-medium">{log.fromBusiness}</td>
-              <td className="py-3 pr-4">
-                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${platformBadgeColor(log.platform)}`}>
-                  {platformLabel(log.platform)}
+    <div className="space-y-2">
+      {logs.map(log => {
+        const rows     = recipients[log.id] || []
+        const reviewed = rows.filter(r => r.reviewed).length
+        const isOpen   = expanded[log.id]
+
+        return (
+          <div key={log.id} className="border border-white/10 rounded-xl overflow-hidden">
+            {/* Batch header — click to expand */}
+            <button
+              onClick={() => setExpanded(e => ({ ...e, [log.id]: !e[log.id] }))}
+              className="w-full flex items-center gap-4 px-4 py-3 bg-[#111827] hover:bg-[#151e30] transition-colors text-left"
+            >
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-semibold text-white">{log.fromBusiness}</span>
+                <span className="text-xs text-slate-500 ml-3">
+                  {new Date(log.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
-              </td>
-              <td className="py-3 pr-4 text-slate-300">{log.recipientCount} recipient{log.recipientCount !== 1 ? 's' : ''}</td>
-              <td className="py-3 text-slate-500 text-xs">
-                {new Date(log.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border flex-shrink-0 ${platformBadgeColor(log.platform)}`}>
+                {platformLabel(log.platform)}
+              </span>
+              {rows.length > 0 ? (
+                <span className={`text-xs font-semibold flex-shrink-0 ${reviewed === rows.length ? 'text-green-400' : reviewed > 0 ? 'text-amber-400' : 'text-slate-500'}`}>
+                  {reviewed}/{rows.length} reviewed
+                </span>
+              ) : (
+                <span className="text-xs text-slate-500 flex-shrink-0">{log.recipientCount} sent</span>
+              )}
+              <span className="text-slate-600 text-xs flex-shrink-0">{isOpen ? '▲' : '▼'}</span>
+            </button>
+
+            {/* Recipient rows */}
+            {isOpen && (
+              <div className="px-4 py-3 space-y-1.5 bg-[#0D1321] border-t border-white/5">
+                {rows.length === 0 ? (
+                  <p className="text-xs text-slate-600 italic">Recipients not tracked for this batch (sent before tracking was added).</p>
+                ) : (
+                  rows.map(r => (
+                    <RecipientRow
+                      key={r.id}
+                      r={r}
+                      onUpdate={updated => updateRecipient(log.id, updated)}
+                    />
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

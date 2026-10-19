@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { db, reviewSends, reviewRatings } from '@/lib/db'
+import { db, reviewSends, reviewRatings, reviewRecipients } from '@/lib/db'
 import { buildReviewEmailHtml, buildReviewEmailSubject } from '@/lib/review-email'
-import { desc } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 
-const resend  = new Resend(process.env.RESEND_API_KEY)
-const FROM    = 'contact@webf5.au'
+const resend   = new Resend(process.env.RESEND_API_KEY)
+const FROM     = 'contact@webf5.au'
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'
 
 // ── POST — send review requests ────────────────────────────────────────────
@@ -34,8 +34,17 @@ export async function POST(req: NextRequest) {
       recipientCount: valid.length,
     }).returning({ id: reviewSends.id })
 
+    // Always store recipients for tracking
+    await db.insert(reviewRecipients).values(
+      valid.map(r => ({
+        sendId: sendRow.id,
+        name:   r.name.trim(),
+        email:  r.email.trim(),
+      }))
+    )
+
     // If using the satisfaction filter, generate a token per recipient
-    let tokenMap: Record<string, string> = {} // email → token UUID
+    let tokenMap: Record<string, string> = {}
 
     if (useFilter) {
       const tokenRows = await db.insert(reviewRatings).values(
@@ -61,21 +70,14 @@ export async function POST(req: NextRequest) {
     for (let i = 0; i < valid.length; i += BATCH_SIZE) {
       const batch = valid.slice(i, i + BATCH_SIZE)
       const emailBatch = batch.map((r: R) => {
-        const token    = tokenMap[r.email.trim()]
+        const token     = tokenMap[r.email.trim()]
         const ratingUrl = token ? `${BASE_URL}/review?t=${token}` : undefined
 
-        // Parse base64 data URI for inline attachment
         let attachments: { content: string; filename: string; content_type: string; content_id: string; inline: boolean }[] | undefined
         if (logoBase64) {
           const match = (logoBase64 as string).match(/^data:(image\/[a-z+]+);base64,(.+)$/)
           if (match) {
-            attachments = [{
-              content:      match[2],
-              filename:     'logo',
-              content_type: match[1],
-              content_id:   'logo',
-              inline:       true,
-            }]
+            attachments = [{ content: match[2], filename: 'logo', content_type: match[1], content_id: 'logo', inline: true }]
           }
         }
 
@@ -111,17 +113,23 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// ── GET — fetch send log ───────────────────────────────────────────────────
+// ── GET — fetch send log with recipients ──────────────────────────────────
 
 export async function GET() {
   try {
-    const logs = await db
-      .select()
-      .from(reviewSends)
-      .orderBy(desc(reviewSends.createdAt))
-      .limit(100)
+    const [logs, allRecipients] = await Promise.all([
+      db.select().from(reviewSends).orderBy(desc(reviewSends.createdAt)).limit(100),
+      db.select().from(reviewRecipients).orderBy(reviewRecipients.createdAt),
+    ])
 
-    return NextResponse.json({ logs })
+    // Group recipients by sendId
+    const byBatch: Record<string, typeof allRecipients> = {}
+    for (const r of allRecipients) {
+      if (!byBatch[r.sendId]) byBatch[r.sendId] = []
+      byBatch[r.sendId].push(r)
+    }
+
+    return NextResponse.json({ logs, recipients: byBatch })
   } catch (err) {
     console.error('Review log error:', err)
     return NextResponse.json({ error: 'Failed to load send log.' }, { status: 500 })
