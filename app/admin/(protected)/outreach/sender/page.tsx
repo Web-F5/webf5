@@ -57,6 +57,25 @@ interface OutreachSend {
   createdAt: string
 }
 
+interface PlaceResult {
+  placeId: string
+  name: string
+  address: string
+  types: string[]
+}
+
+interface EnrichResult {
+  name: string
+  website: string
+  phone: string
+  address: string
+  types: string[]
+  emails: string[]
+  linkedin?: string
+  facebook?: string
+  scrapedTitle?: string
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function timeAgo(iso: string): string {
@@ -84,34 +103,41 @@ function scoreBar(score?: number | null): string {
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function OutreachSenderPage() {
-  const [prospects, setProspects]         = useState<Prospect[]>([])
+  const [prospects, setProspects]             = useState<Prospect[]>([])
   const [sendsByProspect, setSendsByProspect] = useState<Record<string, OutreachSend[]>>({})
-  const [loading, setLoading]             = useState(true)
+  const [loading, setLoading]                 = useState(true)
 
   // Prospect form
-  const [showForm, setShowForm]           = useState(false)
+  const [showForm, setShowForm]               = useState(false)
   const [editingProspect, setEditingProspect] = useState<Prospect | null>(null)
-  const [pName, setPName]                 = useState('')
-  const [pTitle, setPTitle]               = useState('')
-  const [pCompany, setPCompany]           = useState('')
-  const [pWebsite, setPWebsite]           = useState('')
-  const [pEmail, setPEmail]               = useState('')
-  const [pLinkedIn, setPLinkedIn]         = useState('')
-  const [pNotes, setPNotes]               = useState('')
-  const [saving, setSaving]               = useState(false)
+  const [pName, setPName]                     = useState('')
+  const [pTitle, setPTitle]                   = useState('')
+  const [pCompany, setPCompany]               = useState('')
+  const [pWebsite, setPWebsite]               = useState('')
+  const [pEmail, setPEmail]                   = useState('')
+  const [pLinkedIn, setPLinkedIn]             = useState('')
+  const [pNotes, setPNotes]                   = useState('')
+  const [saving, setSaving]                   = useState(false)
+
+  // Business search / enrichment
+  const [searchQuery, setSearchQuery]         = useState('')
+  const [searching, setSearching]             = useState(false)
+  const [searchResults, setSearchResults]     = useState<PlaceResult[]>([])
+  const [enriching, setEnriching]             = useState(false)
+  const [enrichResult, setEnrichResult]       = useState<EnrichResult | null>(null)
 
   // Research
-  const [researching, setResearching]     = useState<string | null>(null)
+  const [researching, setResearching]         = useState<string | null>(null)
 
   // Email composer
-  const [composingFor, setComposingFor]   = useState<Prospect | null>(null)
-  const [emailSubject, setEmailSubject]   = useState('')
-  const [emailBody, setEmailBody]         = useState('')
-  const [sending, setSending]             = useState(false)
-  const [sendSuccess, setSendSuccess]     = useState(false)
+  const [composingFor, setComposingFor]       = useState<Prospect | null>(null)
+  const [emailSubject, setEmailSubject]       = useState('')
+  const [emailBody, setEmailBody]             = useState('')
+  const [sending, setSending]                 = useState(false)
+  const [sendSuccess, setSendSuccess]         = useState(false)
 
   // Selected prospect detail view
-  const [selectedId, setSelectedId]       = useState<string | null>(null)
+  const [selectedId, setSelectedId]           = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -124,7 +150,64 @@ export default function OutreachSenderPage() {
 
   useEffect(() => { load() }, [load])
 
+  // ── Business search ────────────────────────────────────────────────────
+
+  async function searchBusiness() {
+    if (!searchQuery.trim()) return
+    setSearching(true)
+    setSearchResults([])
+    setEnrichResult(null)
+    const res  = await fetch(`/api/admin/outreach/enrich?q=${encodeURIComponent(searchQuery.trim())}`)
+    const data = await res.json()
+    setSearchResults(data.results ?? [])
+    setSearching(false)
+  }
+
+  async function selectPlace(place: PlaceResult) {
+    setEnriching(true)
+    setEnrichResult(null)
+    const res  = await fetch('/api/admin/outreach/enrich', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ placeId: place.placeId }),
+    })
+    const data: EnrichResult = await res.json()
+    setEnrichResult(data)
+    setEnriching(false)
+
+    // Pre-fill the form with what we found
+    setPCompany(data.name || place.name)
+    setPWebsite(data.website || '')
+    setPLinkedIn(data.linkedin || '')
+
+    // Pre-select the first (non-generic) email if any
+    if (data.emails.length > 0) {
+      setPEmail(data.emails[0])
+    }
+
+    // Build notes from address, phone, business type
+    const typeLine = data.types.filter(t => !['establishment', 'point_of_interest'].includes(t))
+      .map(t => t.replace(/_/g, ' ')).join(', ')
+    const noteParts: string[] = []
+    if (data.address)  noteParts.push(`Address: ${data.address}`)
+    if (data.phone)    noteParts.push(`Phone: ${data.phone}`)
+    if (typeLine)      noteParts.push(`Type: ${typeLine}`)
+    if (data.facebook) noteParts.push(`Facebook: ${data.facebook}`)
+    setPNotes(noteParts.join('\n'))
+  }
+
+  function applyEnrichAndOpenForm() {
+    setSearchResults([])
+    setSearchQuery('')
+    setShowForm(true)
+  }
+
+  // ── Prospect CRUD ──────────────────────────────────────────────────────
+
   function openForm(prospect?: Prospect) {
+    setEnrichResult(null)
+    setSearchResults([])
+    setSearchQuery('')
     if (prospect) {
       setEditingProspect(prospect)
       setPName(prospect.name)
@@ -158,6 +241,7 @@ export default function OutreachSenderPage() {
     await load()
     setSaving(false)
     setShowForm(false)
+    setEnrichResult(null)
   }
 
   async function deleteProspect(id: string) {
@@ -186,11 +270,8 @@ export default function OutreachSenderPage() {
   function openComposer(prospect: Prospect) {
     setComposingFor(prospect)
     setSendSuccess(false)
-    // Pre-fill subject using research data
     const rd = prospect.researchData
-    const site = rd?.scraped?.title ?? prospect.company
     setEmailSubject(`quick idea for ${prospect.company}`)
-    // Generate a personalised opener using research
     const issues: string[] = []
     if (rd?.perfScore != null && rd.perfScore < 70) issues.push(`your website speed score is ${rd.perfScore}/100`)
     if (rd?.seoScore  != null && rd.seoScore  < 70) issues.push(`there are SEO opportunities we spotted`)
@@ -240,7 +321,7 @@ webf5.com.au`)
 
   const selected = prospects.find(p => p.id === selectedId)
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div className="text-white px-4 py-8 min-h-screen">
@@ -257,29 +338,186 @@ webf5.com.au`)
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Cold Outreach Sender</h1>
-            <p className="text-slate-400 text-sm mt-1">Research prospects, then send targeted emails — {prospects.length} prospect{prospects.length !== 1 ? 's' : ''}</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Search a business to auto-fill prospect details, then compose targeted emails — {prospects.length} prospect{prospects.length !== 1 ? 's' : ''}
+            </p>
           </div>
           <button
             onClick={() => openForm()}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
-            + Add Prospect
+            + Manual entry
           </button>
         </div>
 
-        {/* Add / Edit prospect form */}
+        {/* ── Business search ───────────────────────────────────────────────── */}
+        <div className="bg-[#111827] border border-white/10 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-white/10">
+            <h2 className="font-semibold text-sm">Find a Business</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Search Google Business Profile — we&apos;ll pull their website, emails, and social links automatically</p>
+          </div>
+          <div className="p-5 space-y-4">
+
+            {/* Search input */}
+            <div className="flex gap-2">
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && searchBusiness()}
+                placeholder="e.g. Smith Plumbing Geelong, or Acme Cafe Belmont VIC"
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+              />
+              <button
+                onClick={searchBusiness}
+                disabled={searching || !searchQuery.trim()}
+                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+              >
+                {searching ? 'Searching…' : 'Search'}
+              </button>
+            </div>
+
+            {/* Search results */}
+            {searchResults.length > 0 && !enrichResult && (
+              <div className="space-y-2">
+                <p className="text-xs text-slate-500">Select the right business:</p>
+                {searchResults.map(place => (
+                  <button
+                    key={place.placeId}
+                    onClick={() => selectPlace(place)}
+                    disabled={enriching}
+                    className="w-full text-left bg-white/5 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 rounded-lg px-4 py-3 transition-colors"
+                  >
+                    <div className="text-sm font-medium text-white">{place.name}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">{place.address}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {enriching && (
+              <div className="text-sm text-slate-400 animate-pulse">
+                Fetching details and scraping website for emails and social links…
+              </div>
+            )}
+
+            {/* Enrichment result */}
+            {enrichResult && (
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm text-white">{enrichResult.name}</h3>
+                  <button onClick={() => { setEnrichResult(null); setSearchResults([]) }} className="text-xs text-slate-500 hover:text-white transition-colors">✕ Clear</button>
+                </div>
+
+                {/* Found data grid */}
+                <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                  {enrichResult.website && (
+                    <div>
+                      <div className="text-xs text-slate-500 mb-0.5">Website</div>
+                      <div className="text-indigo-300 text-xs truncate">{enrichResult.website}</div>
+                    </div>
+                  )}
+                  {enrichResult.phone && (
+                    <div>
+                      <div className="text-xs text-slate-500 mb-0.5">Phone</div>
+                      <div className="text-slate-200 text-xs">{enrichResult.phone}</div>
+                    </div>
+                  )}
+                  {enrichResult.address && (
+                    <div className="sm:col-span-2">
+                      <div className="text-xs text-slate-500 mb-0.5">Address</div>
+                      <div className="text-slate-200 text-xs">{enrichResult.address}</div>
+                    </div>
+                  )}
+                  {enrichResult.linkedin && (
+                    <div>
+                      <div className="text-xs text-slate-500 mb-0.5">LinkedIn</div>
+                      <a href={enrichResult.linkedin} target="_blank" rel="noreferrer" className="text-sky-400 text-xs hover:text-sky-300 truncate block">{enrichResult.linkedin}</a>
+                    </div>
+                  )}
+                  {enrichResult.facebook && (
+                    <div>
+                      <div className="text-xs text-slate-500 mb-0.5">Facebook</div>
+                      <a href={enrichResult.facebook} target="_blank" rel="noreferrer" className="text-blue-400 text-xs hover:text-blue-300 truncate block">{enrichResult.facebook}</a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Email picker */}
+                {enrichResult.emails.length > 0 ? (
+                  <div>
+                    <div className="text-xs text-slate-500 mb-2">
+                      Found {enrichResult.emails.length} email{enrichResult.emails.length > 1 ? 's' : ''} on their website — select one to use:
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {enrichResult.emails.map(email => (
+                        <button
+                          key={email}
+                          onClick={() => {
+                            setPEmail(email)
+                            setSelectedEmails(new Set([email]))
+                          }}
+                          className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                            pEmail === email
+                              ? 'bg-indigo-500/25 border-indigo-500/50 text-indigo-200'
+                              : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/20'
+                          }`}
+                        >
+                          {pEmail === email ? '✓ ' : ''}{email}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-amber-400">
+                    No email addresses found on their website — you&apos;ll need to add one manually.
+                  </div>
+                )}
+
+                {/* LinkedIn search link if not found */}
+                {!enrichResult.linkedin && (
+                  <div>
+                    <a
+                      href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(enrichResult.name)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-sky-400 hover:text-sky-300 underline"
+                    >
+                      Search LinkedIn for contacts at {enrichResult.name} →
+                    </a>
+                  </div>
+                )}
+
+                <button
+                  onClick={applyEnrichAndOpenForm}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                >
+                  Fill in contact details →
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Add / Edit prospect form ─────────────────────────────────────── */}
         {showForm && (
-          <div className="bg-[#111827] border border-white/10 rounded-xl p-6 space-y-4">
-            <h2 className="font-semibold text-base">{editingProspect ? 'Edit Prospect' : 'New Prospect'}</h2>
+          <div className="bg-[#111827] border border-indigo-500/30 rounded-xl p-6 space-y-4">
+            <h2 className="font-semibold text-base">{editingProspect ? 'Edit Prospect' : 'Add Prospect'}</h2>
+
+            {enrichResult && !editingProspect && (
+              <div className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                Auto-filled from Google Business Profile + website scrape. Edit anything below before saving.
+              </div>
+            )}
+
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Name *</label>
+                <label className="block text-xs text-slate-400 mb-1">Name * <span className="text-slate-500">(contact person)</span></label>
                 <input value={pName} onChange={e => setPName(e.target.value)} placeholder="Jane Smith"
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
               </div>
               <div>
                 <label className="block text-xs text-slate-400 mb-1">Title / Role</label>
-                <input value={pTitle} onChange={e => setPTitle(e.target.value)} placeholder="Marketing Manager"
+                <input value={pTitle} onChange={e => setPTitle(e.target.value)} placeholder="Owner, Marketing Manager…"
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
               </div>
               <div>
@@ -296,17 +534,24 @@ webf5.com.au`)
                 <label className="block text-xs text-slate-400 mb-1">Email *</label>
                 <input value={pEmail} onChange={e => setPEmail(e.target.value)} placeholder="jane@acmecorp.com.au" type="email"
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
+                {enrichResult && enrichResult.emails.length > 1 && (
+                  <div className="mt-1.5 flex flex-wrap gap-1">
+                    {enrichResult.emails.filter(e => e !== pEmail).map(e => (
+                      <button key={e} onClick={() => setPEmail(e)} className="text-xs text-slate-500 hover:text-indigo-300 transition-colors">{e}</button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-xs text-slate-400 mb-1">LinkedIn URL</label>
-                <input value={pLinkedIn} onChange={e => setPLinkedIn(e.target.value)} placeholder="linkedin.com/in/..."
+                <input value={pLinkedIn} onChange={e => setPLinkedIn(e.target.value)} placeholder="linkedin.com/in/…"
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
               </div>
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Manual notes (pain points, trigger events, context)</label>
-              <textarea value={pNotes} onChange={e => setPNotes(e.target.value)} rows={3}
-                placeholder="e.g. Recently hired a new marketing manager. Their site looks outdated. They run Google Ads but landing page is slow."
+              <label className="block text-xs text-slate-400 mb-1">Notes <span className="text-slate-500">(pain points, trigger events, address, phone — auto-filled from GBP)</span></label>
+              <textarea value={pNotes} onChange={e => setPNotes(e.target.value)} rows={4}
+                placeholder="e.g. Address: 12 Main St. Phone: 03 5555 0000. Recently hired a new marketing manager."
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 resize-none" />
             </div>
             <div className="flex gap-3">
@@ -314,14 +559,14 @@ webf5.com.au`)
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
                 {saving ? 'Saving…' : 'Save Prospect'}
               </button>
-              <button onClick={() => setShowForm(false)} className="text-sm text-slate-400 hover:text-white px-4 py-2 rounded-lg transition-colors">
+              <button onClick={() => { setShowForm(false); setEnrichResult(null) }} className="text-sm text-slate-400 hover:text-white px-4 py-2 rounded-lg transition-colors">
                 Cancel
               </button>
             </div>
           </div>
         )}
 
-        {/* Main layout: list + detail */}
+        {/* ── Main layout: list + detail ────────────────────────────────────── */}
         <div className="grid lg:grid-cols-[320px_1fr] gap-5 items-start">
 
           {/* Prospect list */}
@@ -329,11 +574,9 @@ webf5.com.au`)
             <div className="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-semibold uppercase tracking-wider">
               Prospects
             </div>
-            {loading && (
-              <div className="px-4 py-8 text-center text-slate-500 text-sm">Loading…</div>
-            )}
+            {loading && <div className="px-4 py-8 text-center text-slate-500 text-sm">Loading…</div>}
             {!loading && prospects.length === 0 && (
-              <div className="px-4 py-8 text-center text-slate-500 text-sm">No prospects yet. Add one above.</div>
+              <div className="px-4 py-8 text-center text-slate-500 text-sm">No prospects yet. Search a business above.</div>
             )}
             {prospects.map(p => {
               const rd = p.researchData as ResearchData
@@ -359,9 +602,7 @@ webf5.com.au`)
                       )}
                     </div>
                   </div>
-                  {p.website && (
-                    <div className="text-xs text-slate-500 mt-0.5 truncate">{p.website}</div>
-                  )}
+                  {p.website && <div className="text-xs text-slate-500 mt-0.5 truncate">{p.website}</div>}
                 </button>
               )
             })}
@@ -379,22 +620,25 @@ webf5.com.au`)
                     <div className="flex flex-wrap gap-3 mt-3 text-sm text-slate-300">
                       <span>{selected.company}</span>
                       {selected.email && <a href={`mailto:${selected.email}`} className="text-indigo-400 hover:text-indigo-300">{selected.email}</a>}
-                      {selected.website && <a href={selected.website.startsWith('http') ? selected.website : `https://${selected.website}`} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white">{selected.website}</a>}
+                      {selected.website && (
+                        <a href={selected.website.startsWith('http') ? selected.website : `https://${selected.website}`}
+                          target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white">
+                          {selected.website}
+                        </a>
+                      )}
                       {selected.linkedin && <a href={selected.linkedin} target="_blank" rel="noreferrer" className="text-sky-400 hover:text-sky-300">LinkedIn</a>}
                     </div>
                   </div>
                   <div className="flex gap-2 shrink-0">
-                    <button onClick={() => openForm(selected)} className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
-                      Edit
-                    </button>
-                    <button onClick={() => deleteProspect(selected.id)} className="text-xs px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-lg transition-colors">
-                      Delete
-                    </button>
+                    <button onClick={() => openForm(selected)} className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">Edit</button>
+                    <button onClick={() => deleteProspect(selected.id)} className="text-xs px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-lg transition-colors">Delete</button>
                   </div>
                 </div>
                 {selected.notes && (
                   <div className="mt-4 bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3">
-                    <p className="text-xs text-amber-200 leading-relaxed"><span className="font-semibold">Notes: </span>{selected.notes}</p>
+                    <p className="text-xs text-amber-200 leading-relaxed whitespace-pre-line">
+                      <span className="font-semibold">Notes: </span>{selected.notes}
+                    </p>
                   </div>
                 )}
               </div>
@@ -428,12 +672,11 @@ webf5.com.au`)
                   }
                   return (
                     <div className="p-5 space-y-4">
-                      {/* Scores row */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {[
-                          { label: 'Performance', score: rd.mobile?.score },
-                          { label: 'SEO',         score: rd.mobile?.seo ?? rd.seoScore },
-                          { label: 'Accessibility', score: rd.mobile?.accessibility },
+                          { label: 'Performance',    score: rd.mobile?.score },
+                          { label: 'SEO',            score: rd.mobile?.seo ?? rd.seoScore },
+                          { label: 'Accessibility',  score: rd.mobile?.accessibility },
                           { label: 'Best Practices', score: rd.mobile?.bestPractices },
                         ].map(({ label, score }) => (
                           <div key={label} className="bg-white/5 rounded-lg p-3 text-center">
@@ -449,8 +692,6 @@ webf5.com.au`)
                           </div>
                         ))}
                       </div>
-
-                      {/* Scraped content */}
                       {rd.scraped && (
                         <div className="space-y-2">
                           {rd.scraped.title && (
@@ -479,7 +720,7 @@ webf5.com.au`)
                               </div>
                             </div>
                           )}
-                          <div className="flex gap-4 text-xs text-slate-500">
+                          <div className="flex gap-4 text-xs">
                             <span className={rd.scraped.hasMobileViewport ? 'text-emerald-400' : 'text-red-400'}>
                               {rd.scraped.hasMobileViewport ? '✓' : '✗'} Mobile viewport
                             </span>
@@ -489,8 +730,6 @@ webf5.com.au`)
                           </div>
                         </div>
                       )}
-
-                      {/* Opportunities */}
                       {rd.mobile?.opportunities && rd.mobile.opportunities.length > 0 && (
                         <div>
                           <div className="text-xs text-slate-500 mb-2">Top opportunities to mention</div>
@@ -521,7 +760,6 @@ webf5.com.au`)
                     </button>
                   )}
                 </div>
-
                 {composingFor?.id === selected.id ? (
                   <div className="p-5 space-y-4">
                     {sendSuccess ? (
@@ -534,7 +772,7 @@ webf5.com.au`)
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
                         </div>
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1">Body (plain text — signature added automatically)</label>
+                          <label className="block text-xs text-slate-400 mb-1">Body <span className="text-slate-500">(plain text — Web F5 signature added automatically)</span></label>
                           <textarea value={emailBody} onChange={e => setEmailBody(e.target.value)} rows={12}
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-indigo-500 resize-y" />
                         </div>
