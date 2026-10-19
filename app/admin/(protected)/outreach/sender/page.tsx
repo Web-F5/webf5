@@ -196,7 +196,7 @@ export default function OutreachSenderPage() {
     if (rd?.seoScore  != null && rd.seoScore  < 70) issues.push(`there are SEO opportunities we spotted`)
     if (rd?.mobile?.opportunities?.length) issues.push(`we found ${rd.mobile.opportunities.length} performance improvements`)
     const painLine = issues.length
-      ? `In reviewing ${prospect.website ?? prospect.company + '\\'s site'}, we noticed ${issues[0]}.`
+      ? `In reviewing ${prospect.website ?? `${prospect.company}'s site`}, we noticed ${issues[0]}.`
       : `We work with businesses like ${prospect.company} to improve their online presence.`
 
     setEmailBody(`Hi ${prospect.name.split(' ')[0]},
