@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { db, reviewSends } from '@/lib/db'
+import { db, reviewSends, reviewSenderLeads } from '@/lib/db'
 import { buildReviewEmailHtml, buildReviewEmailSubject } from '@/lib/review-email'
 
 const resend   = new Resend(process.env.RESEND_API_KEY)
@@ -8,8 +8,10 @@ const FROM     = 'contact@webf5.au'
 
 export async function POST(req: NextRequest) {
   try {
-    const { fromBusiness, fromEmail, platform, reviewUrl, customMessage, recipients, logoBase64 } = await req.json()
+    const { senderName, fromBusiness, fromEmail, platform, reviewUrl, customMessage, recipients, logoBase64 } = await req.json()
 
+    if (!senderName?.trim())   return NextResponse.json({ error: 'Your name is required.' }, { status: 400 })
+    if (!fromEmail?.trim())    return NextResponse.json({ error: 'Your email is required.' }, { status: 400 })
     if (!fromBusiness?.trim()) return NextResponse.json({ error: 'Business name is required.' }, { status: 400 })
     if (!platform)             return NextResponse.json({ error: 'Platform is required.' }, { status: 400 })
     if (!reviewUrl?.trim())    return NextResponse.json({ error: 'Review link is required.' }, { status: 400 })
@@ -24,13 +26,23 @@ export async function POST(req: NextRequest) {
     // Public route: cap at 10 recipients to prevent abuse
     if (valid.length > 10) return NextResponse.json({ error: 'Maximum 10 recipients per send.' }, { status: 400 })
 
-    await db.insert(reviewSends).values({
-      fromBusiness:   fromBusiness.trim(),
-      platform,
-      reviewUrl:      reviewUrl.trim(),
-      customMessage:  customMessage?.trim() || null,
-      recipientCount: valid.length,
-    })
+    // Save send log + lead in parallel
+    await Promise.all([
+      db.insert(reviewSends).values({
+        fromBusiness:   fromBusiness.trim(),
+        platform,
+        reviewUrl:      reviewUrl.trim(),
+        customMessage:  customMessage?.trim() || null,
+        recipientCount: valid.length,
+      }),
+      db.insert(reviewSenderLeads).values({
+        senderName:     senderName.trim(),
+        senderEmail:    fromEmail.trim(),
+        businessName:   fromBusiness.trim(),
+        platform,
+        recipientCount: valid.length,
+      }),
+    ])
 
     const errors: string[] = []
     let sent = 0

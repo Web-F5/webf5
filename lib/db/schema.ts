@@ -66,6 +66,16 @@ export const reviewSends = pgTable('review_sends', {
   createdAt:      timestamp('created_at').notNull().defaultNow(),
 })
 
+export const reviewSenderLeads = pgTable('review_sender_leads', {
+  id:             uuid('id').primaryKey().defaultRandom(),
+  senderName:     text('sender_name').notNull(),
+  senderEmail:    text('sender_email').notNull(),
+  businessName:   text('business_name').notNull(),
+  platform:       text('platform').notNull(),
+  recipientCount: integer('recipient_count').notNull().default(0),
+  createdAt:      timestamp('created_at').notNull().defaultNow(),
+})
+
 // ── TRIPLE CRM ─────────────────────────────────────────────────────────────
 
 export const crmAccounts = pgTable('crm_accounts', {

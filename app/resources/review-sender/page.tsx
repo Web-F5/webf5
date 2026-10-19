@@ -51,6 +51,7 @@ function PreviewModal({ html, onClose }: { html: string; onClose: () => void }) 
 }
 
 export default function ReviewSenderPage() {
+  const [senderName, setSenderName]       = useState('')
   const [fromBusiness, setFromBusiness]   = useState('')
   const [fromEmail, setFromEmail]         = useState('')
   const [platform, setPlatform]           = useState<Platform>('google')
@@ -98,7 +99,7 @@ export default function ReviewSenderPage() {
       const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromBusiness, fromEmail: fromEmail || undefined, platform, reviewUrl, customMessage, recipients: activeRecipients, logoBase64: logoBase64 || undefined }),
+        body: JSON.stringify({ senderName, fromBusiness, fromEmail, platform, reviewUrl, customMessage, recipients: activeRecipients, logoBase64: logoBase64 || undefined }),
       })
       const data = await res.json()
       if (data.success) {
@@ -191,29 +192,43 @@ export default function ReviewSenderPage() {
 
               <div className="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8 space-y-7">
 
+                {/* Your details */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Your name *</label>
+                    <input
+                      type="text"
+                      value={senderName}
+                      onChange={e => setSenderName(e.target.value)}
+                      placeholder="Jane Smith"
+                      className="w-full bg-[#0A0F1E] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Your email *</label>
+                    <input
+                      type="email"
+                      value={fromEmail}
+                      onChange={e => setFromEmail(e.target.value)}
+                      placeholder="jane@acmeelectrical.com.au"
+                      className="w-full bg-[#0A0F1E] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                    <p className="text-xs text-slate-500 mt-1.5">Customers can reply to you directly</p>
+                  </div>
+                </div>
+
                 {/* Business name + logo */}
                 <div className="flex gap-4 items-start">
-                  <div className="flex-1 space-y-2">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Business name *</label>
-                      <input
-                        type="text"
-                        value={fromBusiness}
-                        onChange={e => { setFromBusiness(e.target.value); setPlaceSearch(e.target.value) }}
-                        placeholder="Acme Electrical"
-                        className="w-full bg-[#0A0F1E] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
-                      />
-                      <p className="text-xs text-slate-500 mt-1.5">Your business name appears in the subject line and email body</p>
-                    </div>
-                    <div>
-                      <input
-                        type="email"
-                        value={fromEmail}
-                        onChange={e => setFromEmail(e.target.value)}
-                        placeholder="hello@acmeelectrical.com.au (optional reply-to)"
-                        className="w-full bg-[#0A0F1E] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
-                      />
-                    </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Business name *</label>
+                    <input
+                      type="text"
+                      value={fromBusiness}
+                      onChange={e => { setFromBusiness(e.target.value); setPlaceSearch(e.target.value) }}
+                      placeholder="Acme Electrical"
+                      className="w-full bg-[#0A0F1E] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                    <p className="text-xs text-slate-500 mt-1.5">Appears in the subject line and email body</p>
                   </div>
 
                   {/* Logo upload */}
@@ -386,7 +401,7 @@ export default function ReviewSenderPage() {
                   ) : (
                     <button
                       onClick={() => setConfirming(true)}
-                      disabled={!fromBusiness.trim() || !reviewUrl.trim() || activeRecipients.length === 0}
+                      disabled={!senderName.trim() || !fromEmail.trim() || !fromBusiness.trim() || !reviewUrl.trim() || activeRecipients.length === 0}
                       className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Send {activeRecipients.length > 0 ? `to ${activeRecipients.length}` : 'emails'}

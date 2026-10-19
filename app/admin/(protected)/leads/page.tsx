@@ -1,4 +1,4 @@
-import { db, auditLeads, checklistLeads } from '@/lib/db'
+import { db, auditLeads, checklistLeads, reviewSenderLeads } from '@/lib/db'
 import { desc } from 'drizzle-orm'
 import { DeleteAuditLead, DeleteChecklistLead } from './DeleteButton'
 
@@ -74,9 +74,10 @@ function Num({ v, good, ok }: { v: number | null | undefined; good: number; ok: 
 }
 
 export default async function AdminLeadsPage() {
-  const [leads, checklistDownloads] = await Promise.all([
+  const [leads, checklistDownloads, reviewLeads] = await Promise.all([
     db.select().from(auditLeads).orderBy(desc(auditLeads.createdAt)).limit(200),
     db.select().from(checklistLeads).orderBy(desc(checklistLeads.createdAt)).limit(200),
+    db.select().from(reviewSenderLeads).orderBy(desc(reviewSenderLeads.createdAt)).limit(200),
   ])
 
   const grades = leads.map(l => (l.report as ReportShape)?.grade ?? '?')
@@ -311,6 +312,65 @@ export default async function AdminLeadsPage() {
                   <tr>
                     <td colSpan={5} className="px-4 py-10 text-center text-slate-500">
                       No checklist downloads yet. Share <span className="text-indigo-400">/resources/website-checklist</span> to start collecting them.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Review Sender Leads */}
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold">Review Sender Leads</h2>
+              <p className="text-slate-400 text-sm mt-0.5">Businesses using the public Review Request Sender · most recent first</p>
+            </div>
+            <a
+              href="/resources/review-sender"
+              target="_blank"
+              className="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 hover:border-indigo-500/50 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              View tool ↗
+            </a>
+          </div>
+          <div className="overflow-x-auto rounded-xl border border-white/10">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#111827] text-slate-400 text-xs uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left">Name</th>
+                  <th className="px-4 py-3 text-left">Business</th>
+                  <th className="px-4 py-3 text-left">Platform</th>
+                  <th className="px-4 py-3 text-center">Sent to</th>
+                  <th className="px-4 py-3 text-left">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {reviewLeads.map(lead => (
+                  <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="px-4 py-3.5">
+                      <p className="font-medium text-white">{lead.senderName}</p>
+                      <a href={`mailto:${lead.senderEmail}`} className="text-xs text-indigo-400 hover:underline">{lead.senderEmail}</a>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-300">{lead.businessName}</td>
+                    <td className="px-4 py-3.5">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${
+                        lead.platform === 'google'   ? 'bg-blue-900/40 text-blue-300 border-blue-700/30' :
+                        lead.platform === 'facebook' ? 'bg-blue-900/40 text-blue-400 border-blue-700/30' :
+                        'bg-green-900/40 text-green-300 border-green-700/30'
+                      }`}>
+                        {{ google: 'Google', facebook: 'Facebook', custom: 'Trustpilot' }[lead.platform] ?? lead.platform}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-center text-slate-300">{lead.recipientCount}</td>
+                    <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">{timeAgo(new Date(lead.createdAt))}</td>
+                  </tr>
+                ))}
+                {reviewLeads.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-10 text-center text-slate-500">
+                      No review sender leads yet. Share <span className="text-indigo-400">/resources/review-sender</span> to start collecting them.
                     </td>
                   </tr>
                 )}
