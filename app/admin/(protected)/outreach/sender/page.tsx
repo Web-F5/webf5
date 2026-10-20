@@ -11,6 +11,10 @@ interface ResearchData {
   grade?: string
   perfScore?: number | null
   seoScore?: number | null
+  domainAge?: {
+    registeredAt: string | null
+    firstArchived: string | null
+  } | null
   scraped?: {
     title?: string | null
     metaDesc?: string | null
@@ -62,6 +66,9 @@ interface PlaceResult {
   name: string
   address: string
   types: string[]
+  rating: number | null
+  reviewCount: number
+  hasWebsite: boolean
 }
 
 interface EnrichResult {
@@ -72,6 +79,8 @@ interface EnrichResult {
   phone: string
   address: string
   types: string[]
+  rating: number | null
+  reviewCount: number
   emails: string[]
   linkedin?: string
   facebook?: string
@@ -128,6 +137,10 @@ export default function OutreachSenderPage() {
   const [searchResults, setSearchResults]     = useState<PlaceResult[]>([])
   const [enriching, setEnriching]             = useState(false)
   const [enrichResult, setEnrichResult]       = useState<EnrichResult | null>(null)
+  // Search filters
+  const [filterWebsite, setFilterWebsite]     = useState<'any' | 'with' | 'without'>('any')
+  const [filterMinReviews, setFilterMinReviews] = useState('')
+  const [filterMaxReviews, setFilterMaxReviews] = useState('')
 
   // Research
   const [researching, setResearching]         = useState<string | null>(null)
@@ -160,7 +173,11 @@ export default function OutreachSenderPage() {
     setSearching(true)
     setSearchResults([])
     setEnrichResult(null)
-    const res  = await fetch(`/api/admin/outreach/enrich?q=${encodeURIComponent(searchQuery.trim())}`)
+    const params = new URLSearchParams({ q: searchQuery.trim() })
+    if (filterWebsite !== 'any') params.set('website', filterWebsite)
+    if (filterMinReviews) params.set('minReviews', filterMinReviews)
+    if (filterMaxReviews) params.set('maxReviews', filterMaxReviews)
+    const res  = await fetch(`/api/admin/outreach/enrich?${params}`)
     const data = await res.json()
     setSearchResults(data.results ?? [])
     setSearching(false)
@@ -379,6 +396,51 @@ webf5.com.au`)
               </button>
             </div>
 
+            {/* Filters */}
+            <div className="flex flex-wrap gap-3 items-end">
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Website</label>
+                <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs font-medium">
+                  {(['any', 'with', 'without'] as const).map(v => (
+                    <button
+                      key={v}
+                      onClick={() => setFilterWebsite(v)}
+                      className={`px-3 py-1.5 transition-colors ${
+                        filterWebsite === v
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-white/5 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {v === 'any' ? 'Any' : v === 'with' ? 'Has website' : 'No website'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Min reviews</label>
+                <input
+                  type="number" min="0" value={filterMinReviews}
+                  onChange={e => setFilterMinReviews(e.target.value)}
+                  placeholder="0"
+                  className="w-24 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Max reviews</label>
+                <input
+                  type="number" min="0" value={filterMaxReviews}
+                  onChange={e => setFilterMaxReviews(e.target.value)}
+                  placeholder="any"
+                  className="w-24 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              {filterWebsite !== 'any' && (
+                <p className="text-xs text-amber-400 self-end pb-1.5">
+                  Website filter fetches details for each result — slightly slower
+                </p>
+              )}
+            </div>
+
             {/* Search results */}
             {searchResults.length > 0 && !enrichResult && (
               <div className="space-y-2">
@@ -390,7 +452,22 @@ webf5.com.au`)
                     disabled={enriching}
                     className="w-full text-left bg-white/5 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 rounded-lg px-4 py-3 transition-colors"
                   >
-                    <div className="text-sm font-medium text-white">{place.name}</div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-sm font-medium text-white">{place.name}</div>
+                      <div className="flex items-center gap-2 shrink-0 text-xs">
+                        {place.rating != null && (
+                          <span className="text-amber-400">★ {place.rating.toFixed(1)}</span>
+                        )}
+                        {place.reviewCount > 0 && (
+                          <span className="text-slate-400">({place.reviewCount} reviews)</span>
+                        )}
+                        {filterWebsite !== 'any' && (
+                          <span className={place.hasWebsite ? 'text-emerald-400' : 'text-slate-500'}>
+                            {place.hasWebsite ? '● website' : '○ no website'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <div className="text-xs text-slate-400 mt-0.5">{place.address}</div>
                   </button>
                 ))}
@@ -762,6 +839,29 @@ webf5.com.au`)
                               {rd.scraped.hasCanonical ? '✓' : '○'} Canonical tag
                             </span>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Domain age */}
+                      {rd.domainAge && (rd.domainAge.registeredAt || rd.domainAge.firstArchived) && (
+                        <div className="bg-white/5 rounded-lg p-3 space-y-1.5">
+                          <div className="text-xs font-medium text-slate-300">Website Age</div>
+                          {rd.domainAge.registeredAt && (
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="text-slate-500 w-28 shrink-0">Domain registered</span>
+                              <span className="text-slate-200 font-mono">{rd.domainAge.registeredAt.slice(0, 10)}</span>
+                              <span className="text-slate-500">
+                                ({Math.floor((Date.now() - new Date(rd.domainAge.registeredAt).getTime()) / (1000 * 60 * 60 * 24 * 365))} yrs old)
+                              </span>
+                            </div>
+                          )}
+                          {rd.domainAge.firstArchived && (
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="text-slate-500 w-28 shrink-0">First archived</span>
+                              <span className="text-slate-200 font-mono">{rd.domainAge.firstArchived}</span>
+                              <span className="text-slate-500">(Wayback Machine)</span>
+                            </div>
+                          )}
                         </div>
                       )}
                       {rd.mobile?.opportunities && rd.mobile.opportunities.length > 0 && (
