@@ -68,6 +68,13 @@ interface Report {
     linkCount?:      number
   }
   url: string
+  seo?: {
+    almostRanking:    { keyword: string; position: number; searchVolume: number; url: string }[]
+    estimatedMonthly: number
+    serpFallback:     { position: number; url: string; title: string }[] | null
+    serpPhrase:       string | null
+    backlinks:        { referringDomains: number; backlinks: number } | null
+  } | null
 }
 
 const GRADE_COLOR: Record<string, string> = {
@@ -138,7 +145,7 @@ function ReportPanel({ report, name, biz }: { report: Report; name: string; biz:
   const { lcp, grade, overallScore, ssl, hasSitemap, content } = report
   const gradeColor    = GRADE_COLOR[grade] ?? '#6366F1'
   const allImagesAlt  = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
-  const mobilePass    = lcp < 4
+  const mobilePass    = (report.pageSpeedScore ?? 0) >= 80
   const desktopPass   = (report.desktopScore ?? 0) >= 80
   const accessPass    = (report.lighthouseAccessibility ?? 0) >= 80
   const bestPractPass = (report.lighthouseBestPractices ?? 0) >= 80
@@ -260,6 +267,87 @@ function ReportPanel({ report, name, biz }: { report: Report; name: string; biz:
         <Check pass={content.hasContact} label="Contact details on page" detail={content.hasContact ? 'Contact details are visible on the page.' : "Not found. Visitors who can't reach you quickly will call your competitor."} />
         <Check pass={content.hasCta}     label="Clear call to action"    detail={content.hasCta ? 'Your page has a clear next step for visitors.' : 'Not found. Visitors who are ready to enquire may not know what to do next.'} />
       </SectionCard>
+
+      {/* Organic Traffic & Keywords */}
+      {report.seo && (
+        <SectionCard title="Organic Search Traffic">
+          <div className="py-3 space-y-4">
+            {/* Estimated monthly visits */}
+            <div className="flex items-start gap-4">
+              <div className="bg-white/5 rounded-xl px-5 py-3 text-center shrink-0">
+                <p className="text-2xl font-black text-indigo-300 tabular-nums">{report.seo.estimatedMonthly.toLocaleString()}</p>
+                <p className="text-xs text-slate-500 mt-0.5">est. monthly visits</p>
+              </div>
+              <div className="text-sm text-slate-400 leading-relaxed pt-1">
+                {report.seo.estimatedMonthly > 0
+                  ? `Estimated organic visits per month based on your current Google rankings and average click-through rates by position.`
+                  : `Your site doesn't appear to be ranking for any Google search terms at this time.`}
+              </div>
+            </div>
+
+            {/* Almost ranking keywords */}
+            {report.seo.almostRanking.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">Almost ranking (positions 4–20)</p>
+                <p className="text-xs text-slate-500 mb-3">These are keywords where you're close to page 1. A targeted push could move them up and bring in more traffic.</p>
+                <div className="space-y-1.5">
+                  {report.seo.almostRanking.map((kw, i) => (
+                    <div key={i} className="flex items-center justify-between gap-3 bg-white/5 rounded-lg px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="text-sm text-white truncate">{kw.keyword}</p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 text-xs text-slate-400">
+                        <span className="tabular-nums">{kw.searchVolume.toLocaleString()}/mo</span>
+                        <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">#{kw.position}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fallback SERP */}
+            {report.seo.serpFallback && report.seo.serpPhrase && (
+              <div>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">SERP check: "{report.seo.serpPhrase}"</p>
+                <p className="text-xs text-slate-500 mb-3">
+                  As your site didn't appear to be ranking for anything, we performed an additional check for <strong className="text-slate-300">"{report.seo.serpPhrase}"</strong>. Here are the top results competing for that phrase:
+                </p>
+                <div className="space-y-1.5">
+                  {report.seo.serpFallback.slice(0, 5).map((entry, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-white/5 rounded-lg px-3 py-2">
+                      <span className="text-xs font-mono bg-white/10 text-slate-300 px-1.5 py-0.5 rounded shrink-0">#{entry.position}</span>
+                      <div className="min-w-0">
+                        <p className="text-xs text-white truncate">{entry.title}</p>
+                        <p className="text-xs text-slate-500 truncate">{entry.url}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </SectionCard>
+      )}
+
+      {/* Authority */}
+      {report.seo?.backlinks && (
+        <SectionCard title="Website Authority">
+          <div className="flex gap-4 py-3">
+            <div className="flex-1 bg-white/5 rounded-xl p-4 text-center">
+              <p className="text-2xl font-black text-white tabular-nums">{report.seo.backlinks.referringDomains.toLocaleString()}</p>
+              <p className="text-xs text-slate-500 mt-0.5">referring domains</p>
+            </div>
+            <div className="flex-1 bg-white/5 rounded-xl p-4 text-center">
+              <p className="text-2xl font-black text-white tabular-nums">{report.seo.backlinks.backlinks.toLocaleString()}</p>
+              <p className="text-xs text-slate-500 mt-0.5">total backlinks</p>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 pb-3 leading-relaxed">
+            Referring domains are other websites that link to yours. More quality links = more authority in Google's eyes. Source: DataForSEO.
+          </p>
+        </SectionCard>
+      )}
 
       {/* CTA */}
       <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-6 text-center">

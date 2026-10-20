@@ -3,6 +3,7 @@ import { Resend } from 'resend'
 import { db, auditLeads } from '@/lib/db'
 import { generateAuditPdf } from '@/lib/audit-pdf'
 import { buildAuditEmailHtml } from '@/lib/audit-email'
+import { getRankedKeywords, getBacklinkSummary, checkSerp, type RankedKeyword, type SerpEntry, type BacklinkSummary } from '@/lib/dataforseo'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM   = 'contact@webf5.au'
@@ -176,7 +177,7 @@ function checkContent(html: string) {
 
 interface CheckSet {
   ssl:              boolean
-  speedPass:        boolean   // mobile LCP < 4s
+  speedPass:        boolean   // mobile PageSpeed score ≥ 80
   desktopSpeedPass: boolean   // desktop PageSpeed score ≥ 80
   hasMetaTitle:     boolean
   hasMetaDesc:      boolean
@@ -254,6 +255,14 @@ interface AuditReport {
   hasLlmsTxt:   boolean
   content:      ReturnType<typeof checkContent>
   url:          string
+  // DataForSEO enrichment (may be null if API unavailable)
+  seo: {
+    almostRanking:    RankedKeyword[]
+    estimatedMonthly: number
+    serpFallback:     SerpEntry[] | null   // set when no rankings found; SERP for auto phrase
+    serpPhrase:       string | null        // the phrase used for fallback SERP
+    backlinks:        BacklinkSummary | null
+  } | null
 }
 
 // ── Plain-text email helpers ───────────────────────────────────────────────
@@ -376,12 +385,14 @@ export async function POST(req: NextRequest) {
     if (!/^https?:\/\//i.test(normUrl)) normUrl = 'https://' + normUrl
 
     // Fetch everything in parallel
-    const [psData, htmlContent, hasSitemap, hasRobotsTxt, hasLlmsTxt] = await Promise.all([
+    const [psData, htmlContent, hasSitemap, hasRobotsTxt, hasLlmsTxt, dfsKeywords, dfsBacklinks] = await Promise.all([
       fetchPageSpeedBoth(normUrl),
       fetchPageContent(normUrl),
       checkSitemap(normUrl),
       checkUrlExists(normUrl, '/robots.txt'),
       checkUrlExists(normUrl, '/llms.txt'),
+      getRankedKeywords(normUrl).catch(() => null),
+      getBacklinkSummary(normUrl).catch(() => null),
     ])
 
     const mobileM  = extractMetrics(psData.mobile)
@@ -419,10 +430,10 @@ export async function POST(req: NextRequest) {
 
     const checks: CheckSet = {
       ssl,
-      speedPass:        lcp < 4,
+      speedPass:        (pageSpeedScore ?? 0) >= 80,
       desktopSpeedPass: (desktopScore ?? 0) >= 80,
       hasMetaTitle:     !!content.metaTitle,
-      hasMetaDesc:      !!content.metaDesc,
+      hasMetaDesc:      !!content.metaDesc && (content.metaDescLen ?? 0) >= 120 && (content.metaDescLen ?? 0) <= 155,
       hasH1:            !!content.h1,
       hasCanonical:     content.hasCanonical,
       hasSitemap,
@@ -444,6 +455,33 @@ export async function POST(req: NextRequest) {
     const grade        = gradeFromScore(overallScore)
     const subScores    = computeSubScores(checks, content, bestPracticesPass, pageWeightPass)
 
+    // DataForSEO enrichment — fallback SERP if no rankings found
+    let seoData: AuditReport['seo'] = null
+    if (dfsKeywords !== null) {
+      let serpFallback: SerpEntry[] | null = null
+      let serpPhrase: string | null = null
+
+      if (dfsKeywords.almostRanking.length === 0 && dfsKeywords.keywords.length === 0) {
+        // Try to build a local phrase from industry + suburb
+        const industrySlug = industry?.toLowerCase().split(/[\s/]+/)[0] ?? null
+        const suburbMatch  = content.metaTitle?.match(/\bin\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)\b/)
+                          ?? htmlContent?.match(/\bin\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)\b/)
+        const suburb = suburbMatch?.[1] ?? null
+        if (industrySlug && suburb) {
+          serpPhrase = `${industrySlug} in ${suburb}`
+          serpFallback = await checkSerp(serpPhrase).catch(() => null)
+        }
+      }
+
+      seoData = {
+        almostRanking:    dfsKeywords.almostRanking,
+        estimatedMonthly: dfsKeywords.estimatedMonthly,
+        serpFallback,
+        serpPhrase,
+        backlinks:        dfsBacklinks,
+      }
+    }
+
     const report: AuditReport = {
       lcp, pageSpeedScore, desktopScore,
       mobileCls, mobileFcp, mobileTbt,
@@ -452,6 +490,7 @@ export async function POST(req: NextRequest) {
       grade, overallScore, subScores,
       ssl, hasSitemap, hasRobotsTxt, hasLlmsTxt,
       content, url: normUrl,
+      seo: seoData,
     }
 
     await db.insert(auditLeads).values({
