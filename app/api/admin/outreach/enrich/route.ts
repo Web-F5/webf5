@@ -159,59 +159,58 @@ export async function GET(req: NextRequest) {
   type RawPlace = { place_id: string; name: string; formatted_address: string; types?: string[]; rating?: number; user_ratings_total?: number }
 
   async function textSearch(pageToken?: string): Promise<{ results: RawPlace[]; nextPageToken?: string }> {
-    const base = `https://maps.googleapis.com/maps/api/place/textsearch/json?region=au&key=${apiKey}`
+    const base = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${apiKey}`
     const url  = pageToken
       ? `${base}&pagetoken=${encodeURIComponent(pageToken)}`
-      : `${base}&query=${encodeURIComponent(query!)}`
+      : `${base}&region=au&query=${encodeURIComponent(query!)}`
     const res  = await fetch(url, { next: { revalidate: 0 } })
     const data = await res.json()
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') return { results: [] }
     return { results: data.results ?? [], nextPageToken: data.next_page_token }
   }
 
-  // Fetch pages until we have 6 results that pass filters (max 3 pages = 60 candidates)
-  let collected: { placeId: string; name: string; address: string; types: string[]; rating: number | null; reviewCount: number; hasWebsite: boolean }[] = []
+  // When any filter is active, fetch all available pages first (up to 3 = 60 candidates)
+  // to maximise the pool before filtering. Without filters, 1 page (20 results) is fine.
+  const hasActiveFilter = websiteFilter !== 'any' || minReviews > 0 || maxReviews < 999998
+
+  let allRaw: RawPlace[] = []
   let pageToken: string | undefined
   let pagesChecked = 0
 
   do {
-    if (pagesChecked > 0 && pageToken) {
-      // Google requires a short delay before using next_page_token
-      await new Promise(r => setTimeout(r, 2000))
-    }
-
+    if (pagesChecked > 0) await new Promise(r => setTimeout(r, 2500)) // Google's required delay
     const { results: raw, nextPageToken } = await textSearch(pageToken)
+    allRaw.push(...raw)
     pageToken = nextPageToken
     pagesChecked++
+  } while (pageToken && pagesChecked < 3 && hasActiveFilter)
 
-    // Review count filter (free — already in response)
-    const reviewFiltered = raw.filter(p => {
-      const cnt = p.user_ratings_total ?? 0
-      return cnt >= minReviews && cnt <= maxReviews
-    })
+  // Review count filter
+  const reviewFiltered = allRaw.filter(p => {
+    const cnt = p.user_ratings_total ?? 0
+    return cnt >= minReviews && cnt <= maxReviews
+  })
 
-    if (websiteFilter === 'with' || websiteFilter === 'without') {
-      const websiteChecks = await Promise.all(
-        reviewFiltered.map(p => fetchPlaceWebsite(p.place_id, apiKey))
-      )
-      const withWebsite = reviewFiltered
-        .map((p, i) => ({
-          placeId: p.place_id, name: p.name, address: p.formatted_address,
-          types: p.types ?? [], rating: p.rating ?? null,
-          reviewCount: p.user_ratings_total ?? 0, hasWebsite: !!websiteChecks[i],
-        }))
-        .filter(p => websiteFilter === 'with' ? p.hasWebsite : !p.hasWebsite)
-      collected.push(...withWebsite)
-    } else {
-      collected.push(...reviewFiltered.map(p => ({
+  // Website filter (requires extra API calls per candidate)
+  let results: { placeId: string; name: string; address: string; types: string[]; rating: number | null; reviewCount: number; hasWebsite: boolean }[]
+  if (websiteFilter === 'with' || websiteFilter === 'without') {
+    const websiteChecks = await Promise.all(reviewFiltered.map(p => fetchPlaceWebsite(p.place_id, apiKey)))
+    results = reviewFiltered
+      .map((p, i) => ({
         placeId: p.place_id, name: p.name, address: p.formatted_address,
         types: p.types ?? [], rating: p.rating ?? null,
-        reviewCount: p.user_ratings_total ?? 0, hasWebsite: true,
-      })))
-    }
-  } while (collected.length < 6 && pageToken && pagesChecked < 3)
+        reviewCount: p.user_ratings_total ?? 0, hasWebsite: !!websiteChecks[i],
+      }))
+      .filter(p => websiteFilter === 'with' ? p.hasWebsite : !p.hasWebsite)
+  } else {
+    results = reviewFiltered.map(p => ({
+      placeId: p.place_id, name: p.name, address: p.formatted_address,
+      types: p.types ?? [], rating: p.rating ?? null,
+      reviewCount: p.user_ratings_total ?? 0, hasWebsite: true,
+    }))
+  }
 
-  return NextResponse.json({ results: collected.slice(0, 6) })
+  return NextResponse.json({ results: results.slice(0, 6), totalChecked: allRaw.length, pagesChecked })
 }
 
 // ── POST — get Place Details + scrape website ──────────────────────────────

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { cookies } from 'next/headers'
-import { db, outreachProspects, outreachSends } from '@/lib/db'
+import { db, outreachProspects, outreachSends, outreachTouches } from '@/lib/db'
 import { desc, eq } from 'drizzle-orm'
+import { SEQUENCES } from '@/lib/outreach-sequences'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM   = 'contact@webf5.au'
@@ -148,6 +149,35 @@ export async function POST(req: NextRequest) {
       sequenceName: sequenceName || null,
       touchType:    touchType    || null,
     }).returning()
+
+    // Auto-schedule remaining touches for the selected sequence
+    if (sequenceName) {
+      const seq = SEQUENCES.find(s => s.name === sequenceName)
+      if (seq) {
+        // The email just sent is touch #1 (or whichever touch this is)
+        // Schedule ALL remaining touches relative to today
+        const touchIdx = seq.touches.findIndex(t => t.name === (touchType || seq.touches[0].name))
+        const sentTouchIdx = touchIdx >= 0 ? touchIdx : 0
+        const sentDay = seq.touches[sentTouchIdx]?.day ?? 0
+        const sentAt  = new Date()
+
+        const futureTouches = seq.touches
+          .slice(sentTouchIdx + 1)
+          .map((t, i) => ({
+            prospectId,
+            sendId:       send.id,
+            sequenceName,
+            touchName:    t.name,
+            touchNumber:  sentTouchIdx + 2 + i,
+            channel:      t.channel,
+            scheduledFor: new Date(sentAt.getTime() + (t.day - sentDay) * 86400000),
+          }))
+
+        if (futureTouches.length > 0) {
+          await db.insert(outreachTouches).values(futureTouches)
+        }
+      }
+    }
 
     return NextResponse.json({ success: true, send })
   }

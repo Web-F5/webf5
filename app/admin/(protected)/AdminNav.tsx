@@ -10,6 +10,7 @@ const tabs = [
   { label: 'Leads', href: '/admin/leads' },
   { label: 'Reviews', href: '/admin/reviews' },
   { label: 'CRM', href: '/admin/crm' },
+  { label: 'Calendar', href: '/admin/calendar' },
   { label: 'Usage', href: '/admin/usage' },
 ]
 

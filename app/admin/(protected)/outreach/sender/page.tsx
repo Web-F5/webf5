@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { SEQUENCES } from '@/lib/outreach-sequences'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -145,10 +146,17 @@ export default function OutreachSenderPage() {
   // Research
   const [researching, setResearching]         = useState<string | null>(null)
 
+  // Tier assignment on search results / enrichment
+  const [tierByPlaceId, setTierByPlaceId]     = useState<Record<string, 'A'|'B'|'C'>>({})
+  const [importingCrm, setImportingCrm]       = useState<string | null>(null)
+  const [importedCrm, setImportedCrm]         = useState<Record<string, string>>({}) // placeId → accountId
+
   // Email composer
   const [composingFor, setComposingFor]       = useState<Prospect | null>(null)
   const [emailSubject, setEmailSubject]       = useState('')
   const [emailBody, setEmailBody]             = useState('')
+  const [emailSequence, setEmailSequence]     = useState<string>('')
+  const [emailTouchName, setEmailTouchName]   = useState<string>('')
   const [sending, setSending]                 = useState(false)
   const [sendSuccess, setSendSuccess]         = useState(false)
 
@@ -315,9 +323,39 @@ Web F5
 webf5.com.au`)
   }
 
+  async function importToCrm(placeId: string) {
+    const tier = tierByPlaceId[placeId]
+    if (!tier) return
+    setImportingCrm(placeId)
+    // Use enrichResult if available for this placeId, otherwise use search result data
+    const place = searchResults.find(r => r.placeId === placeId)
+    const res = await fetch('/api/admin/outreach/crm-import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tier,
+        company:  enrichResult?.name ?? place?.name ?? '',
+        name:     pName || null,
+        title:    pTitle || null,
+        linkedin: enrichResult?.linkedin || pLinkedIn || null,
+        notes:    pNotes || null,
+        website:  enrichResult?.website || pWebsite || null,
+        phone:    enrichResult?.phone || null,
+        address:  enrichResult?.address || place?.address || null,
+        email:    enrichResult?.emails?.[0] || pEmail || null,
+      }),
+    })
+    const data = await res.json()
+    if (data.accountId) {
+      setImportedCrm(prev => ({ ...prev, [placeId]: data.accountId }))
+    }
+    setImportingCrm(null)
+  }
+
   async function sendEmail() {
     if (!composingFor || !emailSubject.trim() || !emailBody.trim()) return
     setSending(true)
+    const selectedSeq = SEQUENCES.find(s => s.name === emailSequence)
     const res = await fetch('/api/admin/outreach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -326,6 +364,8 @@ webf5.com.au`)
         prospectId: composingFor.id,
         subject: emailSubject,
         emailBody,
+        sequenceName: emailSequence || null,
+        touchType:    emailTouchName || (selectedSeq?.touches[0]?.name ?? null),
       }),
     })
     const data = await res.json()
@@ -444,33 +484,71 @@ webf5.com.au`)
             {/* Search results */}
             {searchResults.length > 0 && !enrichResult && (
               <div className="space-y-2">
-                <p className="text-xs text-slate-500">Select the right business:</p>
-                {searchResults.map(place => (
-                  <button
-                    key={place.placeId}
-                    onClick={() => selectPlace(place)}
-                    disabled={enriching}
-                    className="w-full text-left bg-white/5 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 rounded-lg px-4 py-3 transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-sm font-medium text-white">{place.name}</div>
-                      <div className="flex items-center gap-2 shrink-0 text-xs">
-                        {place.rating != null && (
-                          <span className="text-amber-400">★ {place.rating.toFixed(1)}</span>
+                <p className="text-xs text-slate-500">Select the right business to enrich, or assign a TRIPLE tier to import directly to CRM:</p>
+                {searchResults.map(place => {
+                  const tier   = tierByPlaceId[place.placeId]
+                  const imported = importedCrm[place.placeId]
+                  return (
+                    <div key={place.placeId} className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 space-y-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <button
+                          onClick={() => selectPlace(place)}
+                          disabled={enriching}
+                          className="flex-1 text-left"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm font-medium text-white hover:text-indigo-300 transition-colors">{place.name}</div>
+                            <div className="flex items-center gap-2 shrink-0 text-xs">
+                              {place.rating != null && <span className="text-amber-400">★ {place.rating.toFixed(1)}</span>}
+                              {place.reviewCount > 0 && <span className="text-slate-400">({place.reviewCount} reviews)</span>}
+                              {filterWebsite !== 'any' && (
+                                <span className={place.hasWebsite ? 'text-emerald-400' : 'text-slate-500'}>
+                                  {place.hasWebsite ? '● website' : '○ no website'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5">{place.address}</div>
+                        </button>
+                      </div>
+
+                      {/* TRIPLE tier selector */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-slate-500">TRIPLE tier:</span>
+                        {(['A', 'B', 'C'] as const).map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setTierByPlaceId(prev => ({ ...prev, [place.placeId]: t }))}
+                            className={`text-xs font-bold w-7 h-7 rounded-full border transition-colors ${
+                              tier === t
+                                ? t === 'A' ? 'bg-emerald-500 border-emerald-400 text-white'
+                                : t === 'B' ? 'bg-indigo-500 border-indigo-400 text-white'
+                                :             'bg-amber-500 border-amber-400 text-white'
+                                : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20'
+                            }`}
+                          >{t}</button>
+                        ))}
+                        {tier && !imported && (
+                          <button
+                            onClick={() => importToCrm(place.placeId)}
+                            disabled={importingCrm === place.placeId}
+                            className="text-xs px-3 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-full transition-colors disabled:opacity-50"
+                          >
+                            {importingCrm === place.placeId ? 'Importing…' : `Import to CRM (Tier ${tier}) →`}
+                          </button>
                         )}
-                        {place.reviewCount > 0 && (
-                          <span className="text-slate-400">({place.reviewCount} reviews)</span>
-                        )}
-                        {filterWebsite !== 'any' && (
-                          <span className={place.hasWebsite ? 'text-emerald-400' : 'text-slate-500'}>
-                            {place.hasWebsite ? '● website' : '○ no website'}
-                          </span>
+                        {imported && (
+                          <a
+                            href="/admin/crm"
+                            className="text-xs px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-full"
+                          >
+                            ✓ Added to CRM →
+                          </a>
                         )}
                       </div>
                     </div>
-                    <div className="text-xs text-slate-400 mt-0.5">{place.address}</div>
-                  </button>
-                ))}
+                  )
+                })}
               </div>
             )}
 
@@ -595,6 +673,43 @@ webf5.com.au`)
                     >
                       Search LinkedIn for contacts at {enrichResult.name} →
                     </a>
+                  </div>
+                )}
+
+                {/* TRIPLE tier + CRM import */}
+                {enrichResult && (
+                  <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-white/10">
+                    <span className="text-xs text-slate-500">TRIPLE tier:</span>
+                    {(['A', 'B', 'C'] as const).map(t => {
+                      const tier = tierByPlaceId[enrichResult.placeId]
+                      return (
+                        <button
+                          key={t}
+                          onClick={() => setTierByPlaceId(prev => ({ ...prev, [enrichResult.placeId]: t }))}
+                          className={`text-xs font-bold w-7 h-7 rounded-full border transition-colors ${
+                            tier === t
+                              ? t === 'A' ? 'bg-emerald-500 border-emerald-400 text-white'
+                              : t === 'B' ? 'bg-indigo-500 border-indigo-400 text-white'
+                              :             'bg-amber-500 border-amber-400 text-white'
+                              : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20'
+                          }`}
+                        >{t}</button>
+                      )
+                    })}
+                    {tierByPlaceId[enrichResult.placeId] && !importedCrm[enrichResult.placeId] && (
+                      <button
+                        onClick={() => importToCrm(enrichResult.placeId)}
+                        disabled={importingCrm === enrichResult.placeId}
+                        className="text-xs px-3 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-full transition-colors disabled:opacity-50"
+                      >
+                        {importingCrm === enrichResult.placeId ? 'Importing…' : `Import to CRM (Tier ${tierByPlaceId[enrichResult.placeId]}) →`}
+                      </button>
+                    )}
+                    {importedCrm[enrichResult.placeId] && (
+                      <a href="/admin/crm" className="text-xs px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-full">
+                        ✓ Added to CRM →
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -900,6 +1015,41 @@ webf5.com.au`)
                       <div className="text-center py-6 text-emerald-400 font-medium">✓ Email sent successfully!</div>
                     ) : (
                       <>
+                        {/* Sequence + touch selector */}
+                        <div className="grid sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-slate-400 mb-1">Sequence <span className="text-slate-500">(auto-schedules follow-up touches in Calendar)</span></label>
+                            <select
+                              value={emailSequence}
+                              onChange={e => {
+                                setEmailSequence(e.target.value)
+                                const seq = SEQUENCES.find(s => s.name === e.target.value)
+                                setEmailTouchName(seq?.touches[0]?.name ?? '')
+                              }}
+                              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                            >
+                              <option value="">No sequence (one-off)</option>
+                              {SEQUENCES.map(s => (
+                                <option key={s.name} value={s.name}>{s.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {emailSequence && (
+                            <div>
+                              <label className="block text-xs text-slate-400 mb-1">This touch</label>
+                              <select
+                                value={emailTouchName}
+                                onChange={e => setEmailTouchName(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                              >
+                                {SEQUENCES.find(s => s.name === emailSequence)?.touches.map(t => (
+                                  <option key={t.name} value={t.name}>Day {t.day} · {t.name}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+
                         <div>
                           <label className="block text-xs text-slate-400 mb-1">Subject</label>
                           <input value={emailSubject} onChange={e => setEmailSubject(e.target.value)}

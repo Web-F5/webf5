@@ -174,6 +174,20 @@ export const outreachSends = pgTable('outreach_sends', {
   createdAt:   timestamp('created_at').notNull().defaultNow(),
 })
 
+export const outreachTouches = pgTable('outreach_touches', {
+  id:           uuid('id').primaryKey().defaultRandom(),
+  prospectId:   uuid('prospect_id').references(() => outreachProspects.id, { onDelete: 'cascade' }).notNull(),
+  sendId:       uuid('send_id').references(() => outreachSends.id, { onDelete: 'set null' }),
+  sequenceName: text('sequence_name').notNull(),
+  touchName:    text('touch_name').notNull(),
+  touchNumber:  integer('touch_number').notNull(),
+  channel:      text('channel').notNull().default('email'), // email | phone | linkedin | video | note
+  scheduledFor: timestamp('scheduled_for').notNull(),
+  status:       text('status').notNull().default('pending'), // pending | completed | skipped
+  completedAt:  timestamp('completed_at'),
+  createdAt:    timestamp('created_at').notNull().defaultNow(),
+})
+
 export const courseEntitlements = pgTable('course_entitlements', {
   id:              uuid('id').primaryKey().defaultRandom(),
   userId:          text('user_id').notNull(),
