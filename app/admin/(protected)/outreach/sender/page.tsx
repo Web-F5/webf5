@@ -65,6 +65,8 @@ interface PlaceResult {
 }
 
 interface EnrichResult {
+  placeId: string
+  gbpUrl: string
   name: string
   website: string
   phone: string
@@ -74,6 +76,7 @@ interface EnrichResult {
   linkedin?: string
   facebook?: string
   scrapedTitle?: string
+  contactNames: string[]
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -404,7 +407,17 @@ webf5.com.au`)
             {enrichResult && (
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm text-white">{enrichResult.name}</h3>
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-sm text-white">{enrichResult.name}</h3>
+                    <a
+                      href={enrichResult.gbpUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded-full transition-colors"
+                    >
+                      View on Google ↗
+                    </a>
+                  </div>
                   <button onClick={() => { setEnrichResult(null); setSearchResults([]) }} className="text-xs text-slate-500 hover:text-white transition-colors">✕ Clear</button>
                 </div>
 
@@ -413,7 +426,7 @@ webf5.com.au`)
                   {enrichResult.website && (
                     <div>
                       <div className="text-xs text-slate-500 mb-0.5">Website</div>
-                      <div className="text-indigo-300 text-xs truncate">{enrichResult.website}</div>
+                      <a href={enrichResult.website} target="_blank" rel="noreferrer" className="text-indigo-300 hover:text-indigo-200 text-xs truncate block">{enrichResult.website}</a>
                     </div>
                   )}
                   {enrichResult.phone && (
@@ -442,6 +455,30 @@ webf5.com.au`)
                   )}
                 </div>
 
+                {/* Contact name picker */}
+                {enrichResult.contactNames.length > 0 && (
+                  <div>
+                    <div className="text-xs text-slate-500 mb-2">
+                      Found {enrichResult.contactNames.length} possible contact name{enrichResult.contactNames.length > 1 ? 's' : ''} — select one to use:
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {enrichResult.contactNames.map(name => (
+                        <button
+                          key={name}
+                          onClick={() => setPName(name)}
+                          className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                            pName === name
+                              ? 'bg-emerald-500/25 border-emerald-500/50 text-emerald-200'
+                              : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/20'
+                          }`}
+                        >
+                          {pName === name ? '✓ ' : ''}{name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Email picker */}
                 {enrichResult.emails.length > 0 ? (
                   <div>
@@ -452,9 +489,7 @@ webf5.com.au`)
                       {enrichResult.emails.map(email => (
                         <button
                           key={email}
-                          onClick={() => {
-                            setPEmail(email)
-                          }}
+                          onClick={() => setPEmail(email)}
                           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                             pEmail === email
                               ? 'bg-indigo-500/25 border-indigo-500/50 text-indigo-200'
