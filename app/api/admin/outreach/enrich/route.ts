@@ -162,7 +162,7 @@ export async function GET(req: NextRequest) {
     const base = `https://maps.googleapis.com/maps/api/place/textsearch/json?region=au&key=${apiKey}`
     const url  = pageToken
       ? `${base}&pagetoken=${encodeURIComponent(pageToken)}`
-      : `${base}&query=${encodeURIComponent(query)}`
+      : `${base}&query=${encodeURIComponent(query!)}`
     const res  = await fetch(url, { next: { revalidate: 0 } })
     const data = await res.json()
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') return { results: [] }
