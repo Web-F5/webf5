@@ -8,10 +8,33 @@ async function isAdmin(): Promise<boolean> {
 
 // ── Email / social extraction ──────────────────────────────────────────────
 
+// Decode Cloudflare email obfuscation (data-cfemail attribute)
+function decodeCloudflareEmail(encoded: string): string | null {
+  try {
+    const r = parseInt(encoded.slice(0, 2), 16)
+    let email = ''
+    for (let n = 2; n < encoded.length; n += 2) {
+      email += String.fromCharCode(parseInt(encoded.slice(n, n + 2), 16) ^ r)
+    }
+    return email.includes('@') ? email : null
+  } catch { return null }
+}
+
 function extractEmails(html: string): string[] {
   const found = new Set<string>()
+
+  // Cloudflare-obfuscated emails (data-cfemail="...")
+  const cfEmails = html.matchAll(/data-cfemail=["']([0-9a-f]+)["']/gi)
+  for (const m of cfEmails) {
+    const decoded = decodeCloudflareEmail(m[1])
+    if (decoded) found.add(decoded.toLowerCase())
+  }
+
+  // mailto: links
   const mailto = html.matchAll(/mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g)
   for (const m of mailto) found.add(m[1].toLowerCase())
+
+  // Plain text emails
   const plain = html.matchAll(/\b([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})\b/g)
   for (const m of plain) {
     const email = m[1].toLowerCase()
@@ -21,6 +44,7 @@ function extractEmails(html: string): string[] {
       found.add(email)
     }
   }
+
   const generic = ['info@', 'hello@', 'admin@', 'contact@', 'support@', 'enquiries@', 'mail@', 'noreply@', 'no-reply@']
   return [...found]
     .sort((a, b) => {
@@ -140,15 +164,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: `Places API: ${data.status}` }, { status: 400 })
 
   type RawPlace = { place_id: string; name: string; formatted_address: string; types?: string[]; rating?: number; user_ratings_total?: number }
-  const raw: RawPlace[] = (data.results ?? []).slice(0, 8)
+  // Take all results from the page (up to 20), apply filters, then return best 6
+  const raw: RawPlace[] = data.results ?? []
 
-  // Apply review count filter (available in text search response — no extra calls)
+  // Apply review count filter first (no extra API calls — already in text search response)
   const reviewFiltered = raw.filter(p => {
     const count = p.user_ratings_total ?? 0
     return count >= minReviews && count <= maxReviews
   })
 
-  // If website filter is active, fetch details for each result in parallel
+  // If website filter is active, fetch details in parallel for all passing results
   let results: { placeId: string; name: string; address: string; types: string[]; rating: number | null; reviewCount: number; hasWebsite: boolean }[]
 
   if (websiteFilter === 'with' || websiteFilter === 'without') {
@@ -174,7 +199,7 @@ export async function GET(req: NextRequest) {
       types:       p.types ?? [],
       rating:      p.rating ?? null,
       reviewCount: p.user_ratings_total ?? 0,
-      hasWebsite:  true, // unknown — not fetched
+      hasWebsite:  true,
     }))
   }
 
