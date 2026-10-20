@@ -131,13 +131,15 @@ async function fetchPage(url: string): Promise<string | null> {
   } catch { return null }
 }
 
-// Fetch just enough place details to check for website presence
+// Fetch just enough place details to check for website presence (New API)
 async function fetchPlaceWebsite(placeId: string, apiKey: string): Promise<string | null> {
   try {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=website&key=${apiKey}`
-    const res  = await fetch(url, { next: { revalidate: 0 } })
+    const res  = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+      headers: { 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': 'websiteUri' },
+      next: { revalidate: 0 },
+    })
     const data = await res.json()
-    return data.result?.website ?? null
+    return data.websiteUri ?? null
   } catch { return null }
 }
 
@@ -156,55 +158,92 @@ export async function GET(req: NextRequest) {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'Places API not configured.' }, { status: 503 })
 
-  // Accept a pagetoken for manual "Next 20" pagination
+  // Accept a pagetoken for manual "Next 20" pagination driven by the client
   const pagetoken = req.nextUrl.searchParams.get('pagetoken')
 
-  type RawPlace = { place_id: string; name: string; formatted_address: string; types?: string[]; rating?: number; user_ratings_total?: number }
+  // ── Places API (New) — Text Search ────────────────────────────────────────
+  // Uses POST /v1/places:searchText which returns up to 20 results per page
+  // and handles location as bias (not a hard filter), matching Maps behaviour.
+  type NewPlace = {
+    id: string
+    displayName?: { text: string }
+    formattedAddress?: string
+    rating?: number
+    userRatingCount?: number
+    types?: string[]
+    primaryType?: string
+  }
 
-  const base = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${apiKey}`
-  const url  = pagetoken
-    ? `${base}&pagetoken=${encodeURIComponent(pagetoken)}`
-    : `${base}&region=au&query=${encodeURIComponent(query!)}`
+  const searchPayload: Record<string, unknown> = {
+    textQuery:      query,
+    maxResultCount: 20,
+    languageCode:   'en',
+    regionCode:     'AU',
+  }
+  if (pagetoken) searchPayload.pageToken = pagetoken
 
-  const res  = await fetch(url, { next: { revalidate: 0 } })
-  const data = await res.json()
+  const searchRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type':    'application/json',
+      'X-Goog-Api-Key':  apiKey,
+      'X-Goog-FieldMask': [
+        'places.id', 'places.displayName', 'places.formattedAddress',
+        'places.rating', 'places.userRatingCount', 'places.types',
+        'places.primaryType', 'nextPageToken',
+      ].join(','),
+    },
+    body: JSON.stringify(searchPayload),
+    next: { revalidate: 0 },
+  })
 
-  if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS')
-    return NextResponse.json({ error: `Places API: ${data.status}` }, { status: 400 })
+  const searchData = await searchRes.json()
+  if (searchData.error) {
+    return NextResponse.json({ error: `Places API: ${searchData.error.message}` }, { status: 400 })
+  }
 
-  const raw: RawPlace[] = data.results ?? []
-  const nextPageToken: string | undefined = data.next_page_token
+  const raw: NewPlace[] = searchData.places ?? []
+  const nextPageToken: string | null = searchData.nextPageToken ?? null
 
-  // Apply review count filter to this batch
+  // Review count filter
   const reviewFiltered = raw.filter(p => {
-    const cnt = p.user_ratings_total ?? 0
+    const cnt = p.userRatingCount ?? 0
     return cnt >= minReviews && cnt <= maxReviews
   })
 
-  // Apply website filter (extra Details API call per candidate)
+  // Website filter (extra Details call per candidate)
   let results: { placeId: string; name: string; address: string; types: string[]; rating: number | null; reviewCount: number; hasWebsite: boolean }[]
+
   if (websiteFilter === 'with' || websiteFilter === 'without') {
-    const websiteChecks = await Promise.all(reviewFiltered.map(p => fetchPlaceWebsite(p.place_id, apiKey)))
+    const websiteChecks = await Promise.all(reviewFiltered.map(p => fetchPlaceWebsite(p.id, apiKey)))
     results = reviewFiltered
       .map((p, i) => ({
-        placeId: p.place_id, name: p.name, address: p.formatted_address,
-        types: p.types ?? [], rating: p.rating ?? null,
-        reviewCount: p.user_ratings_total ?? 0, hasWebsite: !!websiteChecks[i],
+        placeId:     p.id,
+        name:        p.displayName?.text ?? '',
+        address:     p.formattedAddress ?? '',
+        types:       p.types ?? [],
+        rating:      p.rating ?? null,
+        reviewCount: p.userRatingCount ?? 0,
+        hasWebsite:  !!websiteChecks[i],
       }))
       .filter(p => websiteFilter === 'with' ? p.hasWebsite : !p.hasWebsite)
   } else {
     results = reviewFiltered.map(p => ({
-      placeId: p.place_id, name: p.name, address: p.formatted_address,
-      types: p.types ?? [], rating: p.rating ?? null,
-      reviewCount: p.user_ratings_total ?? 0, hasWebsite: true,
+      placeId:     p.id,
+      name:        p.displayName?.text ?? '',
+      address:     p.formattedAddress ?? '',
+      types:       p.types ?? [],
+      rating:      p.rating ?? null,
+      reviewCount: p.userRatingCount ?? 0,
+      hasWebsite:  true,
     }))
   }
 
   return NextResponse.json({
     results,
-    nextPageToken: nextPageToken ?? null,
-    batchTotal: raw.length,      // how many Google returned in this batch
-    batchPassed: results.length, // how many passed the filter
+    nextPageToken,
+    batchTotal:  raw.length,
+    batchPassed: results.length,
   })
 }
 
@@ -217,14 +256,23 @@ export async function POST(req: NextRequest) {
   if (!placeId) return NextResponse.json({ error: 'placeId required' }, { status: 400 })
 
   const apiKey     = process.env.GOOGLE_PLACES_API_KEY!
-  const fields     = 'name,website,formatted_phone_number,formatted_address,types,business_status,url,rating,user_ratings_total'
-  const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${fields}&key=${apiKey}`
-  const detailsRes = await fetch(detailsUrl, { next: { revalidate: 0 } })
-  const details    = await detailsRes.json()
-  const place      = details.result ?? {}
 
-  const website: string | undefined = place.website
-  const gbpUrl: string = place.url ?? `https://www.google.com/maps/place/?q=place_id:${placeId}`
+  // Places API (New) — Place Details
+  const detailsRes = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+    headers: {
+      'X-Goog-Api-Key':   apiKey,
+      'X-Goog-FieldMask': [
+        'displayName', 'websiteUri', 'internationalPhoneNumber',
+        'formattedAddress', 'types', 'businessStatus',
+        'googleMapsUri', 'rating', 'userRatingCount',
+      ].join(','),
+    },
+    next: { revalidate: 0 },
+  })
+  const place = await detailsRes.json()
+
+  const website: string | undefined = place.websiteUri
+  const gbpUrl: string = place.googleMapsUri ?? `https://www.google.com/maps/place/?q=place_id:${placeId}`
 
   let emails: string[]       = []
   let linkedin: string | undefined
@@ -260,13 +308,13 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     placeId,
     gbpUrl,
-    name:        place.name ?? '',
+    name:        place.displayName?.text ?? '',
     website:     website ?? '',
-    phone:       place.formatted_phone_number ?? '',
-    address:     place.formatted_address ?? '',
+    phone:       place.internationalPhoneNumber ?? '',
+    address:     place.formattedAddress ?? '',
     types:       place.types ?? [],
     rating:      place.rating ?? null,
-    reviewCount: place.user_ratings_total ?? 0,
+    reviewCount: place.userRatingCount ?? 0,
     emails,
     linkedin,
     facebook,
