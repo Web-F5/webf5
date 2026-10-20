@@ -15,6 +15,10 @@ interface ReportShape {
   grade:          string
   overallScore?:  number
   lcp:            number
+  seo?: {
+    estimatedMonthly: number
+    backlinks?: { referringDomains: number; backlinks: number } | null
+  } | null
   pageSpeedScore?: number | null
   desktopScore?:  number | null
   lighthouseAccessibility?: number | null
@@ -167,6 +171,8 @@ export default async function AdminLeadsPage() {
                 <th className="px-3 py-3 text-center" title="Tap-to-call link">Tel</th>
                 <th className="px-3 py-3 text-center" title="Contact details">Cntct</th>
                 <th className="px-3 py-3 text-center" title="Call to action">CTA</th>
+                <th className="px-3 py-3 text-center" title="Estimated monthly organic visits">Visits</th>
+                <th className="px-3 py-3 text-center" title="Referring domains">Ref Dom</th>
                 <th className="px-4 py-3 text-left">Frustration</th>
                 <th className="px-4 py-3 text-left">Received</th>
                 <th className="px-4 py-3"></th>
@@ -244,6 +250,16 @@ export default async function AdminLeadsPage() {
                     <td className="px-3 py-3 text-center"><T v={r?.content?.hasTapToCall} /></td>
                     <td className="px-3 py-3 text-center"><T v={r?.content?.hasContact} /></td>
                     <td className="px-3 py-3 text-center"><T v={r?.content?.hasCta} /></td>
+                    <td className="px-3 py-3 text-center">
+                      {r?.seo?.estimatedMonthly != null
+                        ? <span className="text-xs font-mono font-semibold text-indigo-300">{r.seo.estimatedMonthly.toLocaleString()}</span>
+                        : <span className="text-slate-700 text-xs">—</span>}
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      {r?.seo?.backlinks?.referringDomains != null
+                        ? <span className="text-xs font-mono font-semibold text-slate-300">{r.seo.backlinks.referringDomains.toLocaleString()}</span>
+                        : <span className="text-slate-700 text-xs">—</span>}
+                    </td>
                     <td className="px-4 py-3">
                       {lead.biggestFrustration
                         ? <p className="text-xs text-slate-300 max-w-[180px] truncate" title={lead.biggestFrustration}>{lead.biggestFrustration}</p>

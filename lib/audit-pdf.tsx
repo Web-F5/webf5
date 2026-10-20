@@ -51,6 +51,13 @@ export interface AuditReportData {
     linkCount?:      number
   }
   url: string
+  seo?: {
+    almostRanking:    { keyword: string; position: number; searchVolume: number; url: string }[]
+    estimatedMonthly: number
+    serpFallback:     { position: number; url: string; title: string }[] | null
+    serpPhrase:       string | null
+    backlinks:        { referringDomains: number; backlinks: number } | null
+  } | null
 }
 
 // ── Colours ────────────────────────────────────────────────────────────────
@@ -265,7 +272,7 @@ function CoverPage({ report, biz, date }: { report: AuditReportData; biz: string
 function FindingsPage({ report, biz }: { report: AuditReportData; biz: string }) {
   const { lcp, ssl, hasSitemap, content } = report
   const allImagesAlt  = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
-  const mobilePass    = lcp < 4
+  const mobilePass    = (report.pageSpeedScore ?? 0) >= 80
   const desktopPass   = (report.desktopScore ?? 0) >= 80
   const accessPass    = (report.lighthouseAccessibility ?? 0) >= 80
   const bestPractPass = (report.lighthouseBestPractices ?? 0) >= 80
@@ -405,6 +412,87 @@ function FindingsPage({ report, biz }: { report: AuditReportData; biz: string })
   )
 }
 
+// ── Organic Traffic Page ───────────────────────────────────────────────────
+
+function SeoPage({ report, biz }: { report: AuditReportData; biz: string }) {
+  const seo = report.seo!
+  return (
+    <Page size="A4" style={s.reportPage}>
+      <View style={s.pageHeader}>
+        <View>
+          <Text style={s.pageTitle}>Organic Search: {biz}</Text>
+          <Text style={s.pageSubtitle}>{report.url}</Text>
+        </View>
+        <Text style={s.pageBrand}>Web F5</Text>
+      </View>
+
+      {/* Traffic + backlinks tiles */}
+      <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
+        <View style={{ flex: 1, backgroundColor: '#EEF2FF', borderRadius: 8, padding: 16, alignItems: 'center' }}>
+          <Text style={{ fontSize: 28, fontFamily: 'Helvetica-Bold', color: C.indigo }}>{seo.estimatedMonthly.toLocaleString()}</Text>
+          <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginTop: 4 }}>estimated monthly organic visits</Text>
+        </View>
+        {seo.backlinks && (
+          <>
+            <View style={{ flex: 1, backgroundColor: C.light, borderRadius: 8, padding: 16, alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontFamily: 'Helvetica-Bold', color: C.dark }}>{seo.backlinks.referringDomains.toLocaleString()}</Text>
+              <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginTop: 4 }}>referring domains</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: C.light, borderRadius: 8, padding: 16, alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontFamily: 'Helvetica-Bold', color: C.dark }}>{seo.backlinks.backlinks.toLocaleString()}</Text>
+              <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginTop: 4 }}>total backlinks</Text>
+            </View>
+          </>
+        )}
+      </View>
+
+      {/* Almost ranking */}
+      {seo.almostRanking.length > 0 && (
+        <View style={{ marginBottom: 16 }}>
+          <Text style={[s.sectionTitle, { color: C.amber }]}>ALMOST RANKING (POSITIONS 4–20)</Text>
+          <View style={s.sectionLine} />
+          <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginBottom: 8 }}>
+            Close to page 1 — a targeted push could move these up and bring in more visitors.
+          </Text>
+          {seo.almostRanking.map((kw, i) => (
+            <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: C.border }}>
+              <Text style={{ fontSize: 10, fontFamily: 'Helvetica', color: C.dark, flex: 1 }}>{kw.keyword}</Text>
+              <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, width: 70, textAlign: 'right' }}>{kw.searchVolume.toLocaleString()}/mo</Text>
+              <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: C.amber, width: 36, textAlign: 'right' }}>#{kw.position}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Fallback SERP */}
+      {seo.serpFallback && seo.serpPhrase && (
+        <View>
+          <Text style={s.sectionTitle}>SERP CHECK: "{seo.serpPhrase.toUpperCase()}"</Text>
+          <View style={s.sectionLine} />
+          <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginBottom: 8 }}>
+            Your site didn't appear to be ranking for any search terms, so we checked who's currently winning for this phrase.
+          </Text>
+          {seo.serpFallback.slice(0, 5).map((entry, i) => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: C.border }}>
+              <View style={{ backgroundColor: '#EEF2FF', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, marginRight: 8 }}>
+                <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: C.indigo }}>#{entry.position}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: C.dark }}>{entry.title}</Text>
+                <Text style={{ fontSize: 8, fontFamily: 'Helvetica', color: C.slate }}>{entry.url}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
+      <Text style={{ fontSize: 9, fontFamily: 'Helvetica', color: C.slate, marginTop: 16 }}>
+        Source: DataForSEO · Organic traffic estimate based on ranked keyword volumes and average CTR by position.
+      </Text>
+    </Page>
+  )
+}
+
 // ── Export ─────────────────────────────────────────────────────────────────
 
 export async function generateAuditPdf(
@@ -413,10 +501,17 @@ export async function generateAuditPdf(
   biz: string,
 ): Promise<Buffer> {
   const date = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
+  const hasSeoData = report.seo && (
+    report.seo.almostRanking.length > 0 ||
+    report.seo.estimatedMonthly > 0 ||
+    report.seo.serpFallback != null ||
+    report.seo.backlinks != null
+  )
   const doc = (
     <Document title={`Website Audit: ${biz}`} author="Web F5">
       <CoverPage report={report} biz={biz} date={date} />
       <FindingsPage report={report} biz={biz} />
+      {hasSeoData ? <SeoPage report={report} biz={biz} /> : null}
     </Document>
   )
   return renderToBuffer(doc) as Promise<Buffer>

@@ -89,7 +89,7 @@ export function buildAuditEmailHtml(
   const { lcp, ssl, hasSitemap, content, grade, overallScore, subScores } = report
   const gc = gradeColor(grade)
   const allImagesAlt  = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
-  const mobilePass    = lcp < 4
+  const mobilePass    = (report.pageSpeedScore ?? 0) >= 80
   const desktopPass   = (report.desktopScore ?? 0) >= 80
   const accessPass    = (report.lighthouseAccessibility ?? 0) >= 80
   const bestPractPass = (report.lighthouseBestPractices ?? 0) >= 80
@@ -233,6 +233,52 @@ export function buildAuditEmailHtml(
         ${sectionHeader('Enquiry Path')}
         ${checkRow(content.hasContact, 'Contact details on page', content.hasContact ? 'Contact details are visible on the page.' : "Not found. Visitors who can't reach you quickly will call your competitor.")}
         ${checkRow(content.hasCta, 'Clear call to action', content.hasCta ? 'Your page has a clear next step for visitors.' : 'Not found. Visitors who are ready to enquire may not know what to do next.')}
+
+        ${report.seo ? `
+        ${sectionHeader('Organic Search Traffic')}
+        <tr><td style="padding:12px 16px 8px;">
+          <table cellpadding="0" cellspacing="0" width="100%"><tr>
+            <td style="width:50%;padding-right:6px;">
+              <div style="background:#F8FAFC;border-radius:8px;padding:14px;text-align:center;">
+                <div style="font-size:22px;font-weight:800;color:#6366F1;">${report.seo.estimatedMonthly.toLocaleString()}</div>
+                <div style="font-size:10px;color:#94A3B8;margin-top:3px;">est. monthly organic visits</div>
+              </div>
+            </td>
+            ${report.seo.backlinks ? `<td style="width:50%;padding-left:6px;">
+              <div style="background:#F8FAFC;border-radius:8px;padding:14px;text-align:center;">
+                <div style="font-size:22px;font-weight:800;color:#111827;">${report.seo.backlinks.referringDomains.toLocaleString()}</div>
+                <div style="font-size:10px;color:#94A3B8;margin-top:3px;">referring domains</div>
+              </div>
+            </td>` : ''}
+          </tr></table>
+        </td></tr>
+        ${report.seo.almostRanking.length > 0 ? `
+        <tr><td style="padding:4px 16px 8px;">
+          <div style="font-size:10px;font-weight:700;color:#F59E0B;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Almost ranking (positions 4–20)</div>
+          <div style="font-size:11px;color:#64748B;margin-bottom:8px;">Close to page 1 — a targeted push could move these up and bring in more traffic.</div>
+          <table cellpadding="0" cellspacing="0" width="100%">
+            ${report.seo.almostRanking.map(kw => `
+            <tr>
+              <td style="padding:5px 8px;background:#F8FAFC;border-radius:4px;margin-bottom:4px;font-size:12px;color:#1E293B;">${kw.keyword}</td>
+              <td style="padding:5px 8px;text-align:right;font-size:11px;color:#64748B;white-space:nowrap;">${kw.searchVolume.toLocaleString()}/mo</td>
+              <td style="padding:5px 8px;text-align:right;font-size:11px;color:#F59E0B;font-weight:700;white-space:nowrap;">#${kw.position}</td>
+            </tr>`).join('')}
+          </table>
+        </td></tr>` : ''}
+        ${report.seo.serpFallback && report.seo.serpPhrase ? `
+        <tr><td style="padding:4px 16px 8px;">
+          <div style="font-size:10px;font-weight:700;color:#94A3B8;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">SERP check: "${report.seo.serpPhrase}"</div>
+          <div style="font-size:11px;color:#64748B;margin-bottom:8px;">Your site didn't appear to be ranking for anything, so we checked who's currently winning for <strong>"${report.seo.serpPhrase}"</strong>:</div>
+          ${report.seo.serpFallback.slice(0, 5).map(entry => `
+          <div style="display:flex;align-items:flex-start;padding:5px 0;border-bottom:1px solid #F1F5F9;">
+            <span style="font-size:10px;font-weight:700;color:#6366F1;background:#EEF2FF;padding:2px 6px;border-radius:4px;margin-right:8px;white-space:nowrap;">#${entry.position}</span>
+            <div>
+              <div style="font-size:11px;color:#1E293B;font-weight:600;">${entry.title}</div>
+              <div style="font-size:10px;color:#94A3B8;">${entry.url}</div>
+            </div>
+          </div>`).join('')}
+        </td></tr>` : ''}
+        ` : ''}
 
       </table>
     </td></tr>
