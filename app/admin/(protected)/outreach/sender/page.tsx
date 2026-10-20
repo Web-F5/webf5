@@ -87,6 +87,7 @@ interface EnrichResult {
   facebook?: string
   scrapedTitle?: string
   contactNames: string[]
+  description?: string
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -142,7 +143,7 @@ export default function OutreachSenderPage() {
   const [enriching, setEnriching]             = useState(false)
   const [enrichResult, setEnrichResult]       = useState<EnrichResult | null>(null)
   // Search filters
-  const [filterWebsite, setFilterWebsite]     = useState<'any' | 'with' | 'without'>('any')
+  const [filterWebsite, setFilterWebsite]     = useState<'any' | 'without'>('any')
   const [filterMinReviews, setFilterMinReviews] = useState('')
   const [filterMaxReviews, setFilterMaxReviews] = useState('')
 
@@ -361,15 +362,20 @@ webf5.com.au`)
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         tier,
-        company:  enrichResult?.name ?? place?.name ?? '',
-        name:     pName || null,
-        title:    pTitle || null,
-        linkedin: enrichResult?.linkedin || pLinkedIn || null,
-        notes:    pNotes || null,
-        website:  enrichResult?.website || pWebsite || null,
-        phone:    enrichResult?.phone || null,
-        address:  enrichResult?.address || place?.address || null,
-        email:    enrichResult?.emails?.[0] || pEmail || null,
+        company:     enrichResult?.name ?? place?.name ?? '',
+        name:        pName || null,
+        title:       pTitle || null,
+        linkedin:    enrichResult?.linkedin || pLinkedIn || null,
+        notes:       pNotes || null,
+        website:     enrichResult?.website || pWebsite || null,
+        phone:       enrichResult?.phone || null,
+        address:     enrichResult?.address || place?.address || null,
+        email:       enrichResult?.emails?.[0] || pEmail || null,
+        rating:      enrichResult?.rating ?? null,
+        reviewCount: enrichResult?.reviewCount ?? place?.reviewCount ?? null,
+        description: enrichResult?.description || null,
+        facebook:    enrichResult?.facebook || null,
+        gbpUrl:      enrichResult?.gbpUrl || null,
       }),
     })
     const data = await res.json()
@@ -468,7 +474,7 @@ webf5.com.au`)
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Website</label>
                 <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs font-medium">
-                  {(['any', 'with', 'without'] as const).map(v => (
+                  {(['any', 'without'] as const).map(v => (
                     <button
                       key={v}
                       onClick={() => setFilterWebsite(v)}
@@ -478,7 +484,7 @@ webf5.com.au`)
                           : 'bg-white/5 text-slate-400 hover:text-white'
                       }`}
                     >
-                      {v === 'any' ? 'Any' : v === 'with' ? 'Has website' : 'No website'}
+                      {v === 'any' ? 'Any' : 'No website'}
                     </button>
                   ))}
                 </div>
@@ -501,12 +507,37 @@ webf5.com.au`)
                   className="w-24 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500"
                 />
               </div>
-              {filterWebsite !== 'any' && (
-                <p className="text-xs text-amber-400 self-end pb-1.5">
-                  Website filter fetches details for each result — slightly slower
-                </p>
+              {(filterWebsite !== 'any' || filterMinReviews || filterMaxReviews) && (
+                <button
+                  onClick={() => { setFilterWebsite('any'); setFilterMinReviews(''); setFilterMaxReviews('') }}
+                  className="self-end pb-1.5 text-xs text-slate-400 hover:text-white underline underline-offset-2 transition-colors"
+                >
+                  Clear filters
+                </button>
               )}
             </div>
+
+            {/* Active filter banner */}
+            {(filterWebsite !== 'any' || filterMinReviews || filterMaxReviews) && (
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-xs text-amber-400 font-medium">Active filters:</span>
+                {filterWebsite !== 'any' && (
+                  <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
+                    Website: {filterWebsite === 'with' ? 'Has website' : 'No website'} — extra API calls per result
+                  </span>
+                )}
+                {filterMinReviews && (
+                  <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
+                    Min reviews: {filterMinReviews}
+                  </span>
+                )}
+                {filterMaxReviews && (
+                  <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
+                    Max reviews: {filterMaxReviews}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Search results */}
             {searchResults.length > 0 && !enrichResult && (
@@ -659,6 +690,16 @@ webf5.com.au`)
                     </div>
                   )}
                 </div>
+
+                {/* Business description */}
+                {enrichResult.description && (
+                  <div>
+                    <div className="text-xs text-slate-500 mb-1">About this business</div>
+                    <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                      {enrichResult.description}
+                    </div>
+                  </div>
+                )}
 
                 {/* Contact name picker */}
                 {enrichResult.contactNames.length > 0 && (

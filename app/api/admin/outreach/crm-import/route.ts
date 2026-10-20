@@ -10,16 +10,21 @@ async function isAdmin(): Promise<boolean> {
 export async function POST(req: NextRequest) {
   if (!await isAdmin()) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const { company, tier, name, title, linkedin, notes, website, phone, address, email } = await req.json()
+  const { company, tier, name, title, linkedin, notes, website, phone, address, email,
+          rating, reviewCount, description, facebook, gbpUrl } = await req.json()
   if (!company?.trim() || !tier) return NextResponse.json({ error: 'company and tier required' }, { status: 400 })
 
-  // Build account notes from whatever we collected
+  // Build account notes from all collected intelligence
   const noteParts: string[] = []
-  if (address) noteParts.push(`Address: ${address}`)
-  if (phone)   noteParts.push(`Phone: ${phone}`)
-  if (website) noteParts.push(`Website: ${website}`)
-  if (email)   noteParts.push(`Email: ${email}`)
-  if (notes)   noteParts.push(notes)
+  if (description)            noteParts.push(description)
+  if (address)                noteParts.push(`Address: ${address}`)
+  if (phone)                  noteParts.push(`Phone: ${phone}`)
+  if (website)                noteParts.push(`Website: ${website}`)
+  if (email)                  noteParts.push(`Email: ${email}`)
+  if (facebook)               noteParts.push(`Facebook: ${facebook}`)
+  if (gbpUrl)                 noteParts.push(`Google Maps: ${gbpUrl}`)
+  if (rating != null)         noteParts.push(`Rating: ${rating} ⭐ (${reviewCount ?? 0} reviews)`)
+  if (notes)                  noteParts.push(notes)
 
   const [account] = await db.insert(crmAccounts).values({
     name: company.trim(),

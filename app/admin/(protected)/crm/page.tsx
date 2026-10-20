@@ -50,6 +50,12 @@ export default function CrmPage() {
 
   useEffect(() => { load() }, [load])
 
+  async function deleteAccount(id: string, name: string) {
+    if (!confirm(`Remove "${name}" from the CRM? This cannot be undone.`)) return
+    await fetch(`/api/admin/crm/accounts/${id}`, { method: 'DELETE' })
+    load()
+  }
+
   async function create(e: React.FormEvent) {
     e.preventDefault()
     if (!form.name.trim()) return
@@ -183,43 +189,53 @@ export default function CrmPage() {
             const tc = TIER_COLORS[account.tier] ?? '#64748B'
             const stageName = STAGE_NAMES[account.currentStage - 1] ?? 'Target'
             return (
-              <Link
-                key={account.id}
-                href={`/admin/crm/${account.id}`}
-                className="flex items-center gap-4 bg-[#111827] border border-white/10 rounded-xl px-5 py-4 hover:border-indigo-500/50 transition-colors group"
-              >
-                {/* Tier badge */}
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                  style={{ backgroundColor: tc + '22', color: tc, border: `1.5px solid ${tc}` }}
+              <div key={account.id} className="flex items-center gap-2">
+                <Link
+                  href={`/admin/crm/${account.id}`}
+                  className="flex-1 flex items-center gap-4 bg-[#111827] border border-white/10 rounded-xl px-5 py-4 hover:border-indigo-500/50 transition-colors group min-w-0"
                 >
-                  {account.tier}
-                </div>
-
-                {/* Name + trigger */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
-                    {account.name}
+                  {/* Tier badge */}
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    style={{ backgroundColor: tc + '22', color: tc, border: `1.5px solid ${tc}` }}
+                  >
+                    {account.tier}
                   </div>
-                  {account.triggerText && (
-                    <div className="text-xs text-slate-400 truncate mt-0.5">{account.triggerText}</div>
+
+                  {/* Name + trigger */}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
+                      {account.name}
+                    </div>
+                    {account.triggerText && (
+                      <div className="text-xs text-slate-400 truncate mt-0.5">{account.triggerText}</div>
+                    )}
+                  </div>
+
+                  {/* Stage pill */}
+                  <div className="text-xs font-medium text-slate-400 flex-shrink-0">
+                    Stage {account.currentStage}: {stageName}
+                  </div>
+
+                  {/* Trigger date */}
+                  {account.triggerDate && (
+                    <div className="text-xs text-slate-500 flex-shrink-0">
+                      {new Date(account.triggerDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
+                    </div>
                   )}
-                </div>
 
-                {/* Stage pill */}
-                <div className="text-xs font-medium text-slate-400 flex-shrink-0">
-                  Stage {account.currentStage}: {stageName}
-                </div>
+                  <span className="text-slate-600 group-hover:text-slate-400 transition-colors">→</span>
+                </Link>
 
-                {/* Trigger date */}
-                {account.triggerDate && (
-                  <div className="text-xs text-slate-500 flex-shrink-0">
-                    {new Date(account.triggerDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
-                  </div>
-                )}
-
-                <span className="text-slate-600 group-hover:text-slate-400 transition-colors">→</span>
-              </Link>
+                {/* Delete */}
+                <button
+                  onClick={() => deleteAccount(account.id, account.name)}
+                  title="Remove from CRM"
+                  className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                >
+                  ×
+                </button>
+              </div>
             )
           })}
         </div>

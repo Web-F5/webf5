@@ -84,6 +84,50 @@ function looksLikeName(s: string): boolean {
   return words.every(w => /^[A-Z][a-zA-Z'\-]{1,}$/.test(w))
 }
 
+function extractBusinessDescription(pages: (string | null)[]): string {
+  const candidates: string[] = []
+
+  for (const html of pages) {
+    if (!html) continue
+
+    // Meta description
+    const meta = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']{30,300})["']/i)?.[1]?.trim()
+      ?? html.match(/<meta[^>]+content=["']([^"']{30,300})["'][^>]+name=["']description["']/i)?.[1]?.trim()
+    if (meta) candidates.push(meta)
+
+    // JSON-LD description
+    const jsonLdBlocks = html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)
+    for (const block of jsonLdBlocks) {
+      try {
+        const parsed = JSON.parse(block[1])
+        const items = Array.isArray(parsed) ? parsed : [parsed]
+        for (const item of items) {
+          if (item.description && typeof item.description === 'string' && item.description.length > 30)
+            candidates.push(item.description.trim())
+        }
+      } catch { /* skip */ }
+    }
+
+    // First meaningful <p> tag (30–400 chars, no HTML inside)
+    for (const m of html.matchAll(/<p[^>]*>([^<]{30,400})<\/p>/gi)) {
+      const text = m[1].trim()
+      if (text.length >= 30) { candidates.push(text); break }
+    }
+
+    if (candidates.length >= 2) break
+  }
+
+  // Deduplicate and return best 1–2
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const c of candidates) {
+    const key = c.slice(0, 60).toLowerCase()
+    if (!seen.has(key)) { seen.add(key); out.push(c) }
+    if (out.length === 2) break
+  }
+  return out.join('\n\n')
+}
+
 function extractContactNames(pages: (string | null)[]): string[] {
   const names = new Set<string>()
   for (const html of pages) {
@@ -279,6 +323,7 @@ export async function POST(req: NextRequest) {
   let facebook: string | undefined
   let scrapedTitle: string | undefined
   let contactNames: string[] = []
+  let description:  string   = ''
 
   if (website) {
     let origin: string
@@ -302,6 +347,7 @@ export async function POST(req: NextRequest) {
     linkedin     = socials.linkedin
     facebook     = socials.facebook
     contactNames = extractContactNames(pages)
+    description  = extractBusinessDescription(pages)
     if (home) scrapedTitle = home.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim()
   }
 
@@ -320,5 +366,6 @@ export async function POST(req: NextRequest) {
     facebook,
     scrapedTitle,
     contactNames,
+    description,
   })
 }
