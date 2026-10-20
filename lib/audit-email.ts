@@ -203,7 +203,7 @@ export function buildAuditEmailHtml(
 
         ${sectionHeader('On-Page SEO')}
         ${checkRow(!!content.metaTitle, 'Page title', content.metaTitle ? `"${content.metaTitle}"` : 'Missing. Google has nothing to show in search results.', content.metaTitleLen != null ? `${content.metaTitleLen} chars` : undefined)}
-        ${checkRow(!!content.metaDesc, 'Meta description', content.metaDesc ? 'Set. You control what people read before clicking your result.' : 'Missing. Google will choose what to display instead of you.', content.metaDescLen != null ? `${content.metaDescLen} chars${(content.metaDescLen < 120 || content.metaDescLen > 155) ? ' · aim 120–155' : ' · good'}` : undefined)}
+        ${checkRow(!!content.metaDesc && (content.metaDescLen ?? 0) >= 120 && (content.metaDescLen ?? 0) <= 155, 'Meta description', content.metaDesc ? 'Set. You control what people read before clicking your result.' : 'Missing. Google will choose what to display instead of you.', content.metaDescLen != null ? `${content.metaDescLen} chars${(content.metaDescLen < 120 || content.metaDescLen > 155) ? ' · aim 120–155' : ' · good'}` : undefined)}
         ${checkRow(!!content.h1, 'Page heading (H1)', content.h1 ? `"${content.h1}"` : 'Missing. No clear message for visitors or search engines.')}
         ${checkRow(!!content.hasCanonical, 'Canonical tag', content.hasCanonical ? 'Set. Prevents duplicate-content issues.' : 'Missing. Add a canonical tag to tell Google which URL is authoritative.')}
         ${checkRow(!!hasSitemap, 'XML sitemap', hasSitemap ? 'Found. Google can discover every page on your site.' : 'Not found. Google has a harder time finding and indexing all your pages.')}

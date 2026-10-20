@@ -463,11 +463,13 @@ export async function POST(req: NextRequest) {
 
       if (dfsKeywords.almostRanking.length === 0 && dfsKeywords.keywords.length === 0) {
         // Try to build a local phrase from industry + suburb
-        const industrySlug = industry?.toLowerCase().split(/[\s/]+/)[0] ?? null
+        // Skip vague/catch-all industry values
+        const SKIP_SLUGS = new Set(['other', 'various', 'general', 'misc', 'miscellaneous'])
+        const industrySlug = industry?.toLowerCase().split(/[\s/&,]+/)[0] ?? null
         const suburbMatch  = content.metaTitle?.match(/\bin\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)\b/)
                           ?? htmlContent?.match(/\bin\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)\b/)
         const suburb = suburbMatch?.[1] ?? null
-        if (industrySlug && suburb) {
+        if (industrySlug && !SKIP_SLUGS.has(industrySlug) && suburb) {
           serpPhrase = `${industrySlug} in ${suburb}`
           serpFallback = await checkSerp(serpPhrase).catch(() => null)
         }
