@@ -209,14 +209,17 @@ export async function POST(req: NextRequest) {
     let origin: string
     try { origin = new URL(website).origin } catch { origin = website }
 
-    const [home, contact, about, team] = await Promise.all([
+    // Fetch the exact GBP URL (may be a store/location subpage) + common pages
+    const specificPage = website !== origin ? fetchPage(website) : Promise.resolve(null)
+    const [home, contact, about, team, specific] = await Promise.all([
       fetchPage(origin),
       fetchPage(`${origin}/contact`),
       fetchPage(`${origin}/about`),
       fetchPage(`${origin}/team`),
+      specificPage,
     ])
 
-    const pages    = [home, contact, about, team]
+    const pages    = [specific, home, contact, about, team]
     const combined = pages.filter(Boolean).join('\n')
 
     emails       = extractEmails(combined)
