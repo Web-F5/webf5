@@ -135,7 +135,10 @@ export default function OutreachSenderPage() {
   // Business search / enrichment
   const [searchQuery, setSearchQuery]         = useState('')
   const [searching, setSearching]             = useState(false)
+  const [loadingMore, setLoadingMore]         = useState(false)
   const [searchResults, setSearchResults]     = useState<PlaceResult[]>([])
+  const [nextPageToken, setNextPageToken]     = useState<string | null>(null)
+  const [searchStats, setSearchStats]         = useState<{ checked: number; passed: number } | null>(null)
   const [enriching, setEnriching]             = useState(false)
   const [enrichResult, setEnrichResult]       = useState<EnrichResult | null>(null)
   // Search filters
@@ -176,24 +179,48 @@ export default function OutreachSenderPage() {
 
   // ── Business search ────────────────────────────────────────────────────
 
-  async function searchBusiness() {
-    if (!searchQuery.trim()) return
-    setSearching(true)
-    setSearchResults([])
-    setEnrichResult(null)
+  function buildSearchParams(pagetoken?: string) {
     const params = new URLSearchParams({ q: searchQuery.trim() })
     if (filterWebsite !== 'any') params.set('website', filterWebsite)
     if (filterMinReviews) params.set('minReviews', filterMinReviews)
     if (filterMaxReviews) params.set('maxReviews', filterMaxReviews)
-    const res  = await fetch(`/api/admin/outreach/enrich?${params}`)
+    if (pagetoken) params.set('pagetoken', pagetoken)
+    return params
+  }
+
+  async function searchBusiness() {
+    if (!searchQuery.trim()) return
+    setSearching(true)
+    setSearchResults([])
+    setNextPageToken(null)
+    setSearchStats(null)
+    setEnrichResult(null)
+    const res  = await fetch(`/api/admin/outreach/enrich?${buildSearchParams()}`)
     const data = await res.json()
     setSearchResults(data.results ?? [])
+    setNextPageToken(data.nextPageToken ?? null)
+    setSearchStats({ checked: data.batchTotal ?? 0, passed: data.batchPassed ?? 0 })
     setSearching(false)
+  }
+
+  async function loadMoreResults() {
+    if (!nextPageToken) return
+    setLoadingMore(true)
+    const res  = await fetch(`/api/admin/outreach/enrich?${buildSearchParams(nextPageToken)}`)
+    const data = await res.json()
+    setSearchResults(prev => [...prev, ...(data.results ?? [])])
+    setNextPageToken(data.nextPageToken ?? null)
+    setSearchStats(prev => prev ? {
+      checked: prev.checked + (data.batchTotal ?? 0),
+      passed:  prev.passed  + (data.batchPassed ?? 0),
+    } : null)
+    setLoadingMore(false)
   }
 
   async function selectPlace(place: PlaceResult) {
     setEnriching(true)
     setEnrichResult(null)
+    setNextPageToken(null)
     const res  = await fetch('/api/admin/outreach/enrich', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -484,7 +511,14 @@ webf5.com.au`)
             {/* Search results */}
             {searchResults.length > 0 && !enrichResult && (
               <div className="space-y-2">
-                <p className="text-xs text-slate-500">Select the right business to enrich, or assign a TRIPLE tier to import directly to CRM:</p>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <p className="text-xs text-slate-500">Select a business to enrich, or assign a TRIPLE tier to import to CRM:</p>
+                  {searchStats && (
+                    <span className="text-xs text-slate-500 bg-white/5 border border-white/10 rounded-full px-2.5 py-0.5">
+                      Checked {searchStats.checked} · {searchStats.passed} matched filter
+                    </span>
+                  )}
+                </div>
                 {searchResults.map(place => {
                   const tier   = tierByPlaceId[place.placeId]
                   const imported = importedCrm[place.placeId]
@@ -549,6 +583,22 @@ webf5.com.au`)
                     </div>
                   )
                 })}
+
+                {/* Next 20 button */}
+                {nextPageToken && (
+                  <button
+                    onClick={loadMoreResults}
+                    disabled={loadingMore}
+                    className="w-full py-2.5 text-sm text-indigo-400 hover:text-indigo-300 border border-dashed border-indigo-500/30 hover:border-indigo-500/60 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {loadingMore ? 'Fetching next 20 from Google…' : 'Next 20 →'}
+                  </button>
+                )}
+                {!nextPageToken && searchResults.length > 0 && (
+                  <p className="text-xs text-center text-slate-600 pt-1">
+                    End of Google results — {searchStats?.checked ?? 0} businesses checked
+                  </p>
+                )}
               </div>
             )}
 
@@ -573,7 +623,7 @@ webf5.com.au`)
                       View on Google ↗
                     </a>
                   </div>
-                  <button onClick={() => { setEnrichResult(null); setSearchResults([]) }} className="text-xs text-slate-500 hover:text-white transition-colors">✕ Clear</button>
+                  <button onClick={() => setEnrichResult(null)} className="text-xs text-slate-500 hover:text-white transition-colors">✕ Clear</button>
                 </div>
 
                 {/* Found data grid */}

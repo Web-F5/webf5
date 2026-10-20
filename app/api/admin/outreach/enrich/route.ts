@@ -156,42 +156,32 @@ export async function GET(req: NextRequest) {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'Places API not configured.' }, { status: 503 })
 
+  // Accept a pagetoken for manual "Next 20" pagination
+  const pagetoken = req.nextUrl.searchParams.get('pagetoken')
+
   type RawPlace = { place_id: string; name: string; formatted_address: string; types?: string[]; rating?: number; user_ratings_total?: number }
 
-  async function textSearch(pageToken?: string): Promise<{ results: RawPlace[]; nextPageToken?: string }> {
-    const base = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${apiKey}`
-    const url  = pageToken
-      ? `${base}&pagetoken=${encodeURIComponent(pageToken)}`
-      : `${base}&region=au&query=${encodeURIComponent(query!)}`
-    const res  = await fetch(url, { next: { revalidate: 0 } })
-    const data = await res.json()
-    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') return { results: [] }
-    return { results: data.results ?? [], nextPageToken: data.next_page_token }
-  }
+  const base = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${apiKey}`
+  const url  = pagetoken
+    ? `${base}&pagetoken=${encodeURIComponent(pagetoken)}`
+    : `${base}&region=au&query=${encodeURIComponent(query!)}`
 
-  // When any filter is active, fetch all available pages first (up to 3 = 60 candidates)
-  // to maximise the pool before filtering. Without filters, 1 page (20 results) is fine.
-  const hasActiveFilter = websiteFilter !== 'any' || minReviews > 0 || maxReviews < 999998
+  const res  = await fetch(url, { next: { revalidate: 0 } })
+  const data = await res.json()
 
-  let allRaw: RawPlace[] = []
-  let pageToken: string | undefined
-  let pagesChecked = 0
+  if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS')
+    return NextResponse.json({ error: `Places API: ${data.status}` }, { status: 400 })
 
-  do {
-    if (pagesChecked > 0) await new Promise(r => setTimeout(r, 2500)) // Google's required delay
-    const { results: raw, nextPageToken } = await textSearch(pageToken)
-    allRaw.push(...raw)
-    pageToken = nextPageToken
-    pagesChecked++
-  } while (pageToken && pagesChecked < 3 && hasActiveFilter)
+  const raw: RawPlace[] = data.results ?? []
+  const nextPageToken: string | undefined = data.next_page_token
 
-  // Review count filter
-  const reviewFiltered = allRaw.filter(p => {
+  // Apply review count filter to this batch
+  const reviewFiltered = raw.filter(p => {
     const cnt = p.user_ratings_total ?? 0
     return cnt >= minReviews && cnt <= maxReviews
   })
 
-  // Website filter (requires extra API calls per candidate)
+  // Apply website filter (extra Details API call per candidate)
   let results: { placeId: string; name: string; address: string; types: string[]; rating: number | null; reviewCount: number; hasWebsite: boolean }[]
   if (websiteFilter === 'with' || websiteFilter === 'without') {
     const websiteChecks = await Promise.all(reviewFiltered.map(p => fetchPlaceWebsite(p.place_id, apiKey)))
@@ -210,7 +200,12 @@ export async function GET(req: NextRequest) {
     }))
   }
 
-  return NextResponse.json({ results: results.slice(0, 6), totalChecked: allRaw.length, pagesChecked })
+  return NextResponse.json({
+    results,
+    nextPageToken: nextPageToken ?? null,
+    batchTotal: raw.length,      // how many Google returned in this batch
+    batchPassed: results.length, // how many passed the filter
+  })
 }
 
 // ── POST — get Place Details + scrape website ──────────────────────────────
