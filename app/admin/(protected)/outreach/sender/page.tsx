@@ -523,7 +523,7 @@ webf5.com.au`)
                 <span className="text-xs text-amber-400 font-medium">Active filters:</span>
                 {filterWebsite !== 'any' && (
                   <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
-                    Website: {filterWebsite === 'with' ? 'Has website' : 'No website'} — extra API calls per result
+                    Website: No website — extra API calls per result
                   </span>
                 )}
                 {filterMinReviews && (
