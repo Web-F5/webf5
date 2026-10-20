@@ -143,7 +143,6 @@ export default function OutreachSenderPage() {
   const [enriching, setEnriching]             = useState(false)
   const [enrichResult, setEnrichResult]       = useState<EnrichResult | null>(null)
   // Search filters
-  const [filterWebsite, setFilterWebsite]     = useState<'any' | 'without'>('any')
   const [filterMinReviews, setFilterMinReviews] = useState('')
   const [filterMaxReviews, setFilterMaxReviews] = useState('')
 
@@ -182,7 +181,6 @@ export default function OutreachSenderPage() {
 
   function buildSearchParams(pagetoken?: string) {
     const params = new URLSearchParams({ q: searchQuery.trim() })
-    if (filterWebsite !== 'any') params.set('website', filterWebsite)
     if (filterMinReviews) params.set('minReviews', filterMinReviews)
     if (filterMaxReviews) params.set('maxReviews', filterMaxReviews)
     if (pagetoken) params.set('pagetoken', pagetoken)
@@ -430,7 +428,7 @@ webf5.com.au`)
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Cold Outreach Sender</h1>
+            <h1 className="text-2xl font-bold">Target Business Prospects</h1>
             <p className="text-slate-400 text-sm mt-1">
               Search a business to auto-fill prospect details, then compose targeted emails — {prospects.length} prospect{prospects.length !== 1 ? 's' : ''}
             </p>
@@ -472,24 +470,6 @@ webf5.com.au`)
             {/* Filters */}
             <div className="flex flex-wrap gap-3 items-end">
               <div>
-                <label className="block text-xs text-slate-500 mb-1">Website</label>
-                <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs font-medium">
-                  {(['any', 'without'] as const).map(v => (
-                    <button
-                      key={v}
-                      onClick={() => setFilterWebsite(v)}
-                      className={`px-3 py-1.5 transition-colors ${
-                        filterWebsite === v
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-white/5 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {v === 'any' ? 'Any' : 'No website'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
                 <label className="block text-xs text-slate-500 mb-1">Min reviews</label>
                 <input
                   type="number" min="0" value={filterMinReviews}
@@ -507,9 +487,9 @@ webf5.com.au`)
                   className="w-24 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500"
                 />
               </div>
-              {(filterWebsite !== 'any' || filterMinReviews || filterMaxReviews) && (
+              {(filterMinReviews || filterMaxReviews) && (
                 <button
-                  onClick={() => { setFilterWebsite('any'); setFilterMinReviews(''); setFilterMaxReviews('') }}
+                  onClick={() => { setFilterMinReviews(''); setFilterMaxReviews('') }}
                   className="self-end pb-1.5 text-xs text-slate-400 hover:text-white underline underline-offset-2 transition-colors"
                 >
                   Clear filters
@@ -518,14 +498,9 @@ webf5.com.au`)
             </div>
 
             {/* Active filter banner */}
-            {(filterWebsite !== 'any' || filterMinReviews || filterMaxReviews) && (
+            {(filterMinReviews || filterMaxReviews) && (
               <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-xs text-amber-400 font-medium">Active filters:</span>
-                {filterWebsite !== 'any' && (
-                  <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
-                    Website: No website — extra API calls per result
-                  </span>
-                )}
                 {filterMinReviews && (
                   <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
                     Min reviews: {filterMinReviews}
@@ -566,11 +541,6 @@ webf5.com.au`)
                             <div className="flex items-center gap-2 shrink-0 text-xs">
                               {place.rating != null && <span className="text-amber-400">★ {place.rating.toFixed(1)}</span>}
                               {place.reviewCount > 0 && <span className="text-slate-400">({place.reviewCount} reviews)</span>}
-                              {filterWebsite !== 'any' && (
-                                <span className={place.hasWebsite ? 'text-emerald-400' : 'text-slate-500'}>
-                                  {place.hasWebsite ? '● website' : '○ no website'}
-                                </span>
-                              )}
                             </div>
                           </div>
                           <div className="text-xs text-slate-400 mt-0.5">{place.address}</div>
@@ -1106,6 +1076,16 @@ webf5.com.au`)
                       <div className="text-center py-6 text-emerald-400 font-medium">✓ Email sent successfully!</div>
                     ) : (
                       <>
+                        {/* To field */}
+                        <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                          <span className="text-xs text-slate-500 w-8 shrink-0">To:</span>
+                          <span className="text-sm text-white">{composingFor?.name}</span>
+                          <span className="text-xs text-indigo-300 ml-1">&lt;{composingFor?.email}&gt;</span>
+                          {composingFor?.company && (
+                            <span className="text-xs text-slate-500 ml-auto shrink-0">{composingFor.company}</span>
+                          )}
+                        </div>
+
                         {/* Sequence + touch selector */}
                         <div className="grid sm:grid-cols-2 gap-3">
                           <div>
