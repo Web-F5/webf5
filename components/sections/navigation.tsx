@@ -19,9 +19,9 @@ const PRICING_ITEMS = [
 ]
 
 const RESOURCES = [
-  { label: 'Free Website Audit', href: '/audit', desc: 'Instant report — speed, SEO, contact & more' },
+  { label: 'Free Website Audit', href: '/audit', desc: 'Instant report: speed, SEO, contact & more' },
   { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs' },
-  { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers — Google, Facebook & more' },
+  { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers. Google, Facebook & more.' },
 ]
 
 export function Navigation() {

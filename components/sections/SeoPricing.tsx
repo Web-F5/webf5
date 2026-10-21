@@ -89,7 +89,7 @@ export function SeoPricing() {
           Rank higher. Get found. Stay there.
         </h2>
         <p className="text-foreground/60 max-w-2xl mx-auto text-balance text-base">
-          Ongoing SEO that compounds over time — built around your location, your industry, and the customers you actually want.
+          Ongoing SEO that compounds over time, built around your location, your industry, and the customers you actually want.
         </p>
       </div>
 
@@ -164,7 +164,7 @@ export function SeoPricing() {
                 </div>
                 {annual && (
                   <p className="text-xs text-emerald-400 mt-1">
-                    {fmt(monthly * 12)}/year — save {fmt(plan.monthlyPrice * 12 * ANNUAL_DISCOUNT)}
+                    {fmt(monthly * 12)}/year, saving {fmt(plan.monthlyPrice * 12 * ANNUAL_DISCOUNT)}
                   </p>
                 )}
               </div>

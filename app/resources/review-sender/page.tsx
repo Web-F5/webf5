@@ -166,7 +166,7 @@ export default function ReviewSenderPage() {
             <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-3">Free Tool</p>
             <h1 className="text-3xl md:text-4xl font-black text-white mb-4">Review Request Sender</h1>
             <p className="text-slate-400 text-base leading-relaxed">
-              Send a personalised review request email to your customers — Google, Facebook, or Trustpilot. Upload your logo, add a personal note, and it sends in seconds.
+              Send a personalised review request email to your customers. Google, Facebook, or Trustpilot. Upload your logo, add a personal note, and it sends in seconds.
             </p>
           </div>
 

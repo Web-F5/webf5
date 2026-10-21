@@ -9,7 +9,7 @@ const plans = [
   {
     name: 'Starter',
     price: '$2,500',
-    tagline: 'A professional, mobile-friendly website to get your business found online — built lean and fast, priced to compete with DIY builders, minus the DIY.',
+    tagline: 'A professional, mobile-friendly website to get your business found online. Built lean and fast, priced to compete with DIY builders, minus the DIY.',
     features: [
       'Professionally designed, streamlined build tailored to your business',
       'Up to 6 pages',
@@ -24,22 +24,22 @@ const plans = [
   {
     name: 'Professional',
     price: '$6,500',
-    tagline: 'A custom-built website designed to generate real enquiries and rank locally — with the content, blog and SEO depth to back it up, or a full Shopify store if you\'re ready to sell online.',
+    tagline: 'A custom-built website designed to generate real enquiries and rank locally, with the content, blog and SEO depth to back it up, or a full Shopify store if you\'re ready to sell online.',
     features: [
-      'Custom design — no templates',
+      'Custom design, no templates',
       'Up to 15 pages',
       'Mobile-first and fast-loading',
       'Blog and content sections built for local SEO',
       'Full Shopify store with cart and checkout',
       'Google Business Profile setup',
     ],
-    footnote: 'Shopify stores require a separate Shopify subscription, billed directly by Shopify — from around $56/month.',
+    footnote: 'Shopify stores require a separate Shopify subscription, billed directly by Shopify, from around $56/month.',
     featured: true,
   },
   {
     name: 'Hydrogen / SaaS',
     price: '$15,000',
-    tagline: 'A fully custom headless Shopify storefront or bespoke web application — built for scale, speed, and a product that looks nothing like an off-the-shelf theme.',
+    tagline: 'A fully custom headless Shopify storefront or bespoke web application, built for scale, speed, and a product that looks nothing like an off-the-shelf theme.',
     features: [
       'Custom React / Hydrogen frontend',
       'Shopify Storefront API or custom backend',
@@ -92,7 +92,7 @@ export function PricingSection() {
             Straightforward pricing for real projects.
           </h2>
           <p className="text-lg text-foreground/60 max-w-2xl mx-auto text-balance">
-            Every project is scoped individually — these are starting points, not hard limits.
+            Every project is scoped individually; these are starting points, not hard limits.
             Tell us what you need and we'll come back with a fixed quote.
           </p>
         </motion.div>

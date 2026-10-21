@@ -8,37 +8,37 @@ const faqs = [
   {
     question: 'How long does a website take to build?',
     answer:
-      'Most local business and trades sites take 2–4 weeks from brief to launch. Ecommerce builds are typically 4–8 weeks depending on catalogue size and complexity. Shopify Hydrogen projects run 8–12 weeks. We\'ll give you a specific timeline in your quote — not a vague estimate.',
+      'Most local business and trades sites take 2–4 weeks from brief to launch. Ecommerce builds are typically 4–8 weeks depending on catalogue size and complexity. Shopify Hydrogen projects run 8–12 weeks. We\'ll give you a specific timeline in your quote, not a vague estimate.',
   },
   {
     question: 'Do I need to provide content and images?',
     answer:
-      'We\'ll guide you on both. If you have content and photos, great — we\'ll work with what you have. If not, we can advise on copywriting and sourcing images that suit your brand. We won\'t leave you staring at a blank page.',
+      'We\'ll guide you on both. If you have content and photos, great; we\'ll work with what you have. If not, we can advise on copywriting and sourcing images that suit your brand. We won\'t leave you staring at a blank page.',
   },
   {
     question: 'Can you take over my existing website?',
     answer:
-      'Yes. We handle migrations, redesigns, and platform changes regularly — from WordPress to Shopify, from one host to another, from an old static site to a modern build. Tell us about your current setup in the discovery wizard and we\'ll factor it into the scope.',
+      'Yes. We handle migrations, redesigns, and platform changes regularly, from WordPress to Shopify, from one host to another, from an old static site to a modern build. Tell us about your current setup in the discovery wizard and we\'ll factor it into the scope.',
   },
   {
     question: 'What happens after my site launches?',
     answer:
-      'You get full access to everything — hosting, CMS, domain — and we\'re available for ongoing support. We offer monthly hosting and maintenance packages, SEO services, and ad-hoc updates. Or we hand everything over and you manage it yourself. Your call.',
+      'You get full access to everything: hosting, CMS, domain. We\'re available for ongoing support, offer monthly hosting and maintenance packages, SEO services, and ad-hoc updates. Or we hand everything over and you manage it yourself. Your call.',
   },
   {
     question: 'Where are you based?',
     answer:
-      'Central Victoria, Australia. We work with clients across Victoria, WA, and nationally for ecommerce and Shopify projects. We\'re not remote-first by necessity — we\'re local by choice.',
+      'Central Victoria, Australia. We work with clients across Victoria, WA, and nationally for ecommerce and Shopify projects. We\'re not remote-first by necessity; we\'re local by choice.',
   },
   {
     question: 'Do you offer fixed-price quotes?',
     answer:
-      'Always. Once we\'ve reviewed your discovery brief we come back with a fixed-price quote — not a range, not a "starting from." You know exactly what you\'re paying before any work begins. Scope changes are discussed and agreed before they affect the price.',
+      'Always. Once we\'ve reviewed your discovery brief we come back with a fixed-price quote, not a range, not a "starting from." You know exactly what you\'re paying before any work begins. Scope changes are discussed and agreed before they affect the price.',
   },
   {
     question: 'What do you need from me to get started?',
     answer:
-      'Just 5 minutes in the discovery wizard. Answer the questions as best you can — even rough answers help us scope accurately. We\'ll follow up with any questions before putting together your quote.',
+      'Just 5 minutes in the discovery wizard. Answer the questions as best you can; even rough answers help us scope accurately. We\'ll follow up with any questions before putting together your quote.',
   },
 ]
 

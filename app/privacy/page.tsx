@@ -73,10 +73,10 @@ export default function PrivacyPage() {
           <h2 className="text-base font-semibold text-white mb-3">Third-party services</h2>
           <p>We use the following third-party services to operate our website and tools:</p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li><strong className="text-slate-200">Vercel</strong> — website hosting (USA). <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
-            <li><strong className="text-slate-200">Resend</strong> — email delivery (USA). <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
-            <li><strong className="text-slate-200">Google PageSpeed / Places API</strong> — used to analyse websites and find businesses. <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
-            <li><strong className="text-slate-200">Neon (PostgreSQL)</strong> — secure database hosting (USA). <a href="https://neon.tech/privacy-policy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
+            <li><strong className="text-slate-200">Vercel</strong>: website hosting (USA). <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
+            <li><strong className="text-slate-200">Resend</strong>: email delivery (USA). <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
+            <li><strong className="text-slate-200">Google PageSpeed / Places API</strong>: used to analyse websites and find businesses. <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
+            <li><strong className="text-slate-200">Neon (PostgreSQL)</strong>: secure database hosting (USA). <a href="https://neon.tech/privacy-policy" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">Privacy policy ↗</a></li>
           </ul>
           <p className="mt-2">These providers may process data outside Australia. We only use providers with appropriate data protection practices.</p>
         </section>

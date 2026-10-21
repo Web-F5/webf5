@@ -123,7 +123,7 @@ export function SchemaOrg() {
         name: 'Do you offer fixed-price quotes?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Always. Once we\'ve reviewed your discovery brief we come back with a fixed-price quote — not a range, not a "starting from." You know exactly what you\'re paying before any work begins.',
+          text: 'Always. Once we\'ve reviewed your discovery brief we come back with a fixed-price quote, not a range, not a "starting from." You know exactly what you\'re paying before any work begins.',
         },
       },
       {
@@ -139,7 +139,7 @@ export function SchemaOrg() {
         name: 'Do I need to provide content and images?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'We\'ll guide you on both. If you have content and photos, great — we\'ll work with what you have. If not, we can advise on copywriting and sourcing images that suit your brand.',
+          text: 'We\'ll guide you on both. If you have content and photos, great; we\'ll work with what you have. If not, we can advise on copywriting and sourcing images that suit your brand.',
         },
       },
       {
@@ -147,7 +147,7 @@ export function SchemaOrg() {
         name: 'Can you take over my existing website?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. We handle migrations, redesigns, and platform changes regularly — from WordPress to Shopify, from one host to another, from an old static site to a modern build.',
+          text: 'Yes. We handle migrations, redesigns, and platform changes regularly, from WordPress to Shopify, from one host to another, from an old static site to a modern build.',
         },
       },
       {
@@ -155,7 +155,7 @@ export function SchemaOrg() {
         name: 'What happens after my site launches?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'You get full access to everything — hosting, CMS, domain — and we\'re available for ongoing support. We offer monthly hosting and maintenance packages, SEO services, and ad-hoc updates.',
+          text: 'You get full access to everything: hosting, CMS, domain. We\'re available for ongoing support and offer monthly hosting and maintenance packages, SEO services, and ad-hoc updates.',
         },
       },
       {
@@ -163,7 +163,7 @@ export function SchemaOrg() {
         name: 'What do you need from me to get started?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Just 5 minutes in the discovery wizard. Answer the questions as best you can — even rough answers help us scope accurately. We\'ll follow up with any questions before putting together your quote.',
+          text: 'Just 5 minutes in the discovery wizard. Answer the questions as best you can; even rough answers help us scope accurately. We\'ll follow up with any questions before putting together your quote.',
         },
       },
     ],

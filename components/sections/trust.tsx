@@ -8,13 +8,13 @@ const reasons = [
     icon: FileText,
     number: 'Better questions.',
     description:
-      'Our discovery wizard is a structured process that forces clarity before any work begins. A better brief means a better site — and far fewer surprises along the way.',
+      'Our discovery wizard is a structured process that forces clarity before any work begins. A better brief means a better site, with far fewer surprises along the way.',
   },
   {
     icon: DollarSign,
     number: 'Built for your needs.',
     description:
-      'No upselling features you don\'t need. No bloated page builders. Clean, fast, maintainable websites built to suit your business — not the agency\'s preferred workflow.',
+      'No upselling features you don\'t need. No bloated page builders. Clean, fast, maintainable websites built to suit your business, not the agency\'s preferred workflow.',
   },
   {
     icon: MapPin,

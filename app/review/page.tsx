@@ -31,7 +31,7 @@ function AlreadyRated({ business }: { business: string }) {
         <div className="text-4xl mb-4">✅</div>
         <h1 className="text-lg font-bold text-slate-800 mb-2">Already submitted</h1>
         <p className="text-slate-500 text-sm">
-          You've already shared your feedback for {business}. Thanks so much — it means a lot.
+          You've already shared your feedback for {business}. Thanks so much, it means a lot.
         </p>
       </div>
     </Shell>

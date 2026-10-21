@@ -187,10 +187,10 @@ export function HostingPricing() {
           Everything your site needs to go live.
         </h3>
         <p className="text-sm text-foreground/55">
-          Hosting, domain registration, SSL, and business email — all managed for you.
+          Hosting, domain registration, SSL, and business email, all managed for you.
           {error && (
             <span className="ml-2 text-foreground/35 italic">
-              (Showing estimated prices — live pricing temporarily unavailable)
+              (Showing estimated prices; live pricing temporarily unavailable)
             </span>
           )}
         </p>
@@ -246,7 +246,7 @@ export function HostingPricing() {
       )}
 
       <p className="mt-6 text-xs text-foreground/35">
-        All prices are in AUD and exclude GST. Hosting billed monthly or annually — annual plans attract a discount.
+        All prices are in AUD and exclude GST. Hosting billed monthly or annually; annual plans attract a discount.
         Domain pricing varies by TLD and registration period.
       </p>
     </motion.div>

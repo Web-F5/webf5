@@ -30,7 +30,7 @@ const CHECKLIST = [
       {
         num: 2,
         title: 'Professional imagery',
-        detail: 'Real photos of your work, team, or premises. Stock photos signal inauthenticity — local customers can tell.',
+        detail: 'Real photos of your work, team, or premises. Stock photos signal inauthenticity; local customers can tell.',
       },
       {
         num: 3,
@@ -47,7 +47,7 @@ const CHECKLIST = [
       {
         num: 4,
         title: 'Contact details on every page',
-        detail: 'Your phone number is visible in the header or footer on every page — not just the contact page. Customers ready to call shouldn\'t have to hunt.',
+        detail: 'Your phone number is visible in the header or footer on every page, not just the contact page. Customers ready to call shouldn\'t have to hunt.',
       },
       {
         num: 5,
@@ -57,7 +57,7 @@ const CHECKLIST = [
       {
         num: 6,
         title: 'SSL certificate (HTTPS)',
-        detail: 'A padlock icon appears in the browser address bar. Without it, browsers display a "Not Secure" warning — which kills trust immediately.',
+        detail: 'A padlock icon appears in the browser address bar. Without it, browsers display a "Not Secure" warning, which kills trust immediately.',
       },
       {
         num: 7,
@@ -74,7 +74,7 @@ const CHECKLIST = [
       {
         num: 8,
         title: 'Page title and description',
-        detail: 'Every page has a unique, descriptive title tag and meta description. These are what Google shows in search results — if they\'re missing, Google guesses, and it usually guesses wrong.',
+        detail: 'Every page has a unique, descriptive title tag and meta description. These are what Google shows in search results; if they\'re missing, Google guesses, and it usually guesses wrong.',
       },
       {
         num: 9,
@@ -96,7 +96,7 @@ const CHECKLIST = [
       {
         num: 11,
         title: 'Clear call to action on every page',
-        detail: 'One obvious next step — "Call now", "Get a free quote", "Book online". Visitors who are ready to act should never have to wonder what to do next.',
+        detail: 'One obvious next step: "Call now", "Get a free quote", "Book online". Visitors who are ready to act should never have to wonder what to do next.',
       },
       {
         num: 12,
@@ -137,12 +137,12 @@ function ChecklistFull() {
         </div>
         {ticked === total && (
           <p className="text-sm text-emerald-400 mt-3 font-medium">
-            ✓ All 12 checks passed — your site is well set up.
+            ✓ All 12 checks passed. Your site is well set up.
           </p>
         )}
         {ticked > 0 && ticked < total && (
           <p className="text-sm text-amber-300 mt-3">
-            {total - ticked} item{total - ticked !== 1 ? 's' : ''} left — want help fixing {total - ticked === 1 ? 'it' : 'them'}?{' '}
+            {total - ticked} item{total - ticked !== 1 ? 's' : ''} left. Want help fixing {total - ticked === 1 ? 'it' : 'them'}?{' '}
             <a href="/brief" className="text-indigo-400 hover:underline">Start your brief →</a>
           </p>
         )}
@@ -213,7 +213,7 @@ function ChecklistFull() {
       <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-6 text-center">
         <h3 className="font-bold text-white text-lg mb-2">Found gaps in your checklist?</h3>
         <p className="text-slate-300 text-sm mb-5 max-w-md mx-auto leading-relaxed">
-          We fix exactly these issues for local Australian businesses — fast load times, professional design, Google-ready setup. Tell us about your project and we'll give you a fixed-price quote within 1 business day.
+          We fix exactly these issues for local Australian businesses: fast load times, professional design, Google-ready setup. Tell us about your project and we'll give you a fixed-price quote within 1 business day.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a href="/brief" className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
@@ -273,7 +273,7 @@ export default function ChecklistPage() {
             <span className="text-indigo-400">for Australian Small Businesses</span>
           </h1>
           <p className="text-slate-400 text-base leading-relaxed max-w-lg mx-auto print:text-gray-600">
-            The exact checks we run on every website before recommending changes. Work through each one — any red flags you find are costing you customers right now.
+            The exact checks we run on every website before recommending changes. Work through each one; any red flags you find are costing you customers right now.
           </p>
         </div>
 
@@ -311,7 +311,7 @@ export default function ChecklistPage() {
             {/* Gate form */}
             <form onSubmit={submit} className="bg-[#111827] border border-indigo-500/20 rounded-2xl p-7 space-y-5">
               <div className="text-center mb-2">
-                <h2 className="text-lg font-bold text-white">Get the full checklist — free</h2>
+                <h2 className="text-lg font-bold text-white">Get the full checklist, free</h2>
                 <p className="text-sm text-slate-400 mt-1">We'll send a copy to your email as well.</p>
               </div>
 
