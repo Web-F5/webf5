@@ -50,12 +50,18 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
 
   return (
     <div className="mb-6 bg-[#111827] border border-white/10 rounded-xl p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Send Tools</p>
-        <button onClick={() => setOpen(o => !o)}
-          className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-          {open ? 'Close' : 'Send checklist or audit →'}
-        </button>
+        <div className="flex items-center gap-3">
+          <a href="https://webf5.com.au/resources/review-sender" target="_blank" rel="noopener noreferrer"
+            className="text-xs text-slate-400 hover:text-white border border-white/10 hover:border-white/20 px-2.5 py-1 rounded-lg transition-colors">
+            Review Request Sender ↗
+          </a>
+          <button onClick={() => setOpen(o => !o)}
+            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+            {open ? 'Close' : 'Send checklist or audit →'}
+          </button>
+        </div>
       </div>
       {open && (
         <form onSubmit={send} className="mt-4 space-y-3">
