@@ -112,7 +112,7 @@ function gradeFromScore(s: number) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { type, name, businessName, email, url } = await req.json()
+    const { type, name, businessName, email, url, preview } = await req.json()
 
     if (!type || !name?.trim() || !email?.trim()) {
       return NextResponse.json({ error: 'type, name and email required' }, { status: 400 })
@@ -121,12 +121,11 @@ export async function POST(req: NextRequest) {
     const nameClean = name.trim()
     const bizClean  = businessName?.trim() || nameClean
 
-    // ── Checklist send ──────────────────────────────────────────────────────
+    // ── Checklist send / preview ────────────────────────────────────────────
     if (type === 'checklist') {
-      const [emailHtml, pdfBuffer] = await Promise.all([
-        Promise.resolve(buildChecklistEmailHtml(nameClean)),
-        renderChecklistPdf(nameClean),
-      ])
+      const emailHtml = buildChecklistEmailHtml(nameClean)
+      if (preview) return NextResponse.json({ html: emailHtml })
+      const pdfBuffer = await renderChecklistPdf(nameClean)
       await resend.emails.send({
         from:    FROM,
         to:      email.trim(),
@@ -207,11 +206,10 @@ export async function POST(req: NextRequest) {
         ssl: checks.ssl, hasSitemap, hasRobotsTxt, hasLlmsTxt, content, url: normUrl,
       }
 
-      const [emailHtml, pdfBuffer] = await Promise.all([
-        Promise.resolve(buildAuditEmailHtml(nameClean, bizClean, report)),
-        generateAuditPdf(report, nameClean, bizClean),
-      ])
+      const emailHtml = buildAuditEmailHtml(nameClean, bizClean, report)
+      if (preview) return NextResponse.json({ html: emailHtml, grade, overallScore })
 
+      const pdfBuffer = await generateAuditPdf(report, nameClean, bizClean)
       await resend.emails.send({
         from:    FROM,
         to:      email.trim(),

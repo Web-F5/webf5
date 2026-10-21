@@ -14,6 +14,7 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
   const [bizName, setBizName]     = useState('')
   const [url, setUrl]             = useState('')
   const [sending, setSending]     = useState(false)
+  const [previewing, setPreviewing] = useState(false)
   const [result, setResult]       = useState<{ ok: boolean; msg: string } | null>(null)
 
   // Pre-fill from contacts if one exists
@@ -22,18 +23,22 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
     if (firstContact && !name) setName(firstContact.name)
   }, [firstContact, name])
 
+  function buildBody(extra?: Record<string, unknown>) {
+    const body: Record<string, unknown> = { type, name, email }
+    if (bizName) body.businessName = bizName
+    if (type === 'audit') body.url = url
+    return { ...body, ...extra }
+  }
+
   async function send(e: React.FormEvent) {
     e.preventDefault()
     setSending(true)
     setResult(null)
     try {
-      const body: Record<string, string> = { type, name, email }
-      if (bizName) body.businessName = bizName
-      if (type === 'audit') body.url = url
       const res = await fetch('/api/admin/crm/send-tools', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(buildBody()),
       })
       const data = await res.json()
       if (res.ok) {
@@ -45,6 +50,34 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
       setResult({ ok: false, msg: 'Network error.' })
     } finally {
       setSending(false)
+    }
+  }
+
+  async function preview() {
+    if (!name.trim() || !email.trim()) {
+      setResult({ ok: false, msg: 'Fill in name and email first.' })
+      return
+    }
+    if (type === 'audit' && !url.trim()) {
+      setResult({ ok: false, msg: 'Fill in the website URL first.' })
+      return
+    }
+    setPreviewing(true)
+    setResult(null)
+    try {
+      const res  = await fetch('/api/admin/crm/send-tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildBody({ preview: true })),
+      })
+      const data = await res.json()
+      if (!res.ok) { setResult({ ok: false, msg: data.error ?? 'Preview failed.' }); return }
+      const win = window.open('', '_blank')
+      if (win) { win.document.write(data.html); win.document.close() }
+    } catch {
+      setResult({ ok: false, msg: 'Preview failed.' })
+    } finally {
+      setPreviewing(false)
     }
   }
 
@@ -111,9 +144,13 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
             </div>
           )}
           <div className="flex items-center gap-3">
-            <button type="submit" disabled={sending}
+            <button type="submit" disabled={sending || previewing}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors">
               {sending ? (type === 'audit' ? 'Running audit…' : 'Sending…') : `Send ${type === 'audit' ? 'audit' : 'checklist'}`}
+            </button>
+            <button type="button" onClick={preview} disabled={sending || previewing}
+              className="px-4 py-2 bg-white/5 text-slate-300 text-sm font-semibold rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-50 transition-colors">
+              {previewing ? (type === 'audit' ? 'Loading…' : 'Loading…') : 'Preview email'}
             </button>
             {result && (
               <span className={`text-xs ${result.ok ? 'text-green-400' : 'text-red-400'}`}>{result.msg}</span>
