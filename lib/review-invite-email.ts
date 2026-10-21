@@ -73,11 +73,11 @@ export function buildReviewInviteEmailHtml(
         </td></tr>
       </table>
 
-      <p style="font-size:13px;color:#64748B;line-height:1.6;margin:0 0 8px;">
+      <p style="font-size:13px;color:#64748B;line-height:1.6;margin:0 0 8px;text-align:center;">
         Works for Google, Facebook, and Trustpilot.
       </p>
-      <p style="font-size:13px;color:#94A3B8;line-height:1.6;margin:0;">
-        We do not collect their data.
+      <p style="font-size:13px;font-weight:700;color:#1E293B;line-height:1.6;margin:0;text-align:center;">
+        🔒 We do not collect their data.
       </p>
 
     </td></tr>
