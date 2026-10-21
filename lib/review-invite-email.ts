@@ -77,7 +77,7 @@ export function buildReviewInviteEmailHtml(
         Works for Google, Facebook, and Trustpilot.
       </p>
       <p style="font-size:13px;font-weight:700;color:#1E293B;line-height:1.6;margin:0;text-align:center;">
-        🔒 We do not collect their data.
+        We do not collect their data.
       </p>
 
     </td></tr>
@@ -85,13 +85,15 @@ export function buildReviewInviteEmailHtml(
     <!-- CTA BAND -->
     <tr><td style="background:#EEF2FF;padding:28px 40px;text-align:center;">
       <div style="font-size:14px;color:#4338CA;line-height:1.6;margin-bottom:16px;">
-        Need help getting more from your online presence?<br/>
-        We would love to hear from you.
+        Need help getting more from your online presence?
       </div>
       <a href="mailto:contact@webf5.au?subject=${encodeURIComponent(`${bizName} - quick question`)}"
         style="display:inline-block;background:#4F46E5;color:#FFFFFF;font-weight:700;font-size:13px;padding:12px 28px;border-radius:50px;text-decoration:none;">
         Get in touch →
       </a>
+      <div style="font-size:13px;color:#6366F1;margin-top:12px;">
+        We would love to hear from you.
+      </div>
     </td></tr>
 
     <!-- FOOTER -->
