@@ -17,8 +17,10 @@ function parseNotes(notes: string | null) {
     website:     get('Website'),
     phone:       get('Phone'),
     address:     get('Address'),
-    facebook:    get('Facebook'),
-    gbpUrl:      get('Google Maps'),
+    facebook:      get('Facebook'),
+    gbpUrl:        get('Google Maps'),
+    ownerName:     get('Owner'),
+    secondContact: get('Second contact'),
     reviewCount: reviewMatch ? parseInt(reviewMatch[1]) : null,
     rating:      ratingMatch ? parseFloat(ratingMatch[1]) : null,
     description: descMatch || null,
@@ -226,7 +228,10 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   const [activeDeal, setActiveDeal] = useState<string | null>(null)
   const [activeStage, setActiveStage] = useState(1)
   const [editingAccount, setEditingAccount] = useState(false)
-  const [accountForm, setAccountForm] = useState({ name: '', tier: 'B', triggerText: '', triggerDate: '', notes: '' })
+  const [accountForm, setAccountForm] = useState({
+    name: '', tier: 'B', triggerText: '', triggerDate: '',
+    ownerName: '', secondContact: '', website: '', phone: '', address: '', email: '', facebook: '', description: '',
+  })
   const [showNewContact, setShowNewContact] = useState(false)
   const [contactForm, setContactForm] = useState({ name: '', title: '', linkedIn: '', role: 'champion', notes: '' })
   const [showNewDeal, setShowNewDeal] = useState(false)
@@ -244,7 +249,22 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
     const accs: Account[] = await accRes.json()
     const acc = accs.find(a => a.id === id) ?? null
     setAccount(acc)
-    if (acc) setAccountForm({ name: acc.name, tier: acc.tier, triggerText: acc.triggerText ?? '', triggerDate: acc.triggerDate ?? '', notes: acc.notes ?? '' })
+    if (acc) {
+      const np = parseNotes(acc.notes)
+      const ownerMatch  = acc.notes?.match(/^Owner:\s*(.+)/im)?.[1]?.trim() ?? ''
+      const secondMatch = acc.notes?.match(/^Second contact:\s*(.+)/im)?.[1]?.trim() ?? ''
+      setAccountForm({
+        name: acc.name, tier: acc.tier, triggerText: acc.triggerText ?? '', triggerDate: acc.triggerDate ?? '',
+        ownerName:     ownerMatch,
+        secondContact: secondMatch,
+        website:       np.website,
+        phone:         np.phone,
+        address:       np.address,
+        email:         np.email,
+        facebook:      np.facebook,
+        description:   np.description ?? '',
+      })
+    }
     setContacts(await conRes.json())
     const d: Deal[] = await dealRes.json()
     setDeals(d)
@@ -300,10 +320,26 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   async function saveAccount(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
+    // Rebuild structured notes string
+    const noteParts: string[] = []
+    if (accountForm.description)   noteParts.push(accountForm.description.trim())
+    if (accountForm.address)       noteParts.push(`Address: ${accountForm.address.trim()}`)
+    if (accountForm.phone)         noteParts.push(`Phone: ${accountForm.phone.trim()}`)
+    if (accountForm.website)       noteParts.push(`Website: ${accountForm.website.trim()}`)
+    if (accountForm.email)         noteParts.push(`Email: ${accountForm.email.trim()}`)
+    if (accountForm.facebook)      noteParts.push(`Facebook: ${accountForm.facebook.trim()}`)
+    if (accountForm.ownerName)     noteParts.push(`Owner: ${accountForm.ownerName.trim()}`)
+    if (accountForm.secondContact) noteParts.push(`Second contact: ${accountForm.secondContact.trim()}`)
+    // Preserve rating / Google Maps lines from existing notes (not editable here)
+    const ratingLine = account?.notes?.match(/^Rating:.+$/im)?.[0] ?? ''
+    const mapsLine   = account?.notes?.match(/^Google Maps:.+$/im)?.[0] ?? ''
+    if (ratingLine) noteParts.push(ratingLine)
+    if (mapsLine)   noteParts.push(mapsLine)
+    const notes = noteParts.join('\n') || null
     await fetch(`/api/admin/crm/accounts/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(accountForm),
+      body: JSON.stringify({ ...accountForm, notes }),
     })
     setEditingAccount(false)
     setSaving(false)
@@ -421,10 +457,54 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
             <input type="date" value={accountForm.triggerDate} onChange={e => setAccountForm(f => ({ ...f, triggerDate: e.target.value }))}
               className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
           </div>
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">Notes</label>
-            <textarea value={accountForm.notes} onChange={e => setAccountForm(f => ({ ...f, notes: e.target.value }))} rows={3}
-              className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 resize-none" />
+          <div className="border-t border-white/10 pt-4 space-y-3">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Business info</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Business owner</label>
+                <input value={accountForm.ownerName} onChange={e => setAccountForm(f => ({ ...f, ownerName: e.target.value }))} placeholder="e.g. Jane Smith"
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Second point of contact</label>
+                <input value={accountForm.secondContact} onChange={e => setAccountForm(f => ({ ...f, secondContact: e.target.value }))} placeholder="e.g. John Smith"
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Website</label>
+                <input value={accountForm.website} onChange={e => setAccountForm(f => ({ ...f, website: e.target.value }))} placeholder="https://example.com.au"
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Phone</label>
+                <input value={accountForm.phone} onChange={e => setAccountForm(f => ({ ...f, phone: e.target.value }))} placeholder="+61 3 1234 5678"
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Address</label>
+              <input value={accountForm.address} onChange={e => setAccountForm(f => ({ ...f, address: e.target.value }))} placeholder="123 Main St, Bendigo VIC 3550"
+                className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Email</label>
+                <input value={accountForm.email} onChange={e => setAccountForm(f => ({ ...f, email: e.target.value }))} placeholder="hello@example.com.au" type="email"
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Facebook</label>
+                <input value={accountForm.facebook} onChange={e => setAccountForm(f => ({ ...f, facebook: e.target.value }))} placeholder="https://facebook.com/..."
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">About this business</label>
+              <textarea value={accountForm.description} onChange={e => setAccountForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder="Short description of the business…"
+                className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 resize-none" />
+            </div>
           </div>
           <div className="flex gap-2">
             <button type="submit" disabled={saving} className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50">
@@ -452,6 +532,23 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
                 const np = parseNotes(account.notes)
                 return (
                   <div className="mt-3 space-y-3">
+                    {/* Owner / second contact */}
+                    {(np.ownerName || np.secondContact) && (
+                      <div className="grid sm:grid-cols-2 gap-2 text-xs">
+                        {np.ownerName && (
+                          <div>
+                            <div className="text-slate-500 mb-0.5">Business owner</div>
+                            <div className="text-slate-200">{np.ownerName}</div>
+                          </div>
+                        )}
+                        {np.secondContact && (
+                          <div>
+                            <div className="text-slate-500 mb-0.5">Second contact</div>
+                            <div className="text-slate-200">{np.secondContact}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {/* Data grid */}
                     <div className="grid sm:grid-cols-2 gap-2 text-xs">
                       {np.website && (
@@ -507,14 +604,25 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
                         <div className="text-xs text-slate-300 leading-relaxed bg-white/5 border border-white/10 rounded-lg px-3 py-2">{np.description}</div>
                       </div>
                     )}
-                    {/* LinkedIn search */}
-                    <a
-                      href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(account.name)}`}
-                      target="_blank" rel="noreferrer"
-                      className="inline-block text-xs text-sky-400 hover:text-sky-300 transition-colors"
-                    >
-                      Search LinkedIn for contacts at {account.name} →
-                    </a>
+                    {/* Search links */}
+                    <div className="flex flex-col gap-1.5">
+                      <a
+                        href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(account.name)}`}
+                        target="_blank" rel="noreferrer"
+                        className="inline-block text-xs text-sky-400 hover:text-sky-300 transition-colors"
+                      >
+                        Search LinkedIn for contacts at {account.name} →
+                      </a>
+                      {!np.ownerName && (
+                        <a
+                          href={`https://www.google.com/search?q=${encodeURIComponent(`"${account.name}" owner OR "business owner" reviews`)}`}
+                          target="_blank" rel="noreferrer"
+                          className="inline-block text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                        >
+                          Search Google reviews for owner name →
+                        </a>
+                      )}
+                    </div>
                   </div>
                 )
               })()}
