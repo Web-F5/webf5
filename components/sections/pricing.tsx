@@ -7,47 +7,47 @@ import { HostingPricing } from '@/components/sections/HostingPricing'
 const plans = [
   {
     name: 'Starter',
-    price: '$39',
+    price: '$2,500',
     tagline: 'A professional, mobile-friendly website to get your business found online — built lean and fast, priced to compete with DIY builders, minus the DIY.',
     features: [
       'Professionally designed, streamlined build tailored to your business',
+      'Up to 6 pages',
       'Mobile-first and fast-loading',
       'Contact form and click-to-call',
       'Google Business Profile setup',
       'Basic on-page SEO',
-      'Domain, hosting and SSL included',
     ],
     footnote: null,
     featured: false,
   },
   {
     name: 'Professional',
-    price: '$115',
+    price: '$6,500',
     tagline: 'A custom-built website designed to generate real enquiries and rank locally — with the content, blog and SEO depth to back it up, or a full Shopify store if you\'re ready to sell online.',
     features: [
       'Custom design — no templates',
+      'Up to 15 pages',
       'Mobile-first and fast-loading',
-      'Blog and content sections built for local SEO, or a full Shopify store with cart and checkout',
-      'Contact form and click-to-call',
+      'Blog and content sections built for local SEO',
+      'Full Shopify store with cart and checkout',
       'Google Business Profile setup',
-      'Domain, hosting and SSL included',
     ],
     footnote: 'Shopify stores require a separate Shopify subscription, billed directly by Shopify — from around $56/month.',
     featured: true,
   },
   {
-    name: 'Shopify Hydrogen',
-    price: '$282',
-    tagline: 'A fully custom, headless Shopify frontend for larger and higher-volume stores — built for speed, flexibility, and a storefront that looks nothing like a theme.',
+    name: 'Hydrogen / SaaS',
+    price: '$15,000',
+    tagline: 'A fully custom headless Shopify storefront or bespoke web application — built for scale, speed, and a product that looks nothing like an off-the-shelf theme.',
     features: [
-      'Custom React/Hydrogen frontend',
-      'Shopify Storefront API integration',
-      'Built for high-volume, scaling stores',
+      'Custom React / Hydrogen frontend',
+      'Shopify Storefront API or custom backend',
+      'Built for high-volume, scaling products',
       'PageSpeed 95+ performance target',
       'No theme limitations or app conflicts',
-      'Purpose-built product and collection pages',
+      'Scoped and quoted per project',
     ],
-    footnote: 'Requires its own Shopify subscription and payment processing, billed directly by Shopify.',
+    footnote: 'Hydrogen stores require a Shopify subscription billed directly by Shopify. SaaS projects are scoped individually.',
     featured: false,
   },
 ]
@@ -133,7 +133,7 @@ export function PricingSection() {
                 <span className="text-xs text-foreground/50 uppercase tracking-wider">From</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
                   <span className="text-3xl font-bold">{plan.price}</span>
-                  <span className="text-foreground/50 text-sm">/month</span>
+                  <span className="text-foreground/50 text-sm">one-off</span>
                 </div>
               </div>
 
@@ -168,17 +168,6 @@ export function PricingSection() {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Global term disclosure */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center text-xs text-foreground/40 mt-8 max-w-2xl mx-auto leading-relaxed"
-        >
-          Prices shown are based on a 60-month payment term. Shorter terms (12–48 months) and an outright payment option are also available — final pricing and term options are confirmed in your quote.
-        </motion.p>
 
         {/* Bottom note */}
         <motion.p
