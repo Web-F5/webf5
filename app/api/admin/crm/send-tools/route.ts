@@ -4,6 +4,7 @@ import { buildChecklistEmailHtml } from '@/lib/checklist-email'
 import { renderChecklistPdf } from '@/lib/checklist-pdf'
 import { buildAuditEmailHtml } from '@/lib/audit-email'
 import { generateAuditPdf } from '@/lib/audit-pdf'
+import { buildReviewInviteEmailHtml } from '@/lib/review-invite-email'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM   = 'contact@webf5.au'
@@ -112,7 +113,7 @@ function gradeFromScore(s: number) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { type, name, businessName, email, url, preview } = await req.json()
+    const { type, name, businessName, email, url, preview, reviewCount } = await req.json()
 
     if (!type || !name?.trim() || !email?.trim()) {
       return NextResponse.json({ error: 'type, name and email required' }, { status: 400 })
@@ -220,6 +221,20 @@ export async function POST(req: NextRequest) {
       })
 
       return NextResponse.json({ success: true, type: 'audit', grade, overallScore })
+    }
+
+    // ── Review invite send / preview ────────────────────────────────────────
+    if (type === 'review') {
+      const emailHtml = buildReviewInviteEmailHtml(nameClean, bizClean, reviewCount ?? null)
+      if (preview) return NextResponse.json({ html: emailHtml })
+      await resend.emails.send({
+        from:    FROM,
+        to:      email.trim(),
+        replyTo: 'contact@webf5.au',
+        subject: `A free tool for ${bizClean} — Web F5`,
+        html:    emailHtml,
+      })
+      return NextResponse.json({ success: true, type: 'review' })
     }
 
     return NextResponse.json({ error: 'Unknown type' }, { status: 400 })

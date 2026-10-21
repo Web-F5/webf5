@@ -6,9 +6,21 @@ import { TRIPLE, STAGE_NAMES, STAGE_COLORS, TIER_COLORS, ROLE_LABELS } from '@/l
 import type { Block, Task } from '@/lib/triple-seed'
 
 // ── Send Tools panel ──────────────────────────────────────────────────────────
-function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
+function parseNotes(notes: string | null) {
+  const get = (key: string) => notes?.match(new RegExp(`${key}:\\s*(.+)`, 'i'))?.[1]?.trim() ?? ''
+  const reviewMatch = notes?.match(/Rating:[^(]+\((\d+)\s+reviews?\)/i)
+  return {
+    email:       get('Email'),
+    website:     get('Website'),
+    reviewCount: reviewMatch ? parseInt(reviewMatch[1]) : null,
+  }
+}
+
+function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: Account }) {
+  const parsed = parseNotes(account.notes)
+
   const [open, setOpen]           = useState(false)
-  const [type, setType]           = useState<'checklist' | 'audit'>('checklist')
+  const [type, setType]           = useState<'checklist' | 'audit' | 'review'>('checklist')
   const [name, setName]           = useState('')
   const [email, setEmail]         = useState('')
   const [bizName, setBizName]     = useState('')
@@ -17,16 +29,20 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
   const [previewing, setPreviewing] = useState(false)
   const [result, setResult]       = useState<{ ok: boolean; msg: string } | null>(null)
 
-  // Pre-fill from contacts if one exists
+  // Pre-fill from account + contacts
   const firstContact = contacts[0]
   useEffect(() => {
     if (firstContact && !name) setName(firstContact.name)
   }, [firstContact, name])
+  useEffect(() => { if (parsed.email  && !email)   setEmail(parsed.email)     }, [parsed.email,   email])
+  useEffect(() => { if (parsed.website && !url)    setUrl(parsed.website)     }, [parsed.website,  url])
+  useEffect(() => { if (account.name   && !bizName) setBizName(account.name)  }, [account.name, bizName])
 
   function buildBody(extra?: Record<string, unknown>) {
     const body: Record<string, unknown> = { type, name, email }
     if (bizName) body.businessName = bizName
     if (type === 'audit') body.url = url
+    if (type === 'review' && parsed.reviewCount != null) body.reviewCount = parsed.reviewCount
     return { ...body, ...extra }
   }
 
@@ -42,7 +58,7 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
       })
       const data = await res.json()
       if (res.ok) {
-        setResult({ ok: true, msg: type === 'audit' ? `Audit sent! Grade ${data.grade} (${data.overallScore}%)` : 'Checklist sent!' })
+        setResult({ ok: true, msg: type === 'audit' ? `Audit sent! Grade ${data.grade} (${data.overallScore}%)` : type === 'review' ? 'Review invite sent!' : 'Checklist sent!' })
       } else {
         setResult({ ok: false, msg: data.error ?? 'Something went wrong.' })
       }
@@ -60,6 +76,10 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
     }
     if (type === 'audit' && !url.trim()) {
       setResult({ ok: false, msg: 'Fill in the website URL first.' })
+      return
+    }
+    if (type === 'review' && !bizName.trim()) {
+      setResult({ ok: false, msg: 'Fill in the business name first.' })
       return
     }
     setPreviewing(true)
@@ -99,13 +119,17 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
       {open && (
         <form onSubmit={send} className="mt-4 space-y-3">
           {/* Type selector */}
-          <div className="flex gap-2">
-            {(['checklist', 'audit'] as const).map(t => (
+          <div className="flex gap-2 flex-wrap">
+            {([
+              ['checklist', '12-Point Checklist'],
+              ['audit',     'Website Audit'],
+              ['review',    'Review Request Sender'],
+            ] as const).map(([t, label]) => (
               <button key={t} type="button" onClick={() => setType(t)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
                   type === t ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-white/10 text-slate-400 hover:text-white'
                 }`}>
-                {t === 'checklist' ? '12-Point Checklist' : 'Website Audit'}
+                {label}
               </button>
             ))}
           </div>
@@ -146,11 +170,11 @@ function SendToolsPanel({ contacts }: { contacts: Contact[] }) {
           <div className="flex items-center gap-3">
             <button type="submit" disabled={sending || previewing}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors">
-              {sending ? (type === 'audit' ? 'Running audit…' : 'Sending…') : `Send ${type === 'audit' ? 'audit' : 'checklist'}`}
+              {sending ? (type === 'audit' ? 'Running audit…' : 'Sending…') : `Send ${type === 'audit' ? 'audit' : type === 'review' ? 'review invite' : 'checklist'}`}
             </button>
             <button type="button" onClick={preview} disabled={sending || previewing}
               className="px-4 py-2 bg-white/5 text-slate-300 text-sm font-semibold rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-50 transition-colors">
-              {previewing ? (type === 'audit' ? 'Loading…' : 'Loading…') : 'Preview email'}
+              {previewing ? 'Loading…' : 'Preview email'}
             </button>
             {result && (
               <span className={`text-xs ${result.ok ? 'text-green-400' : 'text-red-400'}`}>{result.msg}</span>
@@ -500,7 +524,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Send Tools */}
-      <SendToolsPanel contacts={contacts} />
+      <SendToolsPanel contacts={contacts} account={account} />
 
       {/* New deal form */}
       {showNewDeal && (
