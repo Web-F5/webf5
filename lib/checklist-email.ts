@@ -120,13 +120,13 @@ export function buildChecklistEmailHtml(name: string, sig?: EmailSignature | nul
 
       <!-- Headline -->
       <div style="font-size:28px;font-weight:800;color:#FFFFFF;margin-bottom:8px;">Your 12-Point Website Checklist</div>
-      <div style="font-size:14px;color:#94A3B8;line-height:1.6;">
-        Hi ${name}, here's the checklist for Australian small business websites. Print it out, tick off what you have, and see what needs attention.
-      </div>
     </td></tr>
 
     <!-- ═══ CHECKLIST ═══ -->
     <tr><td style="background:#FFFFFF;padding:0;">
+      <div style="padding:28px 40px 16px;font-size:15px;color:#1E293B;line-height:1.7;">
+        Hi ${name}, here's the checklist for Australian small business websites. Print it out, tick off what you have, and see what needs attention.
+      </div>
       <table width="100%" cellpadding="0" cellspacing="0">
         ${rows}
       </table>
@@ -141,7 +141,7 @@ export function buildChecklistEmailHtml(name: string, sig?: EmailSignature | nul
         Not sure how your site stacks up?
       </div>
       <div style="font-size:14px;color:#4338CA;line-height:1.6;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto;">
-        Get a free automated audit of your website in seconds. Speed, SEO, usability, and more — delivered as a full PDF report.
+        Get a free automated audit of your website in seconds. Speed, SEO, usability, and more;<br/>delivered as a full PDF report.
       </div>
       <a href="https://webf5.com.au/audit" style="display:inline-block;background:#4F46E5;color:#FFFFFF;font-weight:700;font-size:14px;padding:14px 32px;border-radius:50px;text-decoration:none;">
         Get a free website audit →
