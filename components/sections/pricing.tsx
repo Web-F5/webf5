@@ -12,7 +12,7 @@ const plans = [
     tagline: 'A professional, mobile-friendly website to get your business found online. Built lean and fast, priced to compete with DIY builders, minus the DIY.',
     features: [
       'Professionally designed, streamlined build tailored to your business',
-      'Up to 6 pages',
+      'Up to 8 pages',
       'Mobile-first and fast-loading',
       'Contact form and click-to-call',
       'Google Business Profile setup',
@@ -27,11 +27,12 @@ const plans = [
     tagline: 'A custom-built website designed to generate real enquiries and rank locally, with the content, blog and SEO depth to back it up, or a full Shopify store if you\'re ready to sell online.',
     features: [
       'Custom design, no templates',
-      'Up to 15 pages',
+      'Up to 20 pages',
       'Mobile-first and fast-loading',
       'Blog and content sections built for local SEO',
-      'Full Shopify store with cart and checkout',
       'Google Business Profile setup',
+      '---',
+      'Full Shopify store with cart and checkout',
     ],
     footnote: 'Shopify stores require a separate Shopify subscription, billed directly by Shopify, from around $56/month.',
     featured: true,
@@ -41,11 +42,14 @@ const plans = [
     price: '$15,000',
     tagline: 'A fully custom headless Shopify storefront or bespoke web application, built for scale, speed, and a product that looks nothing like an off-the-shelf theme.',
     features: [
-      'Custom React / Hydrogen frontend',
-      'Shopify Storefront API or custom backend',
+      'Custom React / Hydrogen storefront',
+      'Shopify Storefront API integration',
       'Built for high-volume, scaling products',
       'PageSpeed 95+ performance target',
       'No theme limitations or app conflicts',
+      '---',
+      'Bespoke web application or SaaS build',
+      'Custom backend and database architecture',
       'Scoped and quoted per project',
     ],
     footnote: 'Hydrogen stores require a Shopify subscription billed directly by Shopify. SaaS projects are scoped individually.',
@@ -150,15 +154,23 @@ export function PricingSection() {
               </a>
 
               <div className="space-y-3 flex-grow">
-                {plan.features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <Check
-                      size={16}
-                      className={`flex-shrink-0 mt-0.5 transition-colors duration-300 ${plan.featured ? 'text-accent' : 'text-foreground/40 group-hover:text-accent'}`}
-                    />
-                    <span className="text-foreground/75 text-sm leading-snug">{feature}</span>
-                  </div>
-                ))}
+                {plan.features.map((feature) =>
+                  feature === '---' ? (
+                    <div key={feature} className="flex items-center gap-2 py-0.5">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-xs font-semibold text-foreground/35 uppercase tracking-wider">or</span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                  ) : (
+                    <div key={feature} className="flex items-start gap-3">
+                      <Check
+                        size={16}
+                        className={`flex-shrink-0 mt-0.5 transition-colors duration-300 ${plan.featured ? 'text-accent' : 'text-foreground/40 group-hover:text-accent'}`}
+                      />
+                      <span className="text-foreground/75 text-sm leading-snug">{feature}</span>
+                    </div>
+                  )
+                )}
               </div>
 
               {plan.footnote && (
