@@ -223,6 +223,12 @@ export async function GET(req: NextRequest) {
     maxResultCount: 20,
     languageCode:   'en',
     regionCode:     'AU',
+    locationBias: {
+      circle: {
+        center:  { latitude: -25.2744, longitude: 133.7751 },
+        radius:  2500000,
+      },
+    },
   }
   if (pagetoken) searchPayload.pageToken = pagetoken
 
