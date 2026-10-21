@@ -419,11 +419,6 @@ webf5.com.au`)
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Back link */}
-        <div>
-          <Link href="/admin/outreach" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-            ← Sequences reference
-          </Link>
-        </div>
 
         {/* Header */}
         <div className="flex items-center justify-between gap-4">

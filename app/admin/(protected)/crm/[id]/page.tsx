@@ -106,13 +106,9 @@ function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: A
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Send Tools</p>
         <div className="flex items-center gap-3">
-          <a href="https://webf5.com.au/resources/review-sender" target="_blank" rel="noopener noreferrer"
-            className="text-xs text-slate-400 hover:text-white border border-white/10 hover:border-white/20 px-2.5 py-1 rounded-lg transition-colors">
-            Review Request Sender ↗
-          </a>
           <button onClick={() => setOpen(o => !o)}
             className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-            {open ? 'Close' : 'Send checklist or audit →'}
+            {open ? 'Close' : 'Send tool →'}
           </button>
         </div>
       </div>
