@@ -43,8 +43,10 @@ function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: A
   // Pre-fill from account + contacts
   const firstContact = contacts[0]
   useEffect(() => {
-    if (firstContact && !name) setName(firstContact.name)
-  }, [firstContact, name])
+    // Prefer business owner from notes, fall back to first CRM contact
+    const preferred = parsed.ownerName || firstContact?.name || ''
+    if (preferred && !name) setName(preferred)
+  }, [parsed.ownerName, firstContact, name])
   useEffect(() => { if (parsed.email  && !email)   setEmail(parsed.email)     }, [parsed.email,   email])
   useEffect(() => { if (parsed.website && !url)    setUrl(parsed.website)     }, [parsed.website,  url])
   useEffect(() => { if (account.name   && !bizName) setBizName(account.name)  }, [account.name, bizName])
