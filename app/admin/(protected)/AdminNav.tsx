@@ -12,6 +12,7 @@ const tabs = [
   { label: 'CRM', href: '/admin/crm' },
   { label: 'Calendar', href: '/admin/calendar' },
   { label: 'Usage', href: '/admin/usage' },
+  { label: 'Settings', href: '/admin/settings' },
 ]
 
 export function AdminNav() {

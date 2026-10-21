@@ -188,6 +188,12 @@ export const outreachTouches = pgTable('outreach_touches', {
   createdAt:    timestamp('created_at').notNull().defaultNow(),
 })
 
+export const appSettings = pgTable('app_settings', {
+  key:       text('key').primaryKey(),
+  value:     text('value').notNull(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 export const courseEntitlements = pgTable('course_entitlements', {
   id:              uuid('id').primaryKey().defaultRandom(),
   userId:          text('user_id').notNull(),

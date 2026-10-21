@@ -1,12 +1,16 @@
+import { buildEmailSignatureHtml, type EmailSignature } from '@/lib/utils'
+
 export function buildReviewInviteEmailHtml(
   name: string,
   bizName: string,
   reviewCount: number | null,
+  sig?: EmailSignature | null,
 ): string {
   const reviewLine = reviewCount != null && reviewCount > 0
     ? `You have <strong>${reviewCount} reviews</strong>, great start!`
     : `Building up your review count is one of the fastest ways to stand out locally.`
 
+  const signatureHtml = buildEmailSignatureHtml(sig)
   const toolUrl = 'https://webf5.com.au/resources/review-sender'
   const date    = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
 
@@ -79,6 +83,8 @@ export function buildReviewInviteEmailHtml(
       <p style="font-size:13px;font-weight:700;color:#1E293B;line-height:1.6;margin:0;text-align:center;">
         We do not collect their data.
       </p>
+
+      ${signatureHtml}
 
     </td></tr>
 

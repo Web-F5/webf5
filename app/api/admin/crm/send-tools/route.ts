@@ -5,9 +5,19 @@ import { renderChecklistPdf } from '@/lib/checklist-pdf'
 import { buildAuditEmailHtml } from '@/lib/audit-email'
 import { generateAuditPdf } from '@/lib/audit-pdf'
 import { buildReviewInviteEmailHtml } from '@/lib/review-invite-email'
+import { db, appSettings } from '@/lib/db'
+import type { EmailSignature } from '@/lib/utils'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM   = 'contact@webf5.au'
+
+async function getEmailSignature(): Promise<EmailSignature | null> {
+  const rows = await db.select().from(appSettings)
+  const map: Record<string, string> = {}
+  for (const r of rows) map[r.key] = r.value
+  if (!map.sender_name && !map.sender_title && !map.email_signature) return null
+  return { senderName: map.sender_name, senderTitle: map.sender_title, extraLines: map.email_signature }
+}
 
 // ── Inline audit helpers (same as public audit route) ─────────────────────
 
@@ -120,13 +130,15 @@ export async function POST(req: NextRequest) {
     }
 
     const nameClean = name.trim()
+    const firstName = nameClean.split(/\s+/)[0]
     const bizClean  = businessName?.trim() || nameClean
+    const sig       = await getEmailSignature()
 
     // ── Checklist send / preview ────────────────────────────────────────────
     if (type === 'checklist') {
-      const emailHtml = buildChecklistEmailHtml(nameClean)
+      const emailHtml = buildChecklistEmailHtml(firstName, sig)
       if (preview) return NextResponse.json({ html: emailHtml })
-      const pdfBuffer = await renderChecklistPdf(nameClean)
+      const pdfBuffer = await renderChecklistPdf(firstName)
       await resend.emails.send({
         from:    FROM,
         to:      email.trim(),
@@ -207,10 +219,10 @@ export async function POST(req: NextRequest) {
         ssl: checks.ssl, hasSitemap, hasRobotsTxt, hasLlmsTxt, content, url: normUrl,
       }
 
-      const emailHtml = buildAuditEmailHtml(nameClean, bizClean, report)
+      const emailHtml = buildAuditEmailHtml(firstName, bizClean, report, sig)
       if (preview) return NextResponse.json({ html: emailHtml, grade, overallScore })
 
-      const pdfBuffer = await generateAuditPdf(report, nameClean, bizClean)
+      const pdfBuffer = await generateAuditPdf(report, firstName, bizClean)
       await resend.emails.send({
         from:    FROM,
         to:      email.trim(),
@@ -225,7 +237,7 @@ export async function POST(req: NextRequest) {
 
     // ── Review invite send / preview ────────────────────────────────────────
     if (type === 'review') {
-      const emailHtml = buildReviewInviteEmailHtml(nameClean, bizClean, reviewCount ?? null)
+      const emailHtml = buildReviewInviteEmailHtml(firstName, bizClean, reviewCount ?? null, sig)
       if (preview) return NextResponse.json({ html: emailHtml })
       await resend.emails.send({
         from:    FROM,

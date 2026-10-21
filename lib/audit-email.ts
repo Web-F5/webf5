@@ -1,4 +1,5 @@
 import type { AuditReportData } from './audit-pdf'
+import { buildEmailSignatureHtml, type EmailSignature } from '@/lib/utils'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -85,7 +86,9 @@ export function buildAuditEmailHtml(
   name: string,
   biz: string,
   report: AuditReportData,
+  sig?: EmailSignature | null,
 ): string {
+  const signatureHtml = buildEmailSignatureHtml(sig)
   const { lcp, ssl, hasSitemap, content, grade, overallScore, subScores } = report
   const gc = gradeColor(grade)
   const allImagesAlt  = (content.imagesTotal ?? 0) === 0 || (content.imagesMissingAlt ?? 0) === 0
@@ -282,6 +285,9 @@ export function buildAuditEmailHtml(
 
       </table>
     </td></tr>
+
+    ${signatureHtml ? `<!-- ═══ SIGN-OFF ═══ -->
+    <tr><td style="background:#FFFFFF;padding:0 40px 28px;">${signatureHtml}</td></tr>` : ''}
 
     <!-- ═══ CTA ═══ -->
     <tr><td style="background:#EEF2FF;padding:36px 40px;text-align:center;">

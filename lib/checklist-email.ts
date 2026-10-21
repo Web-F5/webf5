@@ -1,3 +1,5 @@
+import { buildEmailSignatureHtml, type EmailSignature } from '@/lib/utils'
+
 // ── Checklist items ────────────────────────────────────────────────────────
 
 interface CheckItem {
@@ -74,12 +76,14 @@ function checkRow(item: CheckItem): string {
 
 // ── Main builder ───────────────────────────────────────────────────────────
 
-export function buildChecklistEmailHtml(name: string): string {
+export function buildChecklistEmailHtml(name: string, sig?: EmailSignature | null): string {
   const date = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
 
   const rows = SECTIONS.map(section =>
     sectionHeader(section.title) + section.items.map(checkRow).join('')
   ).join('')
+
+  const signatureHtml = buildEmailSignatureHtml(sig)
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -127,6 +131,9 @@ export function buildChecklistEmailHtml(name: string): string {
         ${rows}
       </table>
     </td></tr>
+
+    ${signatureHtml ? `<!-- ═══ SIGN-OFF ═══ -->
+    <tr><td style="background:#FFFFFF;padding:0 40px 28px;">${signatureHtml}</td></tr>` : ''}
 
     <!-- ═══ CTA ═══ -->
     <tr><td style="background:#EEF2FF;padding:36px 40px;text-align:center;">
