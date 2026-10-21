@@ -79,6 +79,7 @@ export function SeoPricing() {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
+      id="seo-packages"
       className="mt-24"
     >
       {/* Header */}

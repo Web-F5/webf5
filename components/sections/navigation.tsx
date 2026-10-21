@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronDown } from 'lucide-react'
@@ -12,6 +12,12 @@ const BriefAuthButton = dynamic(
   { ssr: false }
 )
 
+const PRICING_ITEMS = [
+  { label: 'Website',              href: '#pricing',       desc: 'Starter, Professional, Hydrogen / SaaS' },
+  { label: 'SEO Packages',         href: '#seo-packages',  desc: 'Local, Growth and Authority retainers' },
+  { label: 'Hosting, Domains & SSL', href: '#hosting-domains', desc: 'Everything your site needs to go live' },
+]
+
 const RESOURCES = [
   { label: 'Free Website Audit', href: '/audit', desc: 'Instant report — speed, SEO, contact & more' },
   { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs' },
@@ -21,6 +27,8 @@ const RESOURCES = [
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
+  const [pricingOpen, setPricingOpen] = useState(false)
+  const pricingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
   const isHome = pathname === '/'
   const isBrief = pathname === '/brief'
@@ -31,7 +39,6 @@ export function Navigation() {
     { label: 'Solutions', href: anchor('#solutions') },
     { label: 'Work', href: '/work' },
     { label: 'Process', href: anchor('#process') },
-    { label: 'Pricing', href: anchor('#pricing') },
     { label: 'FAQ', href: anchor('#faq') },
   ]
 
@@ -69,11 +76,49 @@ export function Navigation() {
             </motion.a>
           ))}
 
-          {/* Resources dropdown */}
+          {/* Pricing dropdown */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + navItems.length * 0.05 }}
+            className="relative"
+            onMouseEnter={() => { if (pricingTimeout.current) clearTimeout(pricingTimeout.current); setPricingOpen(true) }}
+            onMouseLeave={() => { pricingTimeout.current = setTimeout(() => setPricingOpen(false), 120) }}
+          >
+            <button className="flex items-center gap-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">
+              Pricing
+              <ChevronDown size={14} className={`transition-transform duration-200 ${pricingOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+              {pricingOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full left-0 mt-2 w-64 bg-[#111827] border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                >
+                  {PRICING_ITEMS.map(p => (
+                    <a
+                      key={p.href}
+                      href={isHome ? p.href : `/${p.href}`}
+                      className="flex flex-col gap-0.5 px-4 py-3.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                      onClick={() => setPricingOpen(false)}
+                    >
+                      <span className="text-sm font-semibold text-white">{p.label}</span>
+                      <span className="text-xs text-slate-400">{p.desc}</span>
+                    </a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Resources dropdown */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + (navItems.length + 1) * 0.05 }}
             className="relative"
             onMouseEnter={() => setResourcesOpen(true)}
             onMouseLeave={() => setResourcesOpen(false)}
@@ -164,6 +209,21 @@ export function Navigation() {
                   {item.label}
                 </a>
               ))}
+
+              {/* Pricing section in mobile */}
+              <div className="pt-1 border-t border-border/50">
+                <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider py-2">Pricing</p>
+                {PRICING_ITEMS.map(p => (
+                  <a
+                    key={p.href}
+                    href={isHome ? p.href : `/${p.href}`}
+                    className="block text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {p.label}
+                  </a>
+                ))}
+              </div>
 
               {/* Resources section in mobile */}
               <div className="pt-1 border-t border-border/50">

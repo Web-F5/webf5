@@ -175,6 +175,7 @@ export function HostingPricing() {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
+      id="hosting-domains"
       className="mt-16 rounded-xl border border-border bg-card/30 p-8"
     >
       {/* Section header */}
