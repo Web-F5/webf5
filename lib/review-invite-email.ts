@@ -41,13 +41,14 @@ export function buildReviewInviteEmailHtml(
         Get more reviews.<br/>
         <span style="color:#6366F1;">The easy way.</span>
       </div>
-      <div style="font-size:14px;color:#94A3B8;line-height:1.6;">
-        Hi ${name}, we built a free tool for local businesses.
-      </div>
     </td></tr>
 
     <!-- BODY -->
     <tr><td style="background:#FFFFFF;padding:36px 40px;">
+
+      <p style="font-size:15px;color:#1E293B;line-height:1.7;margin:0 0 12px;">
+        Hi ${name}, we built a free tool for local businesses.
+      </p>
 
       <p style="font-size:15px;color:#1E293B;line-height:1.7;margin:0 0 20px;">
         ${reviewLine}
