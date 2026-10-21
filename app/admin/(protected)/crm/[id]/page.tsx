@@ -7,12 +7,21 @@ import type { Block, Task } from '@/lib/triple-seed'
 
 // ── Send Tools panel ──────────────────────────────────────────────────────────
 function parseNotes(notes: string | null) {
-  const get = (key: string) => notes?.match(new RegExp(`${key}:\\s*(.+)`, 'i'))?.[1]?.trim() ?? ''
+  const get = (key: string) => notes?.match(new RegExp(`^${key}:\\s*(.+)`, 'im'))?.[1]?.trim() ?? ''
   const reviewMatch = notes?.match(/Rating:[^(]+\((\d+)\s+reviews?\)/i)
+  const ratingMatch = notes?.match(/Rating:\s*([\d.]+)\s*⭐/i)
+  // Description is text before the first "Key: value" line
+  const descMatch = notes?.match(/^([\s\S]*?)(?=\n[A-Za-z ]+:|\s*$)/)?.[1]?.trim() ?? ''
   return {
     email:       get('Email'),
     website:     get('Website'),
+    phone:       get('Phone'),
+    address:     get('Address'),
+    facebook:    get('Facebook'),
+    gbpUrl:      get('Google Maps'),
     reviewCount: reviewMatch ? parseInt(reviewMatch[1]) : null,
+    rating:      ratingMatch ? parseFloat(ratingMatch[1]) : null,
+    description: descMatch || null,
   }
 }
 
@@ -439,7 +448,76 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
                   Trigger: {new Date(account.triggerDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               )}
-              {account.notes && <p className="text-xs text-slate-500 mt-1 italic">{account.notes}</p>}
+              {account.notes && (() => {
+                const np = parseNotes(account.notes)
+                return (
+                  <div className="mt-3 space-y-3">
+                    {/* Data grid */}
+                    <div className="grid sm:grid-cols-2 gap-2 text-xs">
+                      {np.website && (
+                        <div>
+                          <div className="text-slate-500 mb-0.5">Website</div>
+                          <a href={np.website} target="_blank" rel="noreferrer" className="text-indigo-300 hover:text-indigo-200 truncate block">{np.website}</a>
+                        </div>
+                      )}
+                      {np.phone && (
+                        <div>
+                          <div className="text-slate-500 mb-0.5">Phone</div>
+                          <a href={`tel:${np.phone}`} className="text-slate-200 hover:text-white">{np.phone}</a>
+                        </div>
+                      )}
+                      {np.address && (
+                        <div className="sm:col-span-2">
+                          <div className="text-slate-500 mb-0.5">Address</div>
+                          <div className="text-slate-200">{np.address}</div>
+                        </div>
+                      )}
+                      {np.email && (
+                        <div>
+                          <div className="text-slate-500 mb-0.5">Email</div>
+                          <a href={`mailto:${np.email}`} className="text-indigo-300 hover:text-indigo-200">{np.email}</a>
+                        </div>
+                      )}
+                      {np.facebook && (
+                        <div>
+                          <div className="text-slate-500 mb-0.5">Facebook</div>
+                          <a href={np.facebook} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 truncate block">{np.facebook}</a>
+                        </div>
+                      )}
+                      {(np.rating != null || np.reviewCount != null) && (
+                        <div>
+                          <div className="text-slate-500 mb-0.5">Reviews</div>
+                          <div className="text-slate-200">
+                            {np.rating != null && <span className="text-amber-400 mr-1">★ {np.rating}</span>}
+                            {np.reviewCount != null && <span>({np.reviewCount} reviews)</span>}
+                          </div>
+                        </div>
+                      )}
+                      {np.gbpUrl && (
+                        <div>
+                          <div className="text-slate-500 mb-0.5">Google Maps</div>
+                          <a href={np.gbpUrl} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-emerald-300">View on Google ↗</a>
+                        </div>
+                      )}
+                    </div>
+                    {/* Description */}
+                    {np.description && (
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">About this business</div>
+                        <div className="text-xs text-slate-300 leading-relaxed bg-white/5 border border-white/10 rounded-lg px-3 py-2">{np.description}</div>
+                      </div>
+                    )}
+                    {/* LinkedIn search */}
+                    <a
+                      href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(account.name)}`}
+                      target="_blank" rel="noreferrer"
+                      className="inline-block text-xs text-sky-400 hover:text-sky-300 transition-colors"
+                    >
+                      Search LinkedIn for contacts at {account.name} →
+                    </a>
+                  </div>
+                )
+              })()}
             </div>
           </div>
           <div className="flex gap-2">
