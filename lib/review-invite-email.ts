@@ -4,8 +4,8 @@ export function buildReviewInviteEmailHtml(
   reviewCount: number | null,
 ): string {
   const reviewLine = reviewCount != null && reviewCount > 0
-    ? `Your business currently has <strong>${reviewCount} reviews</strong> — that's a great start.`
-    : `Building up your review count is one of the fastest ways to stand out from local competitors.`
+    ? `You have <strong>${reviewCount} reviews</strong>, great start!`
+    : `Building up your review count is one of the fastest ways to stand out locally.`
 
   const toolUrl = 'https://webf5.com.au/resources/review-sender'
   const date    = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -42,7 +42,7 @@ export function buildReviewInviteEmailHtml(
         <span style="color:#6366F1;">The easy way.</span>
       </div>
       <div style="font-size:14px;color:#94A3B8;line-height:1.6;">
-        Hi ${name}, we built a free tool for businesses like ${bizName}.
+        Hi ${name}, we built a free tool for local businesses.
       </div>
     </td></tr>
 
@@ -53,32 +53,30 @@ export function buildReviewInviteEmailHtml(
         ${reviewLine}
       </p>
 
-      <p style="font-size:15px;color:#1E293B;line-height:1.7;margin:0 0 20px;">
-        Most businesses find it awkward to ask for reviews — so they don't, and they miss out.
-        We've built a simple, professional Review Request Sender that lets you send a personalised
-        review request to a customer in seconds, with one click.
+      <p style="font-size:15px;color:#1E293B;line-height:1.7;margin:0 0 24px;">
+        Most businesses find it awkward to ask for reviews, so they don't, and miss out.
+        We've built a simple, professional Review Request Sender that sends a personalised
+        review request to multiple clients in less than a minute.
       </p>
 
-      <div style="background:#F8FAFC;border-left:3px solid #6366F1;border-radius:4px;padding:16px 20px;margin:0 0 28px;">
-        <p style="font-size:13px;color:#475569;margin:0;line-height:1.6;">
-          ✉️ &nbsp;Type a customer name, choose Google or Facebook,<br/>
-          add a personal note — and send a ready-made review request link.<br/>
-          <strong style="color:#1E293B;">No login. No setup. Completely free.</strong>
-        </p>
-      </div>
+      <p style="font-size:14px;color:#475569;margin:0 0 28px;line-height:1.6;">
+        <strong style="color:#1E293B;">No login. No setup. Completely free.</strong>
+      </p>
 
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
         <tr><td align="center">
           <a href="${toolUrl}"
             style="display:inline-block;background:#4F46E5;color:#FFFFFF;font-weight:700;font-size:15px;padding:16px 40px;border-radius:50px;text-decoration:none;">
-            Try the Review Request Sender →
+            Try our Review Request Sender →
           </a>
         </td></tr>
       </table>
 
-      <p style="font-size:13px;color:#64748B;line-height:1.6;margin:0;">
-        It works for Google, Facebook, and custom review links — just paste your review URL and you're good to go.
-        Takes less than a minute to send your first one.
+      <p style="font-size:13px;color:#64748B;line-height:1.6;margin:0 0 8px;">
+        Works for Google, Facebook, and Trustpilot.
+      </p>
+      <p style="font-size:13px;color:#94A3B8;line-height:1.6;margin:0;">
+        We do not collect their data.
       </p>
 
     </td></tr>
@@ -86,11 +84,12 @@ export function buildReviewInviteEmailHtml(
     <!-- CTA BAND -->
     <tr><td style="background:#EEF2FF;padding:28px 40px;text-align:center;">
       <div style="font-size:14px;color:#4338CA;line-height:1.6;margin-bottom:16px;">
-        Want help setting up your Google review link or getting more from your online presence?
+        Need help getting more from your online presence?<br/>
+        We would love to hear from you.
       </div>
       <a href="mailto:contact@webf5.au?subject=${encodeURIComponent(`${bizName} - quick question`)}"
         style="display:inline-block;background:#4F46E5;color:#FFFFFF;font-weight:700;font-size:13px;padding:12px 28px;border-radius:50px;text-decoration:none;">
-        Reply and ask Josh →
+        Get in touch →
       </a>
     </td></tr>
 
