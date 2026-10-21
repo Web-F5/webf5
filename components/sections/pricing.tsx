@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { HostingPricing } from '@/components/sections/HostingPricing'
+import { SeoPricing } from '@/components/sections/SeoPricing'
 
 const plans = [
   {
@@ -182,6 +183,9 @@ export function PricingSection() {
 
         {/* Live hosting, domain, SSL and email pricing */}
         <HostingPricing />
+
+        {/* SEO packages */}
+        <SeoPricing />
 
       </div>
     </section>
