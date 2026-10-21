@@ -113,6 +113,14 @@ export function buildReviewInviteEmailHtml(
             </div>
           </td>
         </tr>
+        <tr><td colspan="2" style="padding-top:16px;border-top:1px solid #1E293B;">
+          <div style="font-size:10px;color:#334155;line-height:1.7;text-align:center;">
+            <a href="https://webf5.com.au/privacy" style="color:#475569;text-decoration:underline;">Privacy Policy</a>
+            &nbsp;·&nbsp;
+            <a href="mailto:contact@webf5.au?subject=Unsubscribe" style="color:#475569;text-decoration:underline;">Unsubscribe</a>
+            <br/>You received this email because you requested information from Web F5, or we identified your business as a potential fit for our services.
+          </div>
+        </td></tr>
       </table>
     </td></tr>
 
