@@ -45,6 +45,7 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Formspree'],
     url: 'https://fsmrecycle.com.au',
     image: '/images/FSM-Recycling-and-Demolition.webp',
+    logo: '/images/fsm-logo.webp',
     caseStudy: {
       headline: 'A complete digital setup for FSM Recycling and Demolitions',
       tagline: 'Domain, hosting, email, and a professional website delivered end-to-end for a Central Victorian recycling and demolitions business.',
