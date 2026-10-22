@@ -15,16 +15,16 @@ type ShowcaseEntry = {
 }
 
 const showcase: ShowcaseEntry[] = [
-  { name: 'Chuck E Electrical',                desktop: '/images/Licensed-Electricians- Chuck-E-Electrical.webp',                         url: 'https://chuckelec.com' },
-  { name: 'F.S.M. Recycling',                  desktop: '/images/FSM-Recycling-and-Demolition.webp',                                      url: 'https://fsmrecycle.com.au' },
-  { name: 'Outright Electrical',               desktop: '/images/Outright-Electrical-Heathcote-Victoria.webp',                             url: 'https://outrightelectrical.com.au' },
-  { name: 'Valley Feeds',                      desktop: '/images/Valley-Feeds-Katandra-West-Victoria.webp',                                url: 'https://valleyfeeds.com.au' },
-  { name: 'Horse Hay',                         desktop: '/images/Horse-Hay-Invergordan-Victoria.webp',                                     url: 'https://horsehay.com.au' },
-  { name: 'Australian Trenching',              desktop: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',              url: 'https://austrenching.com.au' },
-  { name: 'Appti',                             desktop: '/images/Appti.webp',                                                              url: 'https://appti.net' },
-  { name: 'Speechless Electrical',             desktop: '/images/Speechless-Electrical-Licensed-Electrician-Seymour.webp',                 url: 'https://speechlesselec.com' },
-  { name: "Let's Get Trowled",                 desktop: '/images/Lets-Get-Trowled-Plastering-Services-Seymour.webp',                       url: 'https://letsgettrowled.com.au' },
-  { name: 'LKF Contracting',                   desktop: '/images/LKF-Contracting-Agricultural-and- -Civil-Contractors-Invergordon.webp',  url: 'https://lkfcontracting.com.au' },
+  { name: 'Chuck E Electrical',   desktop: '/images/Licensed-Electricians- Chuck-E-Electrical.webp',                        mobile: '/images/mobile-chuck-e-electrical.webp',   url: 'https://chuckelec.com' },
+  { name: 'F.S.M. Recycling',     desktop: '/images/FSM-Recycling-and-Demolition.webp',                                     mobile: '/images/mobile-fsm-recycling.webp',        url: 'https://fsmrecycle.com.au' },
+  { name: 'Outright Electrical',  desktop: '/images/Outright-Electrical-Heathcote-Victoria.webp',                            mobile: '/images/mobile-outright-electrical.webp',  url: 'https://outrightelectrical.com.au' },
+  { name: 'Valley Feeds',         desktop: '/images/Valley-Feeds-Katandra-West-Victoria.webp',                               mobile: '/images/mobile-valley-feeds.webp',         url: 'https://valleyfeeds.com.au' },
+  { name: 'Horse Hay',            desktop: '/images/Horse-Hay-Invergordan-Victoria.webp',                                    mobile: '/images/mobile-horse-hay.webp',            url: 'https://horsehay.com.au' },
+  { name: 'Australian Trenching', desktop: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',             mobile: '/images/mobile-australian-trenching.webp', url: 'https://austrenching.com.au' },
+  { name: 'Appti',                desktop: '/images/Appti.webp',                                                             mobile: '/images/mobile-appti.webp',                url: 'https://appti.net' },
+  { name: 'Speechless Electrical',desktop: '/images/Speechless-Electrical-Licensed-Electrician-Seymour.webp',                mobile: '/images/mobile-speechless-electrical.webp',url: 'https://speechlesselec.com' },
+  { name: "Let's Get Trowled",    desktop: '/images/Lets-Get-Trowled-Plastering-Services-Seymour.webp',                      mobile: '/images/mobile-lets-get-trowled.webp',     url: 'https://letsgettrowled.com.au' },
+  { name: 'LKF Contracting',      desktop: '/images/LKF-Contracting-Agricultural-and- -Civil-Contractors-Invergordon.webp', mobile: '/images/mobile-lkf-contracting.webp',      url: 'https://lkfcontracting.com.au' },
 ]
 
 const clients = [
