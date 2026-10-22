@@ -88,6 +88,18 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Formspree'],
     url: 'https://outrightelectrical.com.au',
     image: '/images/Outright-Electrical-Heathcote-Victoria.webp',
+    caseStudy: {
+      headline: 'Local SEO and a mobile-first website for Outright Electrical in Heathcote',
+      tagline: 'A fast, professional website with targeted local SEO helping a Heathcote electrician get found and convert leads online.',
+      problem: "Outright Electrical service Heathcote and the surrounding towns across Central Victoria. Heathcote is a smaller market than Seymour or Shepparton, but that makes local search positioning even more important: when there are fewer electricians competing, showing up consistently for the right searches can make the difference between a full diary and a quiet week. They needed a site that would perform well on mobile, rank for local searches, and make it easy for clients to get in touch.",
+      solution: "We built a clean, fast Next.js site optimised from the ground up for local search in Heathcote and surrounds. Service pages are structured around the terms potential clients actually use, with location signals built into titles, headings, and metadata throughout. The site is fully mobile-first, loading quickly on the devices most enquiries come from. A Formspree contact form gives visitors a direct, low-friction way to get in touch at any time of day.",
+      services: ['Website Design & Development', 'Local SEO', 'Lead Capture Forms', 'Mobile-First Build'],
+      results: [
+        { metric: 'Mobile-first', label: 'Built to load fast and convert on any device' },
+        { metric: 'Local SEO', label: 'Structured around Heathcote and Central Victoria search terms' },
+        { metric: 'Lead-ready', label: 'Formspree contact form capturing enquiries around the clock' },
+      ],
+    },
   },
   {
     id: 'valley-feeds',
