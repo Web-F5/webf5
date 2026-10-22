@@ -83,13 +83,27 @@ function injectOpenGraph(content: string, pageName: string): string {
 
   const ogBlock = `  openGraph: {\n    title: '${title.replace(/'/g, "\\'")}',\n    description: '${desc.replace(/'/g, "\\'")}',\n  },\n`
 
-  // Insert before the last closing } of the metadata export
-  const metaMatch = content.match(/(export\s+const\s+metadata[\s\S]*?)\n(\})/m)
-  if (metaMatch?.index != null) {
-    const insertAt = metaMatch.index + metaMatch[1].length + 1
-    return content.slice(0, insertAt) + ogBlock + content.slice(insertAt)
+  // Find the start of the metadata export, then walk braces to find its closing }
+  const metaStart = content.search(/export\s+const\s+metadata/)
+  if (metaStart === -1) return content
+
+  const openBrace = content.indexOf('{', metaStart)
+  if (openBrace === -1) return content
+
+  let depth = 0
+  let closingBrace = -1
+  for (let i = openBrace; i < content.length; i++) {
+    if (content[i] === '{') depth++
+    else if (content[i] === '}') {
+      depth--
+      if (depth === 0) { closingBrace = i; break }
+    }
   }
-  return content
+
+  if (closingBrace === -1) return content
+
+  // Insert the openGraph block just before the closing brace
+  return content.slice(0, closingBrace) + ogBlock + content.slice(closingBrace)
 }
 
 function analyzeFile(content: string, filePath: string, sha: string): Finding[] {
