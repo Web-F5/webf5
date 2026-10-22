@@ -170,14 +170,14 @@ export function HeroSection() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Device composition */}
-          <div className="relative w-full" style={{ height: '380px' }}>
+          <div className="relative w-full" style={{ height: '230px' }}>
 
             {/* ── Tablet — left, behind ── */}
             <div
               className="absolute"
               style={{
                 left: '2%',
-                top: '28px',
+                top: '16px',
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(14deg)',
                 transformOrigin: 'left center',
@@ -204,7 +204,7 @@ export function HeroSection() {
               className="absolute"
               style={{
                 right: '2%',
-                top: '48px',
+                top: '28px',
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(-14deg)',
                 transformOrigin: 'right center',
@@ -286,6 +286,12 @@ export function HeroSection() {
 
 /* ─── Device frame components ─── */
 
+/** Rounded-rect SVG path — used for evenodd body+screen-cutout */
+function rrect(x: number, y: number, w: number, h: number, r: number) {
+  const ri = Math.min(r, w / 2, h / 2)
+  return `M${x+ri},${y} H${x+w-ri} Q${x+w},${y} ${x+w},${y+ri} V${y+h-ri} Q${x+w},${y+h} ${x+w-ri},${y+h} H${x+ri} Q${x},${y+h} ${x},${y+h-ri} V${y+ri} Q${x},${y} ${x+ri},${y} Z`
+}
+
 function DeviceImage({
   src, alt, priority, sizes,
 }: {
@@ -315,85 +321,109 @@ function DeviceImage({
 }
 
 function LaptopFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
+  const W = 320, LH = 200
+  const sx = 14, sy = 10, sw = 292, sh = 176
+
   return (
-    <div style={{ width: '320px' }}>
-      {/* Screen bezel */}
-      <div
-        className="rounded-t-xl border border-white/15 bg-[#1a1a2e] shadow-2xl shadow-black/60"
-        style={{ padding: '8px 8px 0' }}
-      >
-        {/* Camera dot */}
-        <div className="flex justify-center mb-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+    <div style={{ width: W, flexShrink: 0 }}>
+      {/* Lid */}
+      <div style={{ position: 'relative', width: W, height: LH }}>
+        {/* Screenshot sits behind the SVG frame */}
+        <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 3, overflow: 'hidden', background: '#0a0a14' }}>
+          <DeviceImage src={entry.desktop} alt={entry.name} priority={priority} sizes={`${sw}px`} />
         </div>
-        {/* Screen area */}
-        <div className="relative rounded overflow-hidden bg-slate-900" style={{ aspectRatio: '16/10', width: '100%' }}>
-          <DeviceImage src={entry.desktop} alt={entry.name} priority={priority} sizes="304px" />
-        </div>
+        {/* SVG frame overlay */}
+        <svg viewBox={`0 0 ${W} ${LH}`} fill="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+          {/* Body with screen cutout (evenodd = hole) */}
+          <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,LH,8)} ${rrect(sx,sy,sw,sh,3)}`} />
+          {/* Outer border */}
+          <rect x="0.5" y="0.5" width={W-1} height={LH-1} rx="7.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+          {/* Screen inner glow */}
+          <rect x={sx} y={sy} width={sw} height={sh} rx="3" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+          {/* Camera */}
+          <circle cx={W/2} cy="5.5" r="2.5" fill="#08080f" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+          <circle cx={W/2} cy="5.5" r="1" fill="#0d0d1a" />
+          {/* Active indicator */}
+          <circle cx={W/2+6} cy="5.5" r="1" fill="rgba(34,197,94,0.55)" />
+          {/* Bottom hinge line */}
+          <line x1="0" y1={LH-0.5} x2={W} y2={LH-0.5} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        </svg>
       </div>
-      {/* Base / keyboard */}
-      <div
-        className="rounded-b-2xl border-x border-b border-white/10 bg-[#111122]"
-        style={{ height: '18px', position: 'relative' }}
-      >
-        {/* Trackpad */}
-        <div
-          className="absolute left-1/2 top-2 -translate-x-1/2 rounded border border-white/10 bg-white/5"
-          style={{ width: '60px', height: '10px' }}
-        />
+      {/* Keyboard base */}
+      <div style={{
+        width: W, height: 20,
+        background: 'linear-gradient(to bottom, #1c1c30, #12121f)',
+        borderLeft: '1px solid rgba(255,255,255,0.12)',
+        borderRight: '1px solid rgba(255,255,255,0.12)',
+        borderBottom: '1px solid rgba(255,255,255,0.12)',
+        borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <div style={{ width: 64, height: 10, background: 'rgba(255,255,255,0.04)', borderRadius: 3, border: '1px solid rgba(255,255,255,0.08)' }} />
       </div>
-      {/* Stand */}
-      <div className="flex justify-center">
-        <div className="bg-[#0e0e1c] border-x border-b border-white/8 rounded-b-xl" style={{ width: '80px', height: '4px' }} />
+      {/* Stand foot */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ width: 84, height: 5, background: '#0e0e1c', borderLeft: '1px solid rgba(255,255,255,0.08)', borderRight: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }} />
       </div>
     </div>
   )
 }
 
 function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
-  const src = entry.tablet ?? entry.mobile ?? entry.desktop
+  const W = 120, H = 168
+  const sx = 8, sy = 8, sw = 104, sh = 144
+
   return (
-    <div
-      className="rounded-2xl border border-white/15 bg-[#1a1a2e] shadow-xl shadow-black/50"
-      style={{ width: '120px', padding: '8px 6px' }}
-    >
-      {/* Camera */}
-      <div className="flex justify-center mb-1.5">
-        <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+    <div style={{ position: 'relative', width: W, height: H, flexShrink: 0 }}>
+      <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 3, overflow: 'hidden', background: '#0a0a14' }}>
+        <DeviceImage src={entry.tablet ?? entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes={`${sw}px`} />
       </div>
-      {/* Screen */}
-      <div className="relative rounded overflow-hidden bg-slate-900" style={{ aspectRatio: '3/4', width: '100%' }}>
-        <DeviceImage src={src} alt={entry.name} priority={priority} sizes="108px" />
-      </div>
-      {/* Home indicator */}
-      <div className="flex justify-center mt-1.5">
-        <div className="w-8 h-1 rounded-full bg-white/20" />
-      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+        <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,3)}`} />
+        <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+        <rect x={sx} y={sy} width={sw} height={sh} rx="3" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        {/* Front camera */}
+        <circle cx={W/2} cy="4.5" r="2.2" fill="#08080f" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <circle cx={W/2} cy="4.5" r="0.9" fill="#0d0d1a" />
+        {/* Home indicator */}
+        <rect x={W/2-14} y={H-7} width="28" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
+        {/* Side button */}
+        <rect x={W-1} y="54" width="2" height="28" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        {/* Volume */}
+        <rect x="-1" y="54" width="2" height="18" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x="-1" y="75" width="2" height="18" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+      </svg>
     </div>
   )
 }
 
 function PhoneFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
-  const src = entry.mobile ?? entry.desktop
+  const W = 75, H = 160
+  const sx = 5, sy = 13, sw = 65, sh = 126
+
   return (
-    <div
-      className="rounded-3xl border border-white/15 bg-[#1a1a2e] shadow-xl shadow-black/50"
-      style={{ width: '75px', padding: '8px 5px' }}
-    >
-      {/* Notch */}
-      <div className="flex justify-center mb-1.5">
-        <div className="w-10 h-2 rounded-full bg-[#0e0e1c] border border-white/10 flex items-center justify-center gap-1">
-          <div className="w-1 h-1 rounded-full bg-white/20" />
-        </div>
+    <div style={{ position: 'relative', width: W, height: H, flexShrink: 0 }}>
+      <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 4, overflow: 'hidden', background: '#0a0a14' }}>
+        <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes={`${sw}px`} />
       </div>
-      {/* Screen */}
-      <div className="relative rounded-xl overflow-hidden bg-slate-900" style={{ aspectRatio: '9/19', width: '100%' }}>
-        <DeviceImage src={src} alt={entry.name} priority={priority} sizes="65px" />
-      </div>
-      {/* Home indicator */}
-      <div className="flex justify-center mt-2">
-        <div className="w-6 h-1 rounded-full bg-white/20" />
-      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+        <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,4)}`} />
+        <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+        <rect x={sx} y={sy} width={sw} height={sh} rx="4" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        {/* Dynamic island */}
+        <rect x="23" y="4" width="29" height="7.5" rx="3.75" fill="#08080f" />
+        <circle cx="43" cy="7.75" r="1.8" fill="#0f0f1e" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+        {/* Home indicator */}
+        <rect x="25" y="146" width="25" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
+        {/* Power button */}
+        <rect x={W-1} y="50" width="2" height="22" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        {/* Mute switch */}
+        <rect x="-1" y="28" width="2" height="10" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        {/* Volume up */}
+        <rect x="-1" y="42" width="2" height="16" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        {/* Volume down */}
+        <rect x="-1" y="61" width="2" height="16" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+      </svg>
     </div>
   )
 }
