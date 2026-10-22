@@ -15,8 +15,16 @@ async function getEmailSignature(): Promise<EmailSignature | null> {
   const rows = await db.select().from(appSettings)
   const map: Record<string, string> = {}
   for (const r of rows) map[r.key] = r.value
-  if (!map.sender_name && !map.sender_title && !map.email_signature) return null
-  return { senderName: map.sender_name, senderTitle: map.sender_title, extraLines: map.email_signature }
+  const sig: EmailSignature = {
+    senderName:    map.sender_name,
+    senderTitle:   map.sender_title,
+    senderCompany: map.sender_company,
+    senderSlogan:  map.sender_slogan,
+    senderPhone:   map.sender_phone,
+    senderWebsite: map.sender_website,
+  }
+  const hasAny = Object.values(sig).some(v => v?.trim())
+  return hasAny ? sig : null
 }
 
 // ── Inline audit helpers (same as public audit route) ─────────────────────
