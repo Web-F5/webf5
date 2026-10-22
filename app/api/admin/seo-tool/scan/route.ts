@@ -75,20 +75,13 @@ function injectMetadata(content: string, pageName: string): string {
   return block + content
 }
 
-function injectOpenGraph(content: string, pageName: string): string {
-  const titleMatch = content.match(/title\s*:\s*[`'"]([^`'"]+)[`'"]/)
-  const descMatch  = content.match(/description\s*:\s*[`'"]([^`'"]+)[`'"]/)
-  const title = titleMatch?.[1] ?? pageName
-  const desc  = descMatch?.[1]  ?? `Learn more about ${pageName}.`
-
-  const ogBlock = `  openGraph: {\n    title: '${title.replace(/'/g, "\\'")}',\n    description: '${desc.replace(/'/g, "\\'")}',\n  },\n`
-
-  // Find the start of the metadata export, then walk braces to find its closing }
+function injectOpenGraph(content: string, pageName: string): string | null {
+  // Only works with export const metadata = { ... } — not generateMetadata functions
   const metaStart = content.search(/export\s+const\s+metadata/)
-  if (metaStart === -1) return content
+  if (metaStart === -1) return null
 
   const openBrace = content.indexOf('{', metaStart)
-  if (openBrace === -1) return content
+  if (openBrace === -1) return null
 
   let depth = 0
   let closingBrace = -1
@@ -99,10 +92,15 @@ function injectOpenGraph(content: string, pageName: string): string {
       if (depth === 0) { closingBrace = i; break }
     }
   }
+  if (closingBrace === -1) return null
 
-  if (closingBrace === -1) return content
+  const titleMatch = content.match(/title\s*:\s*[`'"]([^`'"]+)[`'"]/)
+  const descMatch  = content.match(/description\s*:\s*[`'"]([^`'"]+)[`'"]/)
+  const title = titleMatch?.[1] ?? pageName
+  const desc  = descMatch?.[1]  ?? `Learn more about ${pageName}.`
 
-  // Insert the openGraph block just before the closing brace
+  const ogBlock = `  openGraph: {\n    title: '${title.replace(/'/g, "\\'")}',\n    description: '${desc.replace(/'/g, "\\'")}',\n  },\n`
+
   return content.slice(0, closingBrace) + ogBlock + content.slice(closingBrace)
 }
 
@@ -167,13 +165,17 @@ function analyzeFile(content: string, filePath: string, sha: string): Finding[] 
       file: filePath,
       type: 'missing_og',
       severity: 'warning',
-      message: 'No openGraph metadata. Social sharing previews will use browser defaults.',
-      fixable: true,
-      fix: {
-        newContent: fixed,
-        sha,
-        commitMessage: `seo: add openGraph to metadata in ${filePath}`,
-      },
+      message: fixed
+        ? 'No openGraph metadata. Social sharing previews will use browser defaults.'
+        : 'No openGraph metadata (uses generateMetadata — add openGraph manually).',
+      fixable: fixed !== null,
+      ...(fixed !== null ? {
+        fix: {
+          newContent: fixed,
+          sha,
+          commitMessage: `seo: add openGraph to metadata in ${filePath}`,
+        },
+      } : {}),
     })
   }
 
