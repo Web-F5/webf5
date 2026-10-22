@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { ArrowRight, MapPin } from 'lucide-react'
@@ -109,18 +110,29 @@ export default function WorkPage() {
                     ))}
                   </div>
 
-                  {/* CTA */}
-                  {project.url && (
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-400 border border-indigo-500/30 rounded-full px-5 py-2.5 w-fit hover:bg-indigo-500/10 transition-colors"
-                    >
-                      Visit site
-                      <ArrowRight size={14} />
-                    </a>
-                  )}
+                  {/* CTAs */}
+                  <div className="flex flex-wrap gap-3">
+                    {project.caseStudy && (
+                      <Link
+                        href={`/work/${project.id}`}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-full px-5 py-2.5 transition-colors"
+                      >
+                        Read case study
+                        <ArrowRight size={14} />
+                      </Link>
+                    )}
+                    {project.url && (
+                      <a
+                        href={project.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-400 border border-indigo-500/30 rounded-full px-5 py-2.5 w-fit hover:bg-indigo-500/10 transition-colors"
+                      >
+                        Visit site
+                        <ArrowRight size={14} />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             )
