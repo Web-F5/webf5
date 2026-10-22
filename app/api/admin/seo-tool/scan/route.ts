@@ -96,7 +96,9 @@ function analyzeFile(content: string, filePath: string, sha: string): Finding[] 
   const findings: Finding[] = []
 
   // 'use client' files cannot export metadata — skip entirely
-  if (/^\s*['"]use client['"]/m.test(content)) return findings
+  // Also skip Sanity Studio catch-all routes regardless
+  if (/['"]use client['"]/m.test(content)) return findings
+  if (/\[\[\.\.\.tool\]\]/.test(filePath)) return findings
 
   const pageName = pageNameFromPath(filePath)
 
