@@ -5,9 +5,9 @@ export type CaseStudy = {
   solution: string
   services: string[]
   results: { metric: string; label: string }[]
-  quote: string
-  quoteAuthor: string
-  quoteRole: string
+  quote?: string
+  quoteAuthor?: string
+  quoteRole?: string
 }
 
 export type Project = {
@@ -34,6 +34,18 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Google Reviews', 'GBP Management'],
     url: 'https://chuckelec.com',
     image: '/images/Licensed-Electricians- Chuck-E-Electrical.webp',
+    caseStudy: {
+      headline: 'Full-service SEO and web presence for Chuck E Electrical in Seymour',
+      tagline: 'A fast, lead-ready website with an ongoing SEO and content strategy helping a local electrician stand out in a competitive regional market.',
+      problem: "Chuck E Electrical services residential and commercial clients across Seymour and surrounds. Like most trade businesses, their growth was fuelled by referrals but limited by how little visibility they had online. Seymour has no shortage of electricians, and when a homeowner searches at 7pm after a switchboard trips, you either appear or you don't. Without a proper website, blog content, or a managed Google Business Profile, they were handing enquiries to competitors who had invested in their online presence.",
+      solution: "We built a fast Next.js website structured around the services Chuck E Electrical actually offers and the suburbs they serve. Local SEO was built in from the foundation: optimised page titles, structured service pages, and schema markup to help Google understand who they are and where they work. A Sanity-powered blog gives them a steady stream of indexable content covering common electrical questions and local topics. Google reviews are displayed on-site for instant credibility, and ongoing GBP management keeps their map listing accurate, active, and competitive.",
+      services: ['Website Design & Development', 'Local SEO', 'Sanity CMS Blog', 'Google Review Integration', 'Google Business Profile', 'GBP Management', 'Mobile-First Build'],
+      results: [
+        { metric: 'SEO-first', label: 'Site architecture built around local search from day one' },
+        { metric: 'Ongoing blog', label: 'Regular Sanity CMS content keeping the site fresh and indexed' },
+        { metric: 'GBP managed', label: 'Active Google Business Profile driving map and local pack visibility' },
+      ],
+    },
   },
   {
     id: 'fsm-recycling',

@@ -107,16 +107,18 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
           </div>
 
           {/* Client quote */}
-          <blockquote className="relative border-l-2 border-indigo-500/40 pl-6 py-1">
-            <Quote size={20} className="text-indigo-400/40 mb-3" />
-            <p className="text-lg italic text-foreground/85 leading-relaxed mb-4">
-              &ldquo;{cs.quote}&rdquo;
-            </p>
-            <footer>
-              <p className="text-sm font-semibold text-white">{cs.quoteAuthor}</p>
-              <p className="text-xs text-foreground/40">{cs.quoteRole}</p>
-            </footer>
-          </blockquote>
+          {cs.quote && (
+            <blockquote className="relative border-l-2 border-indigo-500/40 pl-6 py-1">
+              <Quote size={20} className="text-indigo-400/40 mb-3" />
+              <p className="text-lg italic text-foreground/85 leading-relaxed mb-4">
+                &ldquo;{cs.quote}&rdquo;
+              </p>
+              <footer>
+                <p className="text-sm font-semibold text-white">{cs.quoteAuthor}</p>
+                <p className="text-xs text-foreground/40">{cs.quoteRole}</p>
+              </footer>
+            </blockquote>
+          )}
 
         </div>
 
