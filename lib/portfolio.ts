@@ -88,6 +88,7 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Formspree'],
     url: 'https://outrightelectrical.com.au',
     image: '/images/Outright-Electrical-Heathcote-Victoria.webp',
+    logo: '/images/outrightelectrical-logo.webp',
     caseStudy: {
       headline: 'Local SEO and a mobile-first website for Outright Electrical in Heathcote',
       tagline: 'A fast, professional website with targeted local SEO helping a Heathcote electrician get found and convert leads online.',
@@ -138,6 +139,19 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Formspree'],
     url: 'https://horsehay.com.au',
     image: '/images/Horse-Hay-Invergordan-Victoria.webp',
+    logo: '/images/horse-hay-logo.webp',
+    caseStudy: {
+      headline: 'A clean, SEO-ready website for Horse Hay in regional Victoria',
+      tagline: 'A professional online presence helping a specialist horse hay supplier get found by buyers across regional Victoria.',
+      problem: "Horse Hay supply quality hay to horse owners and properties across regional Victoria from their base in Invergordon. Buyers searching for horse hay online are often making a considered purchase: they want to know the product is quality, the supplier is reliable, and that delivery or pickup is practical for their location. Without a website, there was no way to communicate any of that, and no way for buyers searching online to find them at all.",
+      solution: "We built a clean, mobile-first Next.js site that presents Horse Hay's product and service clearly to the right audience. Local SEO foundations are built in throughout: structured page content targeting searches like 'horse hay Victoria', 'hay for horses near me', and location-specific terms across the Goulburn Valley and broader regional Victoria. A Formspree contact form makes it simple for buyers to enquire about availability, pricing, and delivery without needing to hunt for a phone number.",
+      services: ['Website Design & Development', 'Local SEO', 'Lead Capture Forms', 'Mobile-First Build'],
+      results: [
+        { metric: 'Specialist focus', label: 'Site built specifically for horse hay buyers across regional Victoria' },
+        { metric: 'SEO-ready', label: 'Location-targeted content covering Goulburn Valley and surrounds' },
+        { metric: 'Lead-ready', label: 'Formspree enquiry form for availability, pricing and delivery' },
+      ],
+    },
   },
   {
     id: 'australian-trenching',
