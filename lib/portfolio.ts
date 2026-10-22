@@ -46,6 +46,9 @@ export const projects: Project[] = [
         { metric: 'Ongoing blog', label: 'Regular Sanity CMS content keeping the site fresh and indexed' },
         { metric: 'GBP managed', label: 'Active Google Business Profile driving map and local pack visibility' },
       ],
+      quote: 'Josh from Web F5 worked with us closely to completely rebuild our website from the ground up, making sure everything was exactly how we wanted it, while at the same time optimising everything to maximise ranking & exposure. Highly recommend Web F5.',
+      quoteAuthor: 'Chris Evans',
+      quoteRole: 'Owner, Chuck E Electrical',
     },
   },
   {
