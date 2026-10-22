@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Save, CheckCircle } from 'lucide-react'
+import { Save, CheckCircle, HelpCircle, X, ExternalLink } from 'lucide-react'
 
 type Settings = {
   sender_name:    string
@@ -26,10 +26,11 @@ const DEFAULTS: Settings = {
 }
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<Settings>(DEFAULTS)
-  const [saved, setSaved]       = useState(false)
-  const [saving, setSaving]     = useState(false)
-  const [loaded, setLoaded]     = useState(false)
+  const [settings,    setSettings]    = useState<Settings>(DEFAULTS)
+  const [saved,       setSaved]       = useState(false)
+  const [saving,      setSaving]      = useState(false)
+  const [loaded,      setLoaded]      = useState(false)
+  const [tokenHelp,   setTokenHelp]   = useState(false)
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -134,6 +135,14 @@ export default function SettingsPage() {
         <Field label="Repository URL" placeholder="https://github.com/owner/repo" value={settings.github_repo} onChange={v => set('github_repo', v)} />
         <Field label="Personal access token" placeholder="github_pat_..." value={settings.github_token} onChange={v => set('github_token', v)} type="password"
           hint="Needs repo scope (read + write contents)" />
+        <button
+          type="button"
+          onClick={() => setTokenHelp(true)}
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-indigo-400 transition-colors"
+        >
+          <HelpCircle size={12} />
+          How to create a Personal Access Token
+        </button>
       </section>
 
       <div className="flex justify-end">
@@ -149,7 +158,63 @@ export default function SettingsPage() {
           )}
         </button>
       </div>
+
+      {/* Token help modal */}
+      {tokenHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-[#111827] border border-white/10 rounded-2xl p-6 max-w-lg w-full space-y-5">
+            <div className="flex items-start justify-between gap-4">
+              <h3 className="text-white font-semibold">How to create a Personal Access Token</h3>
+              <button onClick={() => setTokenHelp(false)} className="text-slate-500 hover:text-white transition-colors flex-shrink-0">
+                <X size={16} />
+              </button>
+            </div>
+
+            <ol className="space-y-3 text-sm text-slate-300">
+              <Step n={1}>
+                Go to <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="text-indigo-400 hover:underline inline-flex items-center gap-1">github.com <ExternalLink size={11} /></a> and sign in, then click your profile photo (top right) and go to <strong className="text-white">Settings</strong>.
+              </Step>
+              <Step n={2}>
+                Scroll to the bottom of the left sidebar and click <strong className="text-white">Developer settings</strong>.
+              </Step>
+              <Step n={3}>
+                Click <strong className="text-white">Personal access tokens</strong> then <strong className="text-white">Tokens (classic)</strong>.
+              </Step>
+              <Step n={4}>
+                Click <strong className="text-white">Generate new token (classic)</strong>. Give it a name like <span className="font-mono bg-white/5 px-1.5 py-0.5 rounded text-xs">Web F5 SEO Tool</span> and set an expiration.
+              </Step>
+              <Step n={5}>
+                Under <strong className="text-white">Select scopes</strong>, tick the <span className="font-mono bg-white/5 px-1.5 py-0.5 rounded text-xs">repo</span> checkbox — this gives read and write access to repository contents.
+              </Step>
+              <Step n={6}>
+                Click <strong className="text-white">Generate token</strong>. <span className="text-amber-400">Copy it immediately</span> — GitHub only shows it once.
+              </Step>
+              <Step n={7}>
+                Paste it into the Personal access token field above and click <strong className="text-white">Save settings</strong>.
+              </Step>
+            </ol>
+
+            <button
+              onClick={() => setTokenHelp(false)}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+function Step({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 text-xs font-bold flex items-center justify-center mt-0.5">
+        {n}
+      </span>
+      <span className="leading-relaxed">{children}</span>
+    </li>
   )
 }
 
