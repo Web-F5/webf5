@@ -96,6 +96,22 @@ export const projects: Project[] = [
     features: ['Shopify Hydrogen', 'React', 'Google Merchant Center', 'Mobile-first'],
     url: 'https://valleyfeeds.com.au',
     image: '/images/Valley-Feeds-Katandra-West-Victoria.webp',
+    logo: '/images/valley-feeds-logo.webp',
+    caseStudy: {
+      headline: 'A custom Shopify Hydrogen storefront for Valley Feeds and General',
+      tagline: 'A fully bespoke React-powered Shopify storefront replacing an off-the-shelf theme, giving a regional stock feeds supplier a fast, professional online store built exactly to their needs.',
+      problem: "Valley Feeds and General supply stock feed, farm supplies, and general merchandise to farmers and rural households across the Katandra and Goulburn Valley region. They had an existing Shopify store running on a generic theme that didn't reflect the business or perform the way they needed it to. The out-of-the-box look wasn't matching the quality of their products or their reputation in the region, and managing product visibility across Google Shopping was adding unnecessary friction to their day.",
+      solution: "We built a fully custom Shopify Hydrogen storefront using React, replacing the generic theme entirely with a frontend designed specifically for Valley Feeds. Hydrogen gives the store the performance of a modern React app while keeping all of Shopify's backend commerce tools in place. Google Merchant Center was integrated to manage product feeds and keep stock visible across Google Shopping, driving additional traffic beyond organic search. The result is a fast, mobile-first store that feels like Valley Feeds, not a Shopify template.",
+      services: ['Shopify Hydrogen Development', 'Custom React Frontend', 'Google Merchant Center', 'Product Feed Management', 'Mobile-First Build'],
+      results: [
+        { metric: 'Fully custom', label: 'Bespoke React frontend replacing the off-the-shelf Shopify theme' },
+        { metric: 'Hydrogen-powered', label: 'Modern storefront performance with Shopify commerce backend' },
+        { metric: 'Google Shopping', label: 'Merchant Center integration driving product visibility across search' },
+      ],
+      quote: 'Josh has been a wealth of knowledge and done an amazing job creating our new website. I highly recommend him!!',
+      quoteAuthor: 'Melissa Blair',
+      quoteRole: 'Valley Feeds and General, Katandra VIC',
+    },
   },
   {
     id: 'horse-hay',
