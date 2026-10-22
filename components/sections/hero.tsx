@@ -17,66 +17,16 @@ function pickFour<T>(arr: T[]): T[] {
 
 export function HeroSection() {
   const clients = [
-    {
-      name: 'Outright Electrical',
-      logo: '/images/outrightelectrical-logo.webp',
-      url: 'https://outrightelectrical.com.au',
-      logoClass: 'h-7',
-    },
-    {
-      name: 'Valley Feeds & General',
-      logo: '/images/valley-feeds-logo.webp',
-      url: 'https://valleyfeeds.com.au',
-      logoClass: 'h-8',
-    },
-    {
-      name: 'Horse Hay',
-      logo: '/images/horse-hay-logo.webp',
-      url: 'https://horsehay.com.au',
-      logoClass: 'h-10',
-    },
-    {
-      name: 'Australian Trenching and Excavations',
-      logo: '/images/ATE-logo.webp',
-      url: 'https://austrenching.com.au',
-      logoClass: 'h-12',
-    },
-    {
-      name: 'Chuck E Electrical',
-      logo: '/images/logo-chuckelec2.webp',
-      url: 'https://chuckelec.com',
-      logoClass: 'h-12',
-    },
-    {
-      name: 'F.S.M. Recycling and Demolitions',
-      logo: '/images/fsm-logo.webp',
-      url: 'https://fsmrecycle.com.au',
-      logoClass: 'h-10',
-    },
-    {
-      name: 'Appti',
-      logo: '/images/Appti-logo.webp',
-      url: 'https://appti.net',
-      logoClass: 'h-8',
-    },
-    {
-      name: 'Speechless Electrical',
-      logo: '/images/logo-speechless-electrical.webp',
-      url: 'https://speechlesselec.com',
-      logoClass: 'h-10',
-    },
-    {
-      name: "Let's Get Trowled",
-      logo: '/images/logo-lets-get-trowled.webp',
-      url: 'https://letsgettrowled.com.au',
-      logoClass: 'h-10',
-    },
-    {
-      name: 'LKF Contracting',
-      logo: '/images/LKF-logo.webp',
-      url: 'https://lkfcontracting.com.au',
-      logoClass: 'h-10',
-    },
+    { name: 'Outright Electrical',              logo: '/images/outrightelectrical-logo.webp',  url: 'https://outrightelectrical.com.au' },
+    { name: 'Valley Feeds & General',            logo: '/images/valley-feeds-logo.webp',        url: 'https://valleyfeeds.com.au' },
+    { name: 'Horse Hay',                         logo: '/images/horse-hay-logo.webp',           url: 'https://horsehay.com.au' },
+    { name: 'Australian Trenching and Excavations', logo: '/images/ATE-logo.webp',              url: 'https://austrenching.com.au' },
+    { name: 'Chuck E Electrical',                logo: '/images/logo-chuckelec2.webp',          url: 'https://chuckelec.com' },
+    { name: 'F.S.M. Recycling and Demolitions',  logo: '/images/fsm-logo.webp',                url: 'https://fsmrecycle.com.au' },
+    { name: 'Appti',                             logo: '/images/Appti-logo.webp',               url: 'https://appti.net' },
+    { name: 'Speechless Electrical',             logo: '/images/logo-speechless-electrical.webp', url: 'https://speechlesselec.com' },
+    { name: "Let's Get Trowled",                 logo: '/images/logo-lets-get-trowled.webp',    url: 'https://letsgettrowled.com.au' },
+    { name: 'LKF Contracting',                   logo: '/images/LKF-logo.webp',                url: 'https://lkfcontracting.com.au' },
   ]
 
   const layout = [
@@ -105,8 +55,8 @@ export function HeroSection() {
 
       {/* Ambient glows — CSS animation, no JS frame loop */}
       <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl" style={{ opacity: 0.15, animation: 'heroPulse1 8s ease-in-out infinite' }} />
-        <div className="absolute top-[60%] left-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl" style={{ opacity: 0.08, animation: 'heroPulse2 11s ease-in-out infinite' }} />
+        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl" style={{ opacity: 0.15, animation: 'heroPulse1 8s ease-in-out infinite', willChange: 'opacity', transform: 'translateZ(0)' }} />
+        <div className="absolute top-[60%] left-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl" style={{ opacity: 0.08, animation: 'heroPulse2 11s ease-in-out infinite', willChange: 'opacity', transform: 'translateZ(0)' }} />
       </div>
 
       {/* Two-column layout */}
@@ -176,7 +126,7 @@ export function HeroSection() {
             <p className="text-xs text-foreground/35 mb-4 uppercase tracking-widest">
               Recent projects
             </p>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 min-h-[48px]">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
               {clients.map((client) => (
                 <a
                   key={client.name}
@@ -184,16 +134,16 @@ export function HeroSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={client.name}
-                  className="opacity-40 hover:opacity-80 transition-opacity grayscale hover:grayscale-0 h-12 flex items-center"
+                  className="opacity-40 hover:opacity-80 transition-opacity grayscale hover:grayscale-0 flex-shrink-0"
+                  style={{ position: 'relative', width: '80px', height: '48px', display: 'inline-block' }}
                 >
                   <Image
                     src={client.logo}
                     alt={client.name}
-                    width={120}
-                    height={48}
-                    sizes="120px"
+                    fill
+                    sizes="80px"
                     priority
-                    className={`${client.logoClass} w-auto object-contain`}
+                    className="object-contain"
                   />
                 </a>
               ))}
