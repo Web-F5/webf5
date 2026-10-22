@@ -1,8 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, CheckCircle, AlertTriangle, AlertCircle, Wrench, ExternalLink, RefreshCw, FileCode } from 'lucide-react'
+import { Search, CheckCircle, AlertTriangle, AlertCircle, Wrench, ExternalLink, RefreshCw, FileCode, Trash2 } from 'lucide-react'
 import type { Finding } from '@/app/api/admin/seo-tool/scan/route'
+
+// Repos known to have a Sanity Studio page that may have been affected
+const SANITY_REPOS = [
+  'Web-F5/chuckelec',
+  'Web-F5/fsmrecycle',
+  'Web-F5/austrenching',
+  'Web-F5/letsgettrowled',
+  'Web-F5/lkfcontracting',
+]
+
+type CleanupResult = { repo: string; status: 'fixed' | 'clean' | 'not_found' | 'error'; detail?: string }
 
 type ScanResult = {
   findings: Finding[]
@@ -29,7 +40,29 @@ export default function SeoToolPage() {
   const [error,    setError]    = useState<string | null>(null)
   const [fixing,   setFixing]   = useState<string | null>(null)
   const [fixed,    setFixed]    = useState<Set<string>>(new Set())
-  const [confirm,  setConfirm]  = useState<Finding | null>(null)
+  const [confirm,       setConfirm]       = useState<Finding | null>(null)
+  const [cleaning,      setCleaning]      = useState(false)
+  const [cleanupResults, setCleanupResults] = useState<CleanupResult[] | null>(null)
+
+  async function runCleanup() {
+    setCleaning(true)
+    setCleanupResults(null)
+    setError(null)
+    try {
+      const res = await fetch('/api/admin/seo-tool/cleanup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repos: SANITY_REPOS }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Cleanup failed')
+      setCleanupResults(data.results)
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setCleaning(false)
+    }
+  }
 
   async function runScan() {
     setScanning(true)
@@ -100,6 +133,54 @@ export default function SeoToolPage() {
             : <><Search size={14} /> Run scan</>}
         </button>
       </div>
+
+      {/* Cleanup panel */}
+      <section className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5 space-y-4">
+        <div>
+          <h2 className="text-sm font-semibold text-red-300 mb-0.5">Revert bad SEO fixes</h2>
+          <p className="text-xs text-slate-400">
+            A previous scan injected metadata into Sanity Studio pages (use client files), breaking builds.
+            This will remove those bad exports from all affected repos and commit a revert.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {SANITY_REPOS.map(r => (
+            <span key={r} className="text-xs font-mono bg-white/5 text-slate-400 border border-white/10 rounded-lg px-2.5 py-1">{r}</span>
+          ))}
+        </div>
+        <button
+          onClick={runCleanup}
+          disabled={cleaning}
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+        >
+          {cleaning
+            ? <><RefreshCw size={14} className="animate-spin" /> Reverting…</>
+            : <><Trash2 size={14} /> Revert bad commits</>}
+        </button>
+        {cleanupResults && (
+          <div className="space-y-1.5">
+            {cleanupResults.map(r => (
+              <div key={r.repo} className="flex items-center gap-3 text-sm">
+                {r.status === 'fixed'     && <CheckCircle size={14} className="text-emerald-400 flex-shrink-0" />}
+                {r.status === 'clean'     && <CheckCircle size={14} className="text-slate-500 flex-shrink-0" />}
+                {r.status === 'not_found' && <AlertTriangle size={14} className="text-amber-400 flex-shrink-0" />}
+                {r.status === 'error'     && <AlertCircle size={14} className="text-red-400 flex-shrink-0" />}
+                <span className="font-mono text-xs text-slate-300">{r.repo}</span>
+                <span className={`text-xs ${
+                  r.status === 'fixed'     ? 'text-emerald-400' :
+                  r.status === 'clean'     ? 'text-slate-500'   :
+                  r.status === 'not_found' ? 'text-amber-400'   : 'text-red-400'
+                }`}>
+                  {r.status === 'fixed'     ? 'Reverted'           :
+                   r.status === 'clean'     ? 'Already clean'      :
+                   r.status === 'not_found' ? 'Studio page not found' :
+                   `Error: ${r.detail}`}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Error */}
       {error && (
