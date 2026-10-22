@@ -351,7 +351,7 @@ function LaptopFrame({ entry, priority }: { entry: ShowcaseEntry; priority: bool
 }
 
 function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
-  const src = entry.tablet ?? entry.desktop
+  const src = entry.tablet ?? entry.mobile ?? entry.desktop
   return (
     <div
       className="rounded-2xl border border-white/15 bg-[#1a1a2e] shadow-xl shadow-black/50"
