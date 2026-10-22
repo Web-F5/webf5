@@ -41,6 +41,18 @@ const testimonials = [
     role: '',
     location: '',
   },
+  {
+    quote: 'Josh from Web F5 worked with us closely to completely rebuild our website from the ground up, making sure everything was exactly how we wanted it, while at the same time optimising everything to maximise ranking & exposure. Highly recommend Web F5.',
+    author: 'Chris Evans',
+    role: '',
+    location: '',
+  },
+  {
+    quote: 'Josh has been a wealth of knowledge and done an amazing job creating our new website. I highly recommend him!!',
+    author: 'Melissa Blair',
+    role: '',
+    location: '',
+  },
 ]
 
 const AUTOPLAY_MS = 6000
@@ -123,7 +135,7 @@ export function TestimonialsSection() {
               ))}
             </div>
             <span className="text-sm text-foreground/60">
-              5.0 · 7 reviews on Google
+              5.0 · 9 reviews on Google
             </span>
           </div>
         </motion.div>
