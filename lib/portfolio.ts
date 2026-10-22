@@ -164,6 +164,22 @@ export const projects: Project[] = [
     features: ['Next.js', 'SaaS', 'Neon Postgres', 'Stripe', 'SMS Reminders', 'Multi-tenant'],
     url: 'https://appti.net',
     image: '/images/Appti.webp',
+    logo: '/images/Appti-logo.webp',
+    caseStudy: {
+      headline: 'Appti: a multi-tenant appointment booking SaaS built from the ground up',
+      tagline: 'From domain and hosting to a fully functional SaaS platform with Stripe payments, SMS reminders, and multi-tenant business accounts.',
+      problem: "The idea behind Appti was straightforward: give small service businesses a simple, affordable way to take bookings online without paying for bloated scheduling software. The challenge was building it properly. A multi-tenant architecture means every business gets their own isolated account, their own booking page, and their own client data — all on a single platform. It also needed automated email confirmations, SMS reminders to reduce no-shows, Stripe for subscription billing, and a system that could scale without requiring a developer on call.",
+      solution: "We built Appti end-to-end on Next.js with a Neon Postgres database managed through Prisma ORM. Multi-tenancy is handled at the data layer, keeping each business account fully isolated. Resend powers transactional email for booking confirmations and notifications, while Mobile Message handles SMS reminders sent to clients ahead of their appointments. Stripe is integrated for subscription billing, with plans managed per tenant. The whole platform was set up from scratch: domain, hosting, infrastructure, and application layer delivered as one complete product.",
+      services: ['SaaS Architecture & Development', 'Multi-Tenant System Design', 'Stripe Subscription Billing', 'SMS Reminders via Mobile Message', 'Transactional Email via Resend', 'Neon Postgres & Prisma ORM', 'Domain & Hosting Setup'],
+      results: [
+        { metric: 'Multi-tenant', label: 'Isolated business accounts on a shared platform infrastructure' },
+        { metric: 'Stripe billing', label: 'Subscription management built in from day one' },
+        { metric: 'SMS + email', label: 'Automated reminders cutting no-shows for every business on the platform' },
+      ],
+      quote: 'Web F5 helped us from start to finish. We started with a website, they organised hosting a domain at a competitive rate, definitely recommend them.',
+      quoteAuthor: 'Rebecca Austin',
+      quoteRole: 'Appti',
+    },
   },
   {
     id: 'speechless-electrical',
