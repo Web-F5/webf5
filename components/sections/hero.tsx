@@ -1,54 +1,63 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, MapPin } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
-import { projects } from '@/lib/portfolio'
 
-function pickFour<T>(arr: T[]): T[] {
-  const copy = [...arr]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]]
-  }
-  return copy.slice(0, 4)
+// Each showcase entry: desktop image required, tablet/mobile optional (fall back to desktop)
+type ShowcaseEntry = {
+  name: string
+  url: string
+  desktop: string
+  tablet?: string
+  mobile?: string
 }
 
+const showcase: ShowcaseEntry[] = [
+  { name: 'Chuck E Electrical',                desktop: '/images/Licensed-Electricians- Chuck-E-Electrical.webp',                         url: 'https://chuckelec.com' },
+  { name: 'F.S.M. Recycling',                  desktop: '/images/FSM-Recycling-and-Demolition.webp',                                      url: 'https://fsmrecycle.com.au' },
+  { name: 'Outright Electrical',               desktop: '/images/Outright-Electrical-Heathcote-Victoria.webp',                             url: 'https://outrightelectrical.com.au' },
+  { name: 'Valley Feeds',                      desktop: '/images/Valley-Feeds-Katandra-West-Victoria.webp',                                url: 'https://valleyfeeds.com.au' },
+  { name: 'Horse Hay',                         desktop: '/images/Horse-Hay-Invergordan-Victoria.webp',                                     url: 'https://horsehay.com.au' },
+  { name: 'Australian Trenching',              desktop: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',              url: 'https://austrenching.com.au' },
+  { name: 'Appti',                             desktop: '/images/Appti.webp',                                                              url: 'https://appti.net' },
+  { name: 'Speechless Electrical',             desktop: '/images/Speechless-Electrical-Licensed-Electrician-Seymour.webp',                 url: 'https://speechlesselec.com' },
+  { name: "Let's Get Trowled",                 desktop: '/images/Lets-Get-Trowled-Plastering-Services-Seymour.webp',                       url: 'https://letsgettrowled.com.au' },
+  { name: 'LKF Contracting',                   desktop: '/images/LKF-Contracting-Agricultural-and- -Civil-Contractors-Invergordon.webp',  url: 'https://lkfcontracting.com.au' },
+]
+
+const clients = [
+  { name: 'Outright Electrical',              logo: '/images/outrightelectrical-logo.webp',  url: 'https://outrightelectrical.com.au' },
+  { name: 'Valley Feeds & General',            logo: '/images/valley-feeds-logo.webp',        url: 'https://valleyfeeds.com.au' },
+  { name: 'Horse Hay',                         logo: '/images/horse-hay-logo.webp',           url: 'https://horsehay.com.au' },
+  { name: 'Australian Trenching',              logo: '/images/ATE-logo.webp',                 url: 'https://austrenching.com.au' },
+  { name: 'Chuck E Electrical',                logo: '/images/logo-chuckelec2.webp',          url: 'https://chuckelec.com' },
+  { name: 'F.S.M. Recycling',                  logo: '/images/fsm-logo.webp',                url: 'https://fsmrecycle.com.au' },
+  { name: 'Appti',                             logo: '/images/Appti-logo.webp',               url: 'https://appti.net' },
+  { name: 'Speechless Electrical',             logo: '/images/logo-speechless-electrical.webp', url: 'https://speechlesselec.com' },
+  { name: "Let's Get Trowled",                 logo: '/images/logo-lets-get-trowled.webp',    url: 'https://letsgettrowled.com.au' },
+  { name: 'LKF Contracting',                   logo: '/images/LKF-logo.webp',                url: 'https://lkfcontracting.com.au' },
+]
+
 export function HeroSection() {
-  const clients = [
-    { name: 'Outright Electrical',              logo: '/images/outrightelectrical-logo.webp',  url: 'https://outrightelectrical.com.au' },
-    { name: 'Valley Feeds & General',            logo: '/images/valley-feeds-logo.webp',        url: 'https://valleyfeeds.com.au' },
-    { name: 'Horse Hay',                         logo: '/images/horse-hay-logo.webp',           url: 'https://horsehay.com.au' },
-    { name: 'Australian Trenching and Excavations', logo: '/images/ATE-logo.webp',              url: 'https://austrenching.com.au' },
-    { name: 'Chuck E Electrical',                logo: '/images/logo-chuckelec2.webp',          url: 'https://chuckelec.com' },
-    { name: 'F.S.M. Recycling and Demolitions',  logo: '/images/fsm-logo.webp',                url: 'https://fsmrecycle.com.au' },
-    { name: 'Appti',                             logo: '/images/Appti-logo.webp',               url: 'https://appti.net' },
-    { name: 'Speechless Electrical',             logo: '/images/logo-speechless-electrical.webp', url: 'https://speechlesselec.com' },
-    { name: "Let's Get Trowled",                 logo: '/images/logo-lets-get-trowled.webp',    url: 'https://letsgettrowled.com.au' },
-    { name: 'LKF Contracting',                   logo: '/images/LKF-logo.webp',                url: 'https://lkfcontracting.com.au' },
-  ]
+  const [index, setIndex]   = useState(0)
+  const [paused, setPaused] = useState(false)
 
-  const layout = [
-    { rotate: '-2deg',  x: '-4%', delay: 0.4,  originX: '0%',   originY: '0%'   },
-    { rotate: '1.5deg', x: '4%',  delay: 0.55, originX: '100%', originY: '0%'   },
-    { rotate: '2deg',   x: '-3%', delay: 0.7,  originX: '0%',   originY: '100%' },
-    { rotate: '-1.5deg',x: '3%',  delay: 0.85, originX: '100%', originY: '100%' },
-  ]
+  const go = useCallback((next: number, _dir?: number) => {
+    setIndex((next + showcase.length) % showcase.length)
+  }, [])
 
-  const buildScreenshots = (picked: typeof projects) =>
-    picked.map((p, i) => ({
-      src: p.image,
-      alt: `${p.name} website`,
-      url: p.url || '#',
-      ...layout[i],
-    }))
-
-  const [screenshots, setScreenshots] = useState(() => buildScreenshots(projects.slice(0, 4)))
+  const prev = () => go(index - 1)
+  const next = () => go(index + 1)
 
   useEffect(() => {
-    setScreenshots(buildScreenshots(pickFour(projects)))
-  }, [])
+    if (paused) return
+    const id = setInterval(() => go(index + 1), 5000)
+    return () => clearInterval(id)
+  }, [index, paused, go])
+
+  const current = showcase[index]
 
   return (
     <section className="min-h-screen flex items-center justify-center pt-20 px-4 relative overflow-hidden">
@@ -151,193 +160,240 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* ── Right: screenshot collage ── */}
-        {/*
-          Outer wrapper is relative + overflow-visible so scaled cards
-          can expand outside the grid boundary without clipping.
-          Each card is aspect-video (16:9) so screenshots display correctly.
-        */}
-        <div className="relative hidden lg:flex flex-col gap-4">
+        {/* ── Right: responsive device showcase ── */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
+          className="relative hidden lg:flex flex-col items-center gap-6"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          {/* Device composition */}
+          <div className="relative w-full" style={{ height: '380px' }}>
 
-          {/* Row 1 */}
-          <div className="grid grid-cols-2 gap-4">
-            {screenshots.slice(0, 2).map((shot) => (
-              <motion.a
-                key={shot.src}
-                href={shot.url || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  rotate: shot.rotate,
-                  x: shot.x,
-                }}
-                whileHover={{
-                  rotate: '0deg',
-                  x: 0,
-                  y: -6,
-                  scale: 1.55,
-                  zIndex: 35,
-                }}
-                transition={{
-                  duration: 0.8,
-                  delay: shot.delay,
-                  ease: 'easeOut',
-                  type: 'spring',
-                  stiffness: 360,
-                  damping: 28,
-                }}
-                className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50 cursor-pointer block aspect-video"
-                style={{
-                  transformOrigin: `${shot.originX} ${shot.originY}`,
-                  zIndex: 10,
-                }}
-              >
-                <Image
-                  src={shot.src}
-                  alt={shot.alt}
-                  fill
-                  priority
-                  className="object-cover object-top"
-                  sizes="320px"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-                <motion.div
-                  className="absolute inset-0 flex items-end justify-center pb-3"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <span className="text-xs font-semibold text-white bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    Visit site ↗
-                  </span>
-                </motion.div>
-              </motion.a>
-            ))}
-          </div>
-
-          {/* Row 2 */}
-          <div className="grid grid-cols-2 gap-4">
-            {screenshots.slice(2, 4).map((shot) => (
-              <motion.a
-                key={shot.src}
-                href={shot.url || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  rotate: shot.rotate,
-                  x: shot.x,
-                }}
-                whileHover={{
-                  rotate: '0deg',
-                  x: 0,
-                  y: -6,
-                  scale: 1.55,
-                  zIndex: 35,
-                }}
-                transition={{
-                  duration: 0.8,
-                  delay: shot.delay,
-                  ease: 'easeOut',
-                  type: 'spring',
-                  stiffness: 360,
-                  damping: 28,
-                }}
-                className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50 cursor-pointer block aspect-video"
-                style={{
-                  transformOrigin: `${shot.originX} ${shot.originY}`,
-                  zIndex: 10,
-                }}
-              >
-                <Image
-                  src={shot.src}
-                  alt={shot.alt}
-                  fill
-                  className="object-cover object-top"
-                  sizes="320px"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-                <motion.div
-                  className="absolute inset-0 flex items-end justify-center pb-3"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <span className="text-xs font-semibold text-white bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    Visit site ↗
-                  </span>
-                </motion.div>
-              </motion.a>
-            ))}
-          </div>
-
-          {/*
-            Centre logo — positioned over the gap between rows.
-            Using absolute with top/left percentages accounting for the gap.
-            The gap between rows is 16px (gap-4). Each row is aspect-video.
-            We position at exactly the midpoint between rows.
-            Tailwind -translate-x-1/2 -translate-y-1/2 handles the offset
-            correctly without inline transform conflicts.
-          */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.0, duration: 0.5, ease: 'easeOut' }}
-            className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-            style={{
-              top: 'calc(50% - 40px)',  /* 50% minus half-gap (8px) minus ~10mm raise (38px) */
-              transform: 'translate(-50%, -50%)',
-              zIndex: 20,
-            }}
-          >
-            <div className="w-20 h-20 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm flex items-center justify-center shadow-xl">
-              <Image
-                src="/images/logo.webp"
-                alt="Web F5"
-                width={56}
-                height={56}
-                className="w-12 h-12 object-contain"
-              />
+            {/* ── Tablet — left, behind ── */}
+            <div
+              className="absolute"
+              style={{
+                left: '2%',
+                top: '28px',
+                zIndex: 2,
+                transform: 'perspective(700px) rotateY(14deg)',
+                transformOrigin: 'left center',
+              }}
+            >
+              <TabletFrame entry={current} priority={false} />
             </div>
-          </motion.div>
 
-          {/* Bottom-left badge — z-20 so hovered card (z-35) slides over it, returns when focus lost */}
+            {/* ── Laptop — centre, front ── */}
+            <div
+              className="absolute"
+              style={{
+                left: '50%',
+                top: 0,
+                transform: 'translateX(-50%)',
+                zIndex: 4,
+              }}
+            >
+              <LaptopFrame entry={current} priority />
+            </div>
+
+            {/* ── Phone — right, behind ── */}
+            <div
+              className="absolute"
+              style={{
+                right: '2%',
+                top: '48px',
+                zIndex: 2,
+                transform: 'perspective(700px) rotateY(-14deg)',
+                transformOrigin: 'right center',
+              }}
+            >
+              <PhoneFrame entry={current} priority={false} />
+            </div>
+
+          </div>
+
+          {/* Site name label */}
+          <AnimatePresence mode="wait">
+            <motion.a
+              key={current.name}
+              href={current.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.25 }}
+              className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors"
+            >
+              {current.name} ↗
+            </motion.a>
+          </AnimatePresence>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={prev}
+              aria-label="Previous site"
+              className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground/50 hover:text-foreground hover:border-primary/50 transition-all"
+            >
+              <ChevronLeft size={15} />
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {showcase.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => go(i)}
+                  aria-label={`Go to ${showcase[i].name}`}
+                  className={`rounded-full transition-all ${
+                    i === index
+                      ? 'w-4 h-1.5 bg-primary'
+                      : 'w-1.5 h-1.5 bg-foreground/20 hover:bg-foreground/40'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={next}
+              aria-label="Next site"
+              className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground/50 hover:text-foreground hover:border-primary/50 transition-all"
+            >
+              <ChevronRight size={15} />
+            </button>
+          </div>
+
+          {/* Responsive badge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.1, duration: 0.5, ease: 'easeOut' }}
-            className="absolute -bottom-5 -left-5 bg-card border border-border rounded-2xl px-4 py-3 shadow-xl pointer-events-none"
-            style={{ zIndex: 20 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+            className="absolute -top-8 -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-xl pointer-events-none"
+            style={{ zIndex: 10 }}
           >
-            <p className="text-xs text-foreground/50 mb-0.5">Built for</p>
-            <p className="text-sm font-semibold text-foreground">
-              Local businesses across Vic
-            </p>
+            <p className="text-xs text-primary/70 mb-0.5">Desktop · Tablet · Mobile</p>
+            <p className="text-sm font-semibold text-primary">Every device, pixel-perfect</p>
           </motion.div>
 
-          {/* Top-right badge — z-40 always on top, lifted above top-right image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.25, duration: 0.5, ease: 'easeOut' }}
-            className="absolute -right-5 bg-primary/10 border border-primary/20 rounded-2xl px-4 py-3 shadow-xl pointer-events-none"
-            style={{ top: '-75px', zIndex: 40 }}
-          >
-            <p className="text-xs text-primary/70 mb-0.5">
-              Ecommerce · Trades · Agriculture
-            </p>
-            <p className="text-sm font-semibold text-primary">
-              Every industry, custom built
-            </p>
-          </motion.div>
-
-        </div>
+        </motion.div>
       </div>
     </section>
+  )
+}
+
+/* ─── Device frame components ─── */
+
+function DeviceImage({
+  src, alt, priority, sizes,
+}: {
+  src: string; alt: string; priority: boolean; sizes: string
+}) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={src}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="absolute inset-0"
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes={sizes}
+          className="object-cover object-top"
+        />
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+function LaptopFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
+  return (
+    <div style={{ width: '320px' }}>
+      {/* Screen bezel */}
+      <div
+        className="rounded-t-xl border border-white/15 bg-[#1a1a2e] shadow-2xl shadow-black/60"
+        style={{ padding: '8px 8px 0' }}
+      >
+        {/* Camera dot */}
+        <div className="flex justify-center mb-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+        </div>
+        {/* Screen area */}
+        <div className="relative rounded overflow-hidden bg-slate-900" style={{ aspectRatio: '16/10', width: '100%' }}>
+          <DeviceImage src={entry.desktop} alt={entry.name} priority={priority} sizes="304px" />
+        </div>
+      </div>
+      {/* Base / keyboard */}
+      <div
+        className="rounded-b-2xl border-x border-b border-white/10 bg-[#111122]"
+        style={{ height: '18px', position: 'relative' }}
+      >
+        {/* Trackpad */}
+        <div
+          className="absolute left-1/2 top-2 -translate-x-1/2 rounded border border-white/10 bg-white/5"
+          style={{ width: '60px', height: '10px' }}
+        />
+      </div>
+      {/* Stand */}
+      <div className="flex justify-center">
+        <div className="bg-[#0e0e1c] border-x border-b border-white/8 rounded-b-xl" style={{ width: '80px', height: '4px' }} />
+      </div>
+    </div>
+  )
+}
+
+function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
+  const src = entry.tablet ?? entry.desktop
+  return (
+    <div
+      className="rounded-2xl border border-white/15 bg-[#1a1a2e] shadow-xl shadow-black/50"
+      style={{ width: '120px', padding: '8px 6px' }}
+    >
+      {/* Camera */}
+      <div className="flex justify-center mb-1.5">
+        <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      </div>
+      {/* Screen */}
+      <div className="relative rounded overflow-hidden bg-slate-900" style={{ aspectRatio: '3/4', width: '100%' }}>
+        <DeviceImage src={src} alt={entry.name} priority={priority} sizes="108px" />
+      </div>
+      {/* Home indicator */}
+      <div className="flex justify-center mt-1.5">
+        <div className="w-8 h-1 rounded-full bg-white/20" />
+      </div>
+    </div>
+  )
+}
+
+function PhoneFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
+  const src = entry.mobile ?? entry.desktop
+  return (
+    <div
+      className="rounded-3xl border border-white/15 bg-[#1a1a2e] shadow-xl shadow-black/50"
+      style={{ width: '75px', padding: '8px 5px' }}
+    >
+      {/* Notch */}
+      <div className="flex justify-center mb-1.5">
+        <div className="w-10 h-2 rounded-full bg-[#0e0e1c] border border-white/10 flex items-center justify-center gap-1">
+          <div className="w-1 h-1 rounded-full bg-white/20" />
+        </div>
+      </div>
+      {/* Screen */}
+      <div className="relative rounded-xl overflow-hidden bg-slate-900" style={{ aspectRatio: '9/19', width: '100%' }}>
+        <DeviceImage src={src} alt={entry.name} priority={priority} sizes="65px" />
+      </div>
+      {/* Home indicator */}
+      <div className="flex justify-center mt-2">
+        <div className="w-6 h-1 rounded-full bg-white/20" />
+      </div>
+    </div>
   )
 }
