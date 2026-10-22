@@ -89,6 +89,21 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Google Reviews', 'GBP Management'],
     url: 'https://austrenching.com.au',
     image: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',
+    caseStudy: {
+      headline: 'How Australian Trenching went from page 7 to page 1 on Google',
+      tagline: 'A complete website rebuild and SEO overhaul that pushed a Seymour civil contractor to the top of local search and kept them there.',
+      problem: "CJ Ogston's business was doing solid work around Seymour and Central Victoria, but the website wasn't doing its job. It was sitting on page 7 of Google, practically invisible to anyone searching for trenching or excavation services nearby. Without a proper SEO strategy, blog, or Google Business Profile setup, the business was relying entirely on word of mouth while competitors with better online presence were picking up the enquiries.",
+      solution: "We rebuilt the site from scratch on Next.js with a mobile-first approach, then built a full local SEO strategy around the services and locations that matter most. Location-specific landing pages target searches across Seymour, Broadford, Euroa, and the Mitchell Shire. A Sanity-powered blog gives the site fresh, indexed content on a regular basis. We integrated Google reviews on-site for social proof and set up Google Business Profile management to reinforce map rankings. The result is a site that works as hard as the team behind it.",
+      services: ['Website Design & Development', 'Local SEO', 'Location Landing Pages', 'Sanity CMS Blog', 'Google Business Profile', 'Google Review Integration', 'GBP Management'],
+      results: [
+        { metric: 'Page 7 to 1', label: 'Google ranking improvement for core search terms' },
+        { metric: 'Multi-location', label: 'SEO targeting Seymour, Broadford, Euroa and surrounds' },
+        { metric: 'Ongoing', label: 'Blog content and GBP management keeping rankings strong' },
+      ],
+      quote: 'Web F5 transformed our website. Thanks to their SEO and web design, we now rank on the first page. Highly recommended.',
+      quoteAuthor: 'CJ Ogston',
+      quoteRole: 'Owner, Australian Trenching and Excavations',
+    },
   },
   {
     id: 'appti',
@@ -114,9 +129,9 @@ export const projects: Project[] = [
     logo: '/images/logo-speechless-electrical.webp',
     caseStudy: {
       headline: 'Local SEO that puts Speechless Electrical at the top of Google in Seymour',
-      tagline: 'From invisible to first page — electrical contractor earns a competitive edge with professional web design and targeted local SEO.',
-      problem: "Ben Speechley runs Speechless Electrical out of Seymour, VIC, servicing everything from residential fit-outs to commercial switchboard upgrades. He had a basic website that wasn't ranking locally, no Google Business Profile strategy, and no way to capture leads after hours. Electricians are one of the most searched-for trades in regional Victoria — being invisible on Google means losing work to whoever shows up first.",
-      solution: "We built a fast, mobile-first Next.js site from the ground up, prioritising local SEO from day one. Every page was structured around the terms Seymour residents actually search — 'electrician Seymour', 'licensed electrician near me', 'emergency electrical Seymour VIC'. We embedded Google reviews directly on the site to build instant trust and wired up a Formspree contact form for after-hours lead capture. The site also connects to his Google Business Profile, reinforcing location authority across search and maps.",
+      tagline: 'From invisible to first page: electrical contractor earns a competitive edge with professional web design and targeted local SEO.',
+      problem: "Ben Speechley runs Speechless Electrical out of Seymour, VIC, servicing everything from residential fit-outs to commercial switchboard upgrades. He had a basic website that wasn't ranking locally, no Google Business Profile strategy, and no way to capture leads after hours. Electricians are one of the most searched-for trades in regional Victoria; being invisible on Google means losing work to whoever shows up first.",
+      solution: "We built a fast, mobile-first Next.js site from the ground up, prioritising local SEO from day one. Every page was structured around the terms Seymour residents actually search: 'electrician Seymour', 'licensed electrician near me', 'emergency electrical Seymour VIC'. We embedded Google reviews directly on the site to build instant trust and wired up a Formspree contact form for after-hours lead capture. The site also connects to his Google Business Profile, reinforcing location authority across search and maps.",
       services: ['Website Design & Development', 'Local SEO', 'Google Business Profile', 'Google Review Integration', 'Lead Capture Forms', 'Mobile-First Build'],
       results: [
         { metric: 'First page', label: 'Google ranking for Seymour electrician searches' },
