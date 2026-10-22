@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db, appSettings } from '@/lib/db'
 
-const ALLOWED_KEYS = ['sender_name', 'sender_title', 'sender_company', 'sender_slogan', 'sender_phone', 'sender_website'] as const
+const ALLOWED_KEYS = ['sender_name', 'sender_title', 'sender_company', 'sender_slogan', 'sender_phone', 'sender_website', 'github_repo', 'github_token'] as const
 
 export async function GET() {
   const rows = await db.select().from(appSettings)

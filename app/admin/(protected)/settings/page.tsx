@@ -10,6 +10,8 @@ type Settings = {
   sender_slogan:  string
   sender_phone:   string
   sender_website: string
+  github_repo:    string
+  github_token:   string
 }
 
 const DEFAULTS: Settings = {
@@ -19,6 +21,8 @@ const DEFAULTS: Settings = {
   sender_slogan:  '',
   sender_phone:   '',
   sender_website: '',
+  github_repo:    '',
+  github_token:   '',
 }
 
 export default function SettingsPage() {
@@ -121,6 +125,17 @@ export default function SettingsPage() {
         )}
       </section>
 
+      {/* GitHub integration */}
+      <section className="bg-[#111827] border border-white/10 rounded-2xl p-6 space-y-5">
+        <div>
+          <h2 className="text-base font-semibold text-white mb-0.5">GitHub Integration</h2>
+          <p className="text-xs text-slate-500">Used by the SEO Tool to scan and fix Next.js repositories.</p>
+        </div>
+        <Field label="Repository URL" placeholder="https://github.com/owner/repo" value={settings.github_repo} onChange={v => set('github_repo', v)} />
+        <Field label="Personal access token" placeholder="github_pat_..." value={settings.github_token} onChange={v => set('github_token', v)} type="password"
+          hint="Needs repo scope (read + write contents)" />
+      </section>
+
       <div className="flex justify-end">
         <button
           onClick={save}
@@ -139,18 +154,20 @@ export default function SettingsPage() {
 }
 
 function Field({
-  label, placeholder, value, onChange, hint,
+  label, placeholder, value, onChange, hint, type = 'text',
 }: {
   label: string
   placeholder: string
   value: string
   onChange: (v: string) => void
   hint?: string
+  type?: string
 }) {
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</label>
       <input
+        type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
