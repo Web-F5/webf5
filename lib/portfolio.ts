@@ -45,6 +45,21 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Formspree'],
     url: 'https://fsmrecycle.com.au',
     image: '/images/FSM-Recycling-and-Demolition.webp',
+    caseStudy: {
+      headline: 'A complete digital setup for FSM Recycling and Demolitions',
+      tagline: 'Domain, hosting, email, and a professional website delivered end-to-end for a Central Victorian recycling and demolitions business.',
+      problem: "FSM Recycling and Demolitions handle scrap metals, concrete recycling, and demolition work across Broadford and Central Victoria. When they came to Web F5, they had no website, no business domain, and no professional email. They needed everything set up from scratch, done right the first time, without having to coordinate multiple providers or figure it all out themselves. The goal was a clean, credible online presence that matched the quality of their on-the-ground operation.",
+      solution: "We handled the full setup: registered their domain, configured business email hosting, and built a clean mobile-first Next.js site that presents their services clearly and professionally. SEO foundations were built in from the start, with structured pages targeting the services and locations they serve. A Sanity CMS blog was included to give them the ability to publish content and grow organic reach over time. A Formspree contact form makes it simple for clients to enquire directly from the site.",
+      services: ['Domain Registration', 'Email Hosting', 'Website Design & Development', 'Local SEO', 'Sanity CMS Blog', 'Lead Capture Forms', 'Mobile-First Build'],
+      results: [
+        { metric: 'End-to-end', label: 'Domain, email, hosting and website delivered as one package' },
+        { metric: 'SEO-ready', label: 'Structured pages targeting Broadford and Central Victoria' },
+        { metric: 'CMS included', label: 'Sanity blog for ongoing content and organic growth' },
+      ],
+      quote: 'Web F5 designed and developed our website, organised a domain, email and hosting. Very happy with the results. Fantastic service, highly recommend!',
+      quoteAuthor: 'Sophie Fair',
+      quoteRole: 'FSM Recycling and Demolitions',
+    },
   },
   {
     id: 'outright-electrical',
