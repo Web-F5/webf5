@@ -34,6 +34,7 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Google Reviews', 'GBP Management'],
     url: 'https://chuckelec.com',
     image: '/images/Licensed-Electricians- Chuck-E-Electrical.webp',
+    logo: '/images/logo-chuckelec2.webp',
     caseStudy: {
       headline: 'Full-service SEO and web presence for Chuck E Electrical in Seymour',
       tagline: 'A fast, lead-ready website with an ongoing SEO and content strategy helping a local electrician stand out in a competitive regional market.',
@@ -117,6 +118,7 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Google Reviews', 'GBP Management'],
     url: 'https://austrenching.com.au',
     image: '/images/Australian-Trenching-and-Excavations-Seymour-Victoria.webp',
+    logo: '/images/ATE-logo.webp',
     caseStudy: {
       headline: 'How Australian Trenching went from page 7 to page 1 on Google',
       tagline: 'A complete website rebuild and SEO overhaul that pushed a Seymour civil contractor to the top of local search and kept them there.',
@@ -181,6 +183,19 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'GBP Management'],
     url: 'https://letsgettrowled.com.au',
     image: '/images/Lets-Get-Trowled-Plastering-Services-Seymour.webp',
+    logo: '/images/logo-lets-get-trowled.webp',
+    caseStudy: {
+      headline: "Putting Let's Get Trowled on the map for plastering in Seymour and Central Victoria",
+      tagline: 'A professional web presence, targeted local SEO, and ongoing content strategy helping a Seymour plastering contractor win work across the region.',
+      problem: "Plastering is a competitive trade, and most clients go with whoever they find first online. Let's Get Trowled were doing quality work across Seymour and Central Victoria but had no real digital presence to show for it. Without a website structured for local search, a Google Business Profile strategy, or any regular content, they were relying on word of mouth while potential clients were finding other plasterers through Google. The opportunity was clear: build something that reflects the quality of their work and puts them in front of the right people.",
+      solution: "We designed and built a mobile-first Next.js site that positions Let's Get Trowled as the go-to plastering contractor in the region. Location-specific pages target searches across Seymour, Broadford, Kilmore, and the broader Mitchell Shire. A Sanity CMS blog gives them a platform to publish helpful content covering plastering tips, renovation prep, and project spotlights — content that builds authority and gets indexed. Ongoing Google Business Profile management keeps their listing accurate and competitive, helping them appear in the local map pack when it matters most.",
+      services: ['Website Design & Development', 'Local SEO', 'Location Landing Pages', 'Sanity CMS Blog', 'Google Business Profile', 'GBP Management', 'Mobile-First Build'],
+      results: [
+        { metric: 'Multi-location', label: 'SEO targeting Seymour, Broadford, Kilmore and surrounds' },
+        { metric: 'CMS blog', label: 'Ongoing Sanity content building topical authority in plastering' },
+        { metric: 'GBP managed', label: 'Active local map presence driving enquiries from the region' },
+      ],
+    },
   },
   {
     id: 'lkf-contracting',
