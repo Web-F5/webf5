@@ -207,5 +207,18 @@ export const projects: Project[] = [
     features: ['Next.js', 'Mobile-first', 'SEO', 'Sanity Blog', 'Formspree'],
     url: 'https://lkfcontracting.com.au',
     image: '/images/LKF-Contracting-Agricultural-and- -Civil-Contractors-Invergordon.webp',
+    logo: '/images/LKF-logo.webp',
+    caseStudy: {
+      headline: 'A professional online presence for LKF Contracting across agricultural and civil work',
+      tagline: 'Local SEO, targeted location pages, and a Sanity blog helping an Invergordon contractor get found across regional Victoria.',
+      problem: "LKF Contracting operate across agricultural and civil contracting in and around Invergordon and the Goulburn Valley — earthworks, fencing, land clearing, and more. The work speaks for itself, but without a website built to rank locally, clients searching for contractors in the region had no way of finding them. Agricultural and civil contracting is a niche with real search demand from farmers and developers who need reliable operators. Being absent online meant leaving that demand entirely to others.",
+      solution: "We built a clean, mobile-first Next.js site that presents LKF Contracting's services clearly and professionally. Location-targeted pages cover the key areas they operate across: Invergordon, Shepparton, Nagambie, and the broader Goulburn Valley region. A Sanity CMS blog provides a platform for publishing content around agricultural contracting topics, building topical authority over time. A Formspree contact form makes it straightforward for clients and landowners to get in touch directly from any device.",
+      services: ['Website Design & Development', 'Local SEO', 'Location Landing Pages', 'Sanity CMS Blog', 'Lead Capture Forms', 'Mobile-First Build'],
+      results: [
+        { metric: 'Regional reach', label: 'Location pages covering Invergordon, Shepparton, Nagambie and beyond' },
+        { metric: 'CMS blog', label: 'Sanity content platform for agricultural and civil topics' },
+        { metric: 'Lead-ready', label: 'Formspree contact form converting visitors on any device' },
+      ],
+    },
   },
 ]
