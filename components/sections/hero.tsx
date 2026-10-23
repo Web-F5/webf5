@@ -176,10 +176,10 @@ export function HeroSection() {
             <div
               className="absolute"
               style={{
-                left: '1%',
+                left: '0%',
                 top: '28px',
                 zIndex: 2,
-                transform: 'perspective(700px) rotateY(14deg)',
+                transform: 'perspective(700px) rotateY(18deg)',
                 transformOrigin: 'left center',
                 willChange: 'transform',
                 backfaceVisibility: 'hidden',
@@ -205,10 +205,10 @@ export function HeroSection() {
             <div
               className="absolute"
               style={{
-                right: '1%',
+                right: '3%',
                 top: '24px',
                 zIndex: 2,
-                transform: 'perspective(700px) rotateY(-14deg)',
+                transform: 'perspective(700px) rotateY(-10deg)',
                 transformOrigin: 'right center',
                 willChange: 'transform',
                 backfaceVisibility: 'hidden',
@@ -280,6 +280,7 @@ export function HeroSection() {
           >
             <p className="text-xs text-primary/70 mb-0.5">Desktop · Tablet · Mobile</p>
             <p className="text-sm font-semibold text-primary">Every device, pixel-perfect</p>
+            <p className="text-xs text-accent/80 mt-0.5">(check them out on your devices!)</p>
           </motion.div>
 
         </motion.div>
