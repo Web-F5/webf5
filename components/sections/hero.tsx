@@ -181,6 +181,7 @@ export function HeroSection() {
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(14deg)',
                 transformOrigin: 'left center',
+                willChange: 'transform',
               }}
             >
               <TabletFrame entry={current} priority={false} />
@@ -208,6 +209,7 @@ export function HeroSection() {
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(-14deg)',
                 transformOrigin: 'right center',
+                willChange: 'transform',
               }}
             >
               <PhoneFrame entry={current} priority={false} />
@@ -313,7 +315,7 @@ function DeviceImage({
           fill
           priority={priority}
           sizes={sizes}
-          quality={90}
+          unoptimized
           className="object-cover object-top"
         />
       </motion.div>
