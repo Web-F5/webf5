@@ -276,11 +276,11 @@ export function HeroSection() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
             className="absolute -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-xl pointer-events-none"
-            style={{ zIndex: 10, top: '-70px' }}
+            style={{ zIndex: 10, top: '-89px' }}
           >
             <p className="text-xs text-primary/70 mb-0.5">Desktop · Tablet · Mobile</p>
             <p className="text-sm font-semibold text-primary">Every device, pixel-perfect</p>
-            <p className="text-xs text-accent/80 mt-0.5">(check them out on your devices!)</p>
+            <p className="text-xs text-accent/80 mt-0.5">check them out on your devices!</p>
           </motion.div>
 
         </motion.div>
