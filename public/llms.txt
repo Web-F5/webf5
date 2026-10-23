@@ -1,6 +1,6 @@
 # Web F5
 
-> Web design and development for trades, local businesses, and ecommerce brands across Central Victoria, Australia.
+> Web design and development for trades, local businesses, and ecommerce brands across Central Victoria and Greater Geelong, Australia.
 
 Web F5 is a web design and development studio based in Central Victoria, Australia. We build fast, modern websites with fixed-price quotes and no lock-in contracts.
 
@@ -13,14 +13,14 @@ Web F5 is a web design and development studio based in Central Victoria, Austral
 
 ## Who We Work With
 
-Trades and construction, health and allied health, retail, hospitality, professional services, agriculture, real estate, automotive, and education businesses across Central Victoria.
+Trades and construction, health and allied health, retail, hospitality, professional services, agriculture, real estate, automotive, and education businesses across Central Victoria and Greater Geelong.
 
 ## Contact
 
 - Website: https://webf5.com.au
 - Email: contact@webf5.au
 - Phone: 0419 510 206
-- Location: Central Victoria, Australia
+- Location: Central Victoria & Greater Geelong, Australia
 
 ## Key Pages
 
@@ -28,3 +28,16 @@ Trades and construction, health and allied health, retail, hospitality, professi
 - https://webf5.com.au/audit — Free website audit tool
 - https://webf5.com.au/brief — Start a project
 - https://webf5.com.au/work — Our work
+- https://webf5.com.au/resources — Resources and tools
+
+## Recent Work
+
+- https://webf5.com.au/work/chuck-e-electrical — Chuck E Electrical
+- https://webf5.com.au/work/fsm-recycling — FSM Recycling & Demolition
+- https://webf5.com.au/work/outright-electrical — Outright Electrical
+- https://webf5.com.au/work/valley-feeds — Valley Feeds
+- https://webf5.com.au/work/australian-trenching — Australian Trenching
+- https://webf5.com.au/work/appti — Appti
+- https://webf5.com.au/work/speechless-electrical — Speechless Electrical
+- https://webf5.com.au/work/lets-get-trowled — Let's Get Trowled
+- https://webf5.com.au/work/lkf-contracting — LKF Contracting
