@@ -170,7 +170,7 @@ export function HeroSection() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Device composition */}
-          <div className="relative w-full" style={{ height: '230px' }}>
+          <div className="relative w-full" style={{ height: '250px' }}>
 
             {/* ── Tablet — left, behind ── */}
             <div
@@ -206,7 +206,7 @@ export function HeroSection() {
               className="absolute"
               style={{
                 right: '2%',
-                top: '28px',
+                top: '10px',
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(-14deg)',
                 transformOrigin: 'right center',
@@ -275,8 +275,8 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
-            className="absolute -top-8 -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-xl pointer-events-none"
-            style={{ zIndex: 10 }}
+            className="absolute -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-xl pointer-events-none"
+            style={{ zIndex: 10, top: '-70px' }}
           >
             <p className="text-xs text-primary/70 mb-0.5">Desktop · Tablet · Mobile</p>
             <p className="text-sm font-semibold text-primary">Every device, pixel-perfect</p>
@@ -402,13 +402,13 @@ function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: bool
 }
 
 function PhoneFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
-  const W = 75, H = 160
-  const sx = 5, sy = 13, sw = 65, sh = 126
+  const W = 90, H = 192
+  const sx = 6, sy = 15, sw = 78, sh = 152
 
   return (
     <div style={{ position: 'relative', width: W, height: H, flexShrink: 0 }}>
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 4, overflow: 'hidden', background: '#0a0a14' }}>
-        <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes={`${sw}px`} />
+        <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="200px" />
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,4)}`} />
