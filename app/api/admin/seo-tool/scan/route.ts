@@ -229,7 +229,10 @@ export async function POST(req: NextRequest) {
       f => f.type === 'blob' && /^app\/.*\/page\.tsx$/.test(f.path),
     )
 
-    const hasRobots  = tree.tree.some(f => f.path === 'public/robots.txt')
+    const hasRobots  = tree.tree.some(f =>
+      f.path === 'public/robots.txt' ||
+      /^app\/robots\.(ts|js)$/.test(f.path)
+    )
     const hasSitemap = tree.tree.some(
       f => /^(public\/sitemap\.xml|app\/sitemap\.(ts|js))$/.test(f.path),
     )
