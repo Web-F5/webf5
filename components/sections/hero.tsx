@@ -170,19 +170,17 @@ export function HeroSection() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Device composition */}
-          <div className="relative w-full" style={{ height: '250px' }}>
+          <div className="relative w-full" style={{ height: '280px' }}>
 
             {/* ── Tablet — left, behind ── */}
             <div
               className="absolute"
               style={{
-                left: '2%',
-                top: '16px',
+                left: '1%',
+                top: '28px',
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(14deg)',
                 transformOrigin: 'left center',
-                willChange: 'transform',
-                backfaceVisibility: 'hidden',
               }}
             >
               <TabletFrame entry={current} priority={false} />
@@ -205,13 +203,11 @@ export function HeroSection() {
             <div
               className="absolute"
               style={{
-                right: '2%',
-                top: '10px',
+                right: '1%',
+                top: '24px',
                 zIndex: 2,
                 transform: 'perspective(700px) rotateY(-14deg)',
                 transformOrigin: 'right center',
-                willChange: 'transform',
-                backfaceVisibility: 'hidden',
               }}
             >
               <PhoneFrame entry={current} priority={false} />
@@ -317,6 +313,7 @@ function DeviceImage({
           fill
           priority={priority}
           sizes={sizes}
+          quality={90}
           className="object-cover object-top"
         />
       </motion.div>
@@ -374,59 +371,59 @@ function LaptopFrame({ entry, priority }: { entry: ShowcaseEntry; priority: bool
 }
 
 function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
-  const W = 120, H = 168
-  const sx = 8, sy = 8, sw = 104, sh = 144
+  const W = 140, H = 196
+  const sx = 10, sy = 10, sw = 120, sh = 168
 
   return (
-    <div style={{ position: 'relative', width: W, height: H, flexShrink: 0 }}>
+    <div style={{ position: 'relative', width: W, height: H, flexShrink: 0, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', borderRadius: 12 }}>
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 3, overflow: 'hidden', background: '#0a0a14' }}>
-        <DeviceImage src={entry.tablet ?? entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes={`${sw}px`} />
+        <DeviceImage src={entry.tablet ?? entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="300px" />
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,3)}`} />
         <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
         <rect x={sx} y={sy} width={sw} height={sh} rx="3" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
         {/* Front camera */}
-        <circle cx={W/2} cy="4.5" r="2.2" fill="#08080f" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
-        <circle cx={W/2} cy="4.5" r="0.9" fill="#0d0d1a" />
+        <circle cx={W/2} cy="5" r="2.5" fill="#08080f" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <circle cx={W/2} cy="5" r="1" fill="#0d0d1a" />
         {/* Home indicator */}
-        <rect x={W/2-14} y={H-7} width="28" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
+        <rect x={W/2-16} y={H-8} width="32" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
         {/* Side button */}
-        <rect x={W-1} y="54" width="2" height="28" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x={W-1} y="62" width="2" height="32" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
         {/* Volume */}
-        <rect x="-1" y="54" width="2" height="18" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
-        <rect x="-1" y="75" width="2" height="18" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x="-1" y="62" width="2" height="21" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x="-1" y="87" width="2" height="21" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
       </svg>
     </div>
   )
 }
 
 function PhoneFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boolean }) {
-  const W = 90, H = 192
-  const sx = 6, sy = 15, sw = 78, sh = 152
+  const W = 100, H = 212
+  const sx = 7, sy = 17, sw = 86, sh = 168
 
   return (
-    <div style={{ position: 'relative', width: W, height: H, flexShrink: 0 }}>
+    <div style={{ position: 'relative', width: W, height: H, flexShrink: 0, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', borderRadius: 12 }}>
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 4, overflow: 'hidden', background: '#0a0a14' }}>
-        <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="200px" />
+        <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="300px" />
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,4)}`} />
         <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
         <rect x={sx} y={sy} width={sw} height={sh} rx="4" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
         {/* Dynamic island */}
-        <rect x="23" y="4" width="29" height="7.5" rx="3.75" fill="#08080f" />
-        <circle cx="43" cy="7.75" r="1.8" fill="#0f0f1e" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+        <rect x="27" y="5" width="32" height="8" rx="4" fill="#08080f" />
+        <circle cx="50" cy="9" r="2" fill="#0f0f1e" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
         {/* Home indicator */}
-        <rect x="25" y="146" width="25" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
+        <rect x={W/2-14} y={H-9} width="28" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
         {/* Power button */}
-        <rect x={W-1} y="50" width="2" height="22" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x={W-1} y="56" width="2" height="24" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
         {/* Mute switch */}
-        <rect x="-1" y="28" width="2" height="10" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x="-1" y="32" width="2" height="11" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
         {/* Volume up */}
-        <rect x="-1" y="42" width="2" height="16" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x="-1" y="47" width="2" height="18" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
         {/* Volume down */}
-        <rect x="-1" y="61" width="2" height="16" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+        <rect x="-1" y="68" width="2" height="18" rx="1" fill="#1a1a2e" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
       </svg>
     </div>
   )
