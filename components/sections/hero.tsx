@@ -83,7 +83,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl tracking-tight mb-5 text-balance leading-[1.1]" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl tracking-tight mb-5 text-balance leading-[1.1]" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>
             A website built around{' '}
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               your business.
@@ -170,7 +170,7 @@ export function HeroSection() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Brand name above devices */}
-          <p className="text-5xl tracking-tight text-white leading-none" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>
+          <p className="text-7xl tracking-tight text-white leading-none" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>
             Web F5
           </p>
 
