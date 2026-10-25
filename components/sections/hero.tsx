@@ -91,7 +91,7 @@ export function HeroSection() {
           </h1>
 
           <p className="text-base md:text-lg text-foreground/80 mb-3 max-w-lg leading-relaxed">
-            <span className="text-white" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>Web F5</span> builds websites
+            We build websites
             for trades, local businesses, and ecommerce brands across Victoria.
             Our discovery process means we understand your business before we
             write a line of code.
