@@ -281,7 +281,7 @@ export function HeroSection() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
             className="absolute -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-xl pointer-events-none"
-            style={{ zIndex: 10, top: '369px' }}
+            style={{ zIndex: 10, top: '350px', right: '-35px' }}
           >
             <p className="text-xs text-primary/70 mb-0.5">Desktop · Tablet · Mobile</p>
             <p className="text-sm font-semibold text-primary">Every device, pixel-perfect</p>
@@ -389,7 +389,7 @@ function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: bool
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 3, overflow: 'hidden', background: '#0a0a14' }}>
         <DeviceImage src={entry.tablet ?? entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="300px" />
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'none' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 0 1px rgba(0,0,0,0))' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,3)}`} />
         <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
         <rect x={sx} y={sy} width={sw} height={sh} rx="3" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
@@ -417,7 +417,7 @@ function PhoneFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boole
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 4, overflow: 'hidden', background: '#0a0a14' }}>
         <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="300px" />
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'none' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 0 1px rgba(0,0,0,0))' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,4)}`} />
         <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
         <rect x={sx} y={sy} width={sw} height={sh} rx="4" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
