@@ -280,7 +280,7 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
-            className="absolute -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-xl pointer-events-none"
+            className="absolute -right-4 bg-primary/10 border border-primary/20 rounded-2xl px-3 py-2 shadow-md pointer-events-none"
             style={{ zIndex: 10, top: '350px', right: '-35px' }}
           >
             <p className="text-xs text-primary/70 mb-0.5">Desktop · Tablet · Mobile</p>
