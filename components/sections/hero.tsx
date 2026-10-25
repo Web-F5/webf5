@@ -170,7 +170,7 @@ export function HeroSection() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Brand name above devices */}
-          <p className="text-7xl tracking-tight text-white leading-none" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700, textShadow: '0 2px 24px rgba(99,102,241,0.45), 0 6px 16px rgba(0,0,0,0.9)' }}>
+          <p className="text-7xl tracking-tight text-white leading-none" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700, textShadow: '0 1px 0 rgba(255,255,255,0.25), 0 -1px 0 rgba(0,0,0,0.6), 0 2px 24px rgba(99,102,241,0.45)' }}>
             Web F5
           </p>
 
