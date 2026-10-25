@@ -336,7 +336,7 @@ function LaptopFrame({ entry, priority }: { entry: ShowcaseEntry; priority: bool
   const sx = 14, sy = 10, sw = 292, sh = 176
 
   return (
-    <div style={{ width: W, flexShrink: 0 }}>
+    <div style={{ width: W, flexShrink: 0, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.6))' }}>
       {/* Lid */}
       <div style={{ position: 'relative', width: W, height: LH }}>
         {/* Screenshot sits behind the SVG frame */}
@@ -389,7 +389,7 @@ function TabletFrame({ entry, priority }: { entry: ShowcaseEntry; priority: bool
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 3, overflow: 'hidden', background: '#0a0a14' }}>
         <DeviceImage src={entry.tablet ?? entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="300px" />
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 0 1px rgba(0,0,0,0))' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.6))' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,3)}`} />
         <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
         <rect x={sx} y={sy} width={sw} height={sh} rx="3" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
@@ -417,7 +417,7 @@ function PhoneFrame({ entry, priority }: { entry: ShowcaseEntry; priority: boole
       <div style={{ position: 'absolute', left: sx, top: sy, width: sw, height: sh, borderRadius: 4, overflow: 'hidden', background: '#0a0a14' }}>
         <DeviceImage src={entry.mobile ?? entry.desktop} alt={entry.name} priority={priority} sizes="300px" />
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 0 1px rgba(0,0,0,0))' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} fill="none" shapeRendering="geometricPrecision" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.6))' }}>
         <path fillRule="evenodd" fill="#12121f" d={`${rrect(0,0,W,H,12)} ${rrect(sx,sy,sw,sh,4)}`} />
         <rect x="0.5" y="0.5" width={W-1} height={H-1} rx="11.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
         <rect x={sx} y={sy} width={sw} height={sh} rx="4" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
