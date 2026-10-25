@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
+import { Syne } from 'next/font/google'
 import './globals.css'
+
+const syne = Syne({ subsets: ['latin'], weight: '700', variable: '--font-syne', display: 'swap' })
 
 export const metadata: Metadata = {
   title: {
@@ -79,7 +82,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${syne.variable}`}>
       <head>
         <script
           type="application/ld+json"

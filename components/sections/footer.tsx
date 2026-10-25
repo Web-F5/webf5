@@ -53,7 +53,7 @@ export function Footer() {
         >
           {/* Brand */}
           <motion.div variants={itemVariants} className="md:col-span-2">
-            <h3 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+            <h3 className="text-2xl tracking-tighter bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>
               Web F5
             </h3>
             <p className="text-foreground/60 text-sm mb-4">
