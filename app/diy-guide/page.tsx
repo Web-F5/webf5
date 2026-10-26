@@ -1,9 +1,6 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import { useRouter } from 'next/navigation'
-import { useUser } from '@clerk/nextjs'
 import { useState } from 'react'
 
 const included = [
@@ -19,22 +16,20 @@ const included = [
 ]
 
 export default function DiyGuidePage() {
-  const { isSignedIn } = useUser()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleBuy() {
-    if (!isSignedIn) {
-      router.push('/sign-in?redirect_url=/diy-guide')
-      return
-    }
-
     setLoading(true)
     setError(null)
 
     try {
       const res = await fetch('/api/checkout/diy-guide', { method: 'POST' })
+      if (res.status === 401) {
+        router.push('/sign-in?redirect_url=/diy-guide')
+        return
+      }
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
@@ -94,11 +89,9 @@ export default function DiyGuidePage() {
 
           {error && <p className="text-red-400 text-sm mt-3 text-center">{error}</p>}
 
-          {!isSignedIn && (
-            <p className="text-foreground/40 text-xs text-center mt-3">
-              You'll be asked to sign in or create a free account before checkout.
-            </p>
-          )}
+          <p className="text-foreground/40 text-xs text-center mt-3">
+            You'll be asked to sign in or create a free account before checkout.
+          </p>
         </div>
 
         <p className="text-center text-foreground/30 text-xs">
