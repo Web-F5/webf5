@@ -11,6 +11,7 @@ const footerLinks = {
   ],
   Company: [
     { label: 'Our Work',   href: '/work' },
+    { label: 'Blog',       href: '/blog' },
     { label: 'Pricing',    href: '/#pricing' },
     { label: 'Process',    href: '/#process' },
     { label: 'Contact',    href: 'mailto:contact@webf5.au' },

@@ -38,6 +38,7 @@ export function Navigation() {
   const navItems = [
     { label: 'Solutions', href: anchor('#solutions') },
     { label: 'Work', href: '/work' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Process', href: anchor('#process') },
     { label: 'FAQ', href: anchor('#faq') },
   ]
