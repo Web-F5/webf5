@@ -1,0 +1,39 @@
+import { NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
+import Stripe from 'stripe'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+const COURSE_ID = 'diy-guide'
+const PRICE_CENTS = 1900 // $19.00 AUD
+
+export async function POST() {
+  const { userId } = await auth()
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    currency: 'aud',
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: 'aud',
+          unit_amount: PRICE_CENTS,
+          product_data: {
+            name: 'Build Your Trade Website in a Weekend',
+            description: 'Step-by-step guide: brief → Claude → GitHub → Vercel → domain → email → Google.',
+          },
+        },
+      },
+    ],
+    metadata: { userId, courseId: COURSE_ID },
+    success_url: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'}/diy-guide/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'}/diy-guide`,
+  })
+
+  return NextResponse.json({ url: session.url })
+}

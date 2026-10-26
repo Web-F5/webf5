@@ -1,0 +1,109 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useUser } from '@clerk/nextjs'
+import { useState } from 'react'
+
+const included = [
+  'Module 1 — Run the Web F5 discovery wizard and build a brief that drives every decision',
+  'Module 2 — Set up GitHub, Vercel, Cloudflare, and Formspree (all free)',
+  'Module 3 — The Web F5 Claude prompt template: paste your brief, get a complete site',
+  'Module 4 — Purchase and connect your .com.au domain',
+  'Module 5 — Set up email routing with no mail server needed',
+  'Module 6 — Google Search Console, Analytics, and Business Profile',
+  'Module 7 — Go-live checklist (interactive, saves progress)',
+  'Module 8 — How to make updates after launch, and when to upgrade',
+  'Subject to Change reference — up-to-date notes on every third-party service used',
+]
+
+export default function DiyGuidePage() {
+  const { isSignedIn } = useUser()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleBuy() {
+    if (!isSignedIn) {
+      router.push('/sign-in?redirect_url=/diy-guide')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/checkout/diy-guide', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        setError('Something went wrong. Please try again.')
+        setLoading(false)
+      }
+    } catch {
+      setError('Something went wrong. Please try again.')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="min-h-screen pt-24 pb-16 px-4">
+      <div className="max-w-2xl mx-auto">
+
+        {/* Header */}
+        <div className="mb-12">
+          <p className="text-primary text-sm font-medium tracking-widest uppercase mb-3">DIY Guide · $19</p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-5 leading-tight text-balance">
+            Build Your Trade Website in a Weekend
+          </h1>
+          <p className="text-foreground/60 text-lg leading-relaxed">
+            A step-by-step guide for Victorian tradies and local service businesses. No coding experience needed. You get a live website, a real .com.au domain, email routing, and Google visibility — all set up yourself.
+          </p>
+        </div>
+
+        {/* What's included */}
+        <div className="mb-10">
+          <h2 className="text-sm font-semibold tracking-widest uppercase text-foreground/40 mb-5">What's included</h2>
+          <ul className="flex flex-col gap-3">
+            {included.map((item) => (
+              <li key={item} className="flex gap-3 items-start">
+                <span className="text-primary mt-0.5 flex-shrink-0">✓</span>
+                <span className="text-foreground/80 text-sm leading-relaxed">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Pricing card */}
+        <div className="border border-border rounded-2xl p-6 bg-card/30 mb-6">
+          <div className="flex items-end gap-2 mb-1">
+            <span className="text-4xl font-bold">$19</span>
+            <span className="text-foreground/40 mb-1">AUD · one-time</span>
+          </div>
+          <p className="text-foreground/50 text-sm mb-6">Lifetime access. No subscription.</p>
+
+          <button
+            onClick={handleBuy}
+            disabled={loading}
+            className="w-full bg-primary text-white font-semibold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-base"
+          >
+            {loading ? 'Redirecting to checkout…' : 'Get the guide — $19'}
+          </button>
+
+          {error && <p className="text-red-400 text-sm mt-3 text-center">{error}</p>}
+
+          {!isSignedIn && (
+            <p className="text-foreground/40 text-xs text-center mt-3">
+              You'll be asked to sign in or create a free account before checkout.
+            </p>
+          )}
+        </div>
+
+        <p className="text-center text-foreground/30 text-xs">
+          Secure checkout via Stripe. Receipt sent to your email. Refunds within 7 days if you're not happy.
+        </p>
+
+      </div>
+    </main>
+  )
+}
