@@ -27,6 +27,7 @@ export async function POST() {
             product_data: {
               name: 'Build Your Trade Website in a Weekend',
               description: 'Step-by-step guide: brief → Claude → GitHub → Vercel → domain → email → Google.',
+              tax_code: 'txcd_10000000', // General - Electronically Supplied Services
             },
           },
         },
