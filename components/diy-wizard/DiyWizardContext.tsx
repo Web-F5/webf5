@@ -39,6 +39,8 @@ export function DiyWizardProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [stepErrors, setStepErrors]   = useState<StepErrors>({})
+  const [partialSent, setPartialSent] = useState(false)
+  const [briefSaved, setBriefSaved]   = useState(false)
   const totalSteps = 8
 
   const update = useCallback((partial: Partial<WizardData>) => {
@@ -83,8 +85,39 @@ export function DiyWizardProvider({ children }: { children: ReactNode }) {
     }
     setStepErrors({})
     document.getElementById('diy-brief')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+    // Step 3 → fire partial lead email (once)
+    if (currentStep === 3 && !partialSent && data.bizName && data.bizEmail && data.bizPhone) {
+      setPartialSent(true)
+      fetch('/api/brief/partial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bizName:     data.bizName,
+          bizEmail:    data.bizEmail,
+          contactName: data.contactName,
+          bizPhone:    data.bizPhone,
+          startType:   data.startType,
+          domainStatus: data.domainStatus,
+          bizTagline:  data.bizTagline,
+          bizDesc:     data.bizDesc,
+          source:      'diy',
+        }),
+      }).catch(() => {})
+    }
+
+    // Step 7 → save to briefDrafts DB + email briefs@webf5.au (once)
+    if (currentStep === 7 && !briefSaved) {
+      setBriefSaved(true)
+      fetch('/api/diy-brief/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(() => {})
+    }
+
     setCurrentStep(s => Math.min(s + 1, totalSteps))
-  }, [currentStep, data, totalSteps, validateStep])
+  }, [currentStep, data, totalSteps, validateStep, partialSent, briefSaved])
 
   const goBack = useCallback(() => {
     setStepErrors({})

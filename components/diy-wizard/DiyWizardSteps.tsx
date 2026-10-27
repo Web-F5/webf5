@@ -904,7 +904,7 @@ export function DiyStep8() {
 
         <div>
           <p className="text-sm font-medium text-slate-200 mb-1">Save a copy of your brief</p>
-          <p className="text-xs text-slate-400 mb-4">We'll email you a copy of this brief as a reference file, and let Web F5 know you've completed a DIY brief.</p>
+          <p className="text-xs text-slate-400 mb-4">We'll email you a copy of this brief as a reference file.</p>
 
           {error && (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 mb-4">
