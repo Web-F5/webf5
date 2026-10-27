@@ -30,6 +30,21 @@ export default async function GbpSetupContentPage() {
 
   if (!entitlement) redirect('/guides/gbp-setup')
 
+  const [guide2Entitlement] = await db
+    .select()
+    .from(courseEntitlements)
+    .where(and(
+      eq(courseEntitlements.userId, userId),
+      or(
+        eq(courseEntitlements.courseId, 'gbp-optimise'),
+        eq(courseEntitlements.courseId, 'gbp-bundle'),
+      ),
+      isNull(courseEntitlements.refundedAt),
+    ))
+    .limit(1)
+
+  const hasGuide2 = !!guide2Entitlement
+
   return (
     <main className="min-h-screen pt-16 pb-16 px-4">
       <div className="max-w-2xl mx-auto">
@@ -417,16 +432,22 @@ export default async function GbpSetupContentPage() {
             </div>
           </section>
 
-          {/* Next guide upsell */}
+          {/* Next guide upsell / access */}
           <div className="mt-12 border border-emerald-500/20 rounded-2xl p-6 bg-emerald-500/5">
             <p className="text-xs font-medium uppercase tracking-widest text-emerald-400 mb-2">Next: Guide 2</p>
             <h3 className="text-xl font-bold mb-2">Ready to optimise what you've built?</h3>
             <p className="text-sm text-foreground/50 leading-relaxed mb-5">
               Guide 2 covers the optimisation work: categories, services, photos strategy, Google Posts, getting reviews, and using the Web F5 Review Request Sender.
             </p>
-            <Link href="/guides/gbp-optimise" className="inline-block bg-emerald-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-emerald-500 transition-colors">
-              Get Guide 2 - $19 →
-            </Link>
+            {hasGuide2 ? (
+              <Link href="/guides/gbp-optimise/content" className="inline-block bg-emerald-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-emerald-500 transition-colors">
+                Read Guide 2 →
+              </Link>
+            ) : (
+              <Link href="/guides/gbp-optimise" className="inline-block bg-emerald-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-emerald-500 transition-colors">
+                Get Guide 2 - $19 →
+              </Link>
+            )}
           </div>
 
           {/* Web F5 CTA */}
