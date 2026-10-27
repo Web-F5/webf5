@@ -719,7 +719,7 @@ export function DiyStep7() {
                   disabled={isRequired}
                   onClick={() => !isRequired && toggleArray('pages', p.value)}
                   className={`rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
-                    isSelected ? 'border-indigo-500 bg-indigo-500/10 text-indigo-200' : 'border-slate-700 bg-slate-800/40 text-slate-300 hover:border-slate-500'
+                    isSelected ? 'border-emerald-500 bg-emerald-500/10 text-emerald-200' : 'border-slate-700 bg-slate-800/40 text-slate-300 hover:border-slate-500'
                   } ${isRequired ? 'opacity-60 cursor-default' : 'cursor-pointer'}`}
                 >
                   {p.label}
