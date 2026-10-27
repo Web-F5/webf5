@@ -22,13 +22,17 @@ const RESOURCES = [
   { label: 'Free Website Audit', href: '/audit', desc: 'Instant report: speed, SEO, contact & more' },
   { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs' },
   { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers. Google, Facebook & more.' },
-  { label: 'DIY Website Brief', href: '/diy-guide/brief', desc: 'Build your brief and get a personalised Claude prompt' },
+]
+
+const GUIDES = [
+  { label: 'DIY Website Guide', href: '/diy-guide', desc: 'Build your trade website in a weekend - $19', badge: '$19' },
 ]
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
   const [pricingOpen, setPricingOpen] = useState(false)
+  const [guidesOpen, setGuidesOpen] = useState(false)
   const pricingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
   const isHome = pathname === '/'
@@ -116,11 +120,52 @@ export function Navigation() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Resources dropdown */}
+          {/* Guides dropdown */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + (navItems.length + 1) * 0.05 }}
+            className="relative"
+            onMouseEnter={() => setGuidesOpen(true)}
+            onMouseLeave={() => setGuidesOpen(false)}
+          >
+            <button className="flex items-center gap-1 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+              Guides
+              <ChevronDown size={14} className={`transition-transform duration-200 ${guidesOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+              {guidesOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full left-0 mt-2 w-72 bg-[#111827] border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                >
+                  {GUIDES.map(g => (
+                    <a
+                      key={g.href}
+                      href={g.href}
+                      className="flex items-start justify-between gap-3 px-4 py-3.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                      onClick={() => setGuidesOpen(false)}
+                    >
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-semibold text-white">{g.label}</span>
+                        <span className="text-xs text-slate-400">{g.desc}</span>
+                      </div>
+                      {g.badge && <span className="flex-shrink-0 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">{g.badge}</span>}
+                    </a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Resources dropdown */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + (navItems.length + 2) * 0.05 }}
             className="relative"
             onMouseEnter={() => setResourcesOpen(true)}
             onMouseLeave={() => setResourcesOpen(false)}
@@ -223,6 +268,22 @@ export function Navigation() {
                     onClick={() => setIsOpen(false)}
                   >
                     {p.label}
+                  </a>
+                ))}
+              </div>
+
+              {/* Guides section in mobile */}
+              <div className="pt-1 border-t border-border/50">
+                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider py-2">Guides</p>
+                {GUIDES.map(g => (
+                  <a
+                    key={g.href}
+                    href={g.href}
+                    className="flex items-center justify-between text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {g.label}
+                    {g.badge && <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">{g.badge}</span>}
                   </a>
                 ))}
               </div>
