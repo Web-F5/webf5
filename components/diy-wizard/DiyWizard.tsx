@@ -27,7 +27,11 @@ function DiyWizardInner() {
             From opening Claude to deploying on Vercel, connecting your domain, setting up email, and getting found on Google - every step covered in plain English.
           </p>
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <span className="text-2xl font-bold text-white">Only <span className="text-emerald-400">$19</span></span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm text-slate-500 line-through">Was $39</span>
+              <span className="text-2xl font-bold text-white underline">Now only <span className="text-emerald-400">$19</span></span>
+              <span className="text-sm font-semibold text-red-400">(save 51%)</span>
+            </div>
             <a
               href="/diy-guide"
               className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors"
