@@ -54,7 +54,7 @@ export default function DiyGuidePage() {
             Build Your Trade Website in a Weekend
           </h1>
           <p className="text-foreground/60 text-lg leading-relaxed">
-            A step-by-step guide for Victorian tradies and local service businesses. No coding experience needed. You get a live website, a real .com.au domain, email routing, and Google visibility — all set up yourself.
+            A step-by-step guide for Victorian tradies and local service businesses. No coding experience needed. You get to create your own live website using your new brief, connect your domain, set up an email form, setup email routing, and Google visibility; all done by yourself.
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export default function DiyGuidePage() {
             disabled={loading}
             className="w-full bg-primary text-white font-semibold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-base"
           >
-            {loading ? 'Redirecting to checkout…' : 'Get the guide — $19'}
+            {loading ? 'Redirecting to checkout…' : 'Get the guide - $19'}
           </button>
 
           {error && <p className="text-red-400 text-sm mt-3 text-center">{error}</p>}
