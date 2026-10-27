@@ -1,6 +1,4 @@
-import dynamic from 'next/dynamic'
-
-const DiyWizard = dynamic(() => import('@/components/diy-wizard/DiyWizard'), { ssr: false })
+import DiyWizardLoader from './DiyWizardLoader'
 
 export const metadata = {
   title: 'DIY Brief — Build Your Trade Website',
@@ -23,7 +21,7 @@ export default function DiyBriefPage() {
         </div>
 
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
-          <DiyWizard />
+          <DiyWizardLoader />
         </div>
       </div>
     </main>
