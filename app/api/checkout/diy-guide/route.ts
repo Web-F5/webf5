@@ -14,26 +14,32 @@ export async function POST() {
     return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   }
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    currency: 'aud',
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: 'aud',
-          unit_amount: PRICE_CENTS,
-          product_data: {
-            name: 'Build Your Trade Website in a Weekend',
-            description: 'Step-by-step guide: brief → Claude → GitHub → Vercel → domain → email → Google.',
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      currency: 'aud',
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: 'aud',
+            unit_amount: PRICE_CENTS,
+            product_data: {
+              name: 'Build Your Trade Website in a Weekend',
+              description: 'Step-by-step guide: brief → Claude → GitHub → Vercel → domain → email → Google.',
+            },
           },
         },
-      },
-    ],
-    metadata: { userId, courseId: COURSE_ID },
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'}/diy-guide/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'}/diy-guide`,
-  })
+      ],
+      metadata: { userId, courseId: COURSE_ID },
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'}/diy-guide/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webf5.com.au'}/diy-guide`,
+    })
 
-  return NextResponse.json({ url: session.url })
+    return NextResponse.json({ url: session.url })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[checkout/diy-guide]', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

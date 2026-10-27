@@ -34,7 +34,7 @@ export default function DiyGuidePage() {
       if (data.url) {
         window.location.href = data.url
       } else {
-        setError('Something went wrong. Please try again.')
+        setError(data.error ?? 'Something went wrong. Please try again.')
         setLoading(false)
       }
     } catch {
