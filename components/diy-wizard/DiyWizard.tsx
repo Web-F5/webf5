@@ -28,7 +28,7 @@ function DiyWizardInner() {
           </p>
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex flex-col gap-0.5">
-              <span className="text-sm text-slate-500 line-through">Was $39</span>
+              <span className="text-sm text-red-400">Was <span className="line-through">$39</span></span>
               <span className="text-2xl font-bold text-white underline">Now only <span className="text-emerald-400">$19</span></span>
               <span className="text-sm font-semibold text-red-400">(save 51%)</span>
             </div>
