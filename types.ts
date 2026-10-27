@@ -90,6 +90,7 @@ export interface WizardData {
   // Step 5 - Digital presence
   googleBusiness: string
   socialMedia: string[]
+  socialMediaUrls: Record<string, string>
   crm: string
   adAccounts: string
 
@@ -214,6 +215,7 @@ export const defaultWizardData: WizardData = {
   onlineServices: '',
   googleBusiness: '',
   socialMedia: [],
+  socialMediaUrls: {},
   crm: '',
   adAccounts: '',
   logoFiles: [],

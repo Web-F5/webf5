@@ -1,0 +1,96 @@
+'use client'
+
+import { ReactElement } from 'react'
+import { DiyWizardProvider, useDiyWizard } from './DiyWizardContext'
+import { DiyStep1, DiyStep2, DiyStep3, DiyStep4, DiyStep5, DiyStep6, DiyStep7, DiyStep8 } from './DiyWizardSteps'
+
+function DiyWizardInner() {
+  const { currentStep, totalSteps, goNext, goBack, isSubmitted } = useDiyWizard()
+
+  if (isSubmitted) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center gap-6">
+        <div className="text-5xl">✓</div>
+        <h2 className="text-2xl font-bold text-white">Brief sent!</h2>
+        <p className="text-slate-400 max-w-sm leading-relaxed">
+          We've emailed you a copy of your brief and your personalised Claude prompt.
+          Open Claude Code, paste the prompt, and start building.
+        </p>
+        <div className="flex flex-col items-center gap-3 mt-4">
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-medium">Next step</p>
+          <a
+            href="https://claude.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-4 text-base font-semibold text-white hover:bg-indigo-500 transition-colors"
+          >
+            Open Claude →
+          </a>
+          <p className="text-xs text-slate-500 mt-1">Click the &lt;/&gt; symbol (top left) to open Claude Code</p>
+        </div>
+      </div>
+    )
+  }
+
+  const steps: Record<number, ReactElement> = {
+    1: <DiyStep1 />,
+    2: <DiyStep2 />,
+    3: <DiyStep3 />,
+    4: <DiyStep4 />,
+    5: <DiyStep5 />,
+    6: <DiyStep6 />,
+    7: <DiyStep7 />,
+    8: <DiyStep8 />,
+  }
+
+  return (
+    <div id="diy-brief" className="flex flex-col gap-6">
+      {steps[currentStep] ?? null}
+
+      <div className="flex items-center justify-between pt-2">
+        {currentStep > 1 ? (
+          <button
+            type="button"
+            onClick={goBack}
+            className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/60 px-5 py-3 text-sm font-medium text-slate-300 hover:border-slate-600 hover:text-white transition-colors"
+          >
+            ← Back
+          </button>
+        ) : <div />}
+
+        {currentStep < totalSteps && (
+          <button
+            type="button"
+            onClick={goNext}
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors active:scale-[0.98]"
+          >
+            Continue →
+          </button>
+        )}
+      </div>
+
+      <div className="flex gap-1.5 justify-center pt-2">
+        {Array.from({ length: totalSteps }, (_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 rounded-full transition-all ${
+              i + 1 === currentStep
+                ? 'w-6 bg-indigo-500'
+                : i + 1 < currentStep
+                ? 'w-3 bg-indigo-500/40'
+                : 'w-3 bg-slate-700'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function DiyWizard() {
+  return (
+    <DiyWizardProvider>
+      <DiyWizardInner />
+    </DiyWizardProvider>
+  )
+}

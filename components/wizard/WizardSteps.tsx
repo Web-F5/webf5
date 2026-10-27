@@ -648,10 +648,22 @@ export function Step5() {
           </Select>
         </Field>
 
-        <Field label="Social media accounts" hint="(select all that apply)">
+        <Field label="Social media accounts" hint="(select all that apply — add your profile URL)">
           <div className="flex flex-col gap-2">
             {SOCIAL_OPTIONS.map(s => (
-              <CheckRow key={s} checked={data.socialMedia.includes(s)} onChange={() => toggleArray('socialMedia', s)} label={s} />
+              <div key={s}>
+                <CheckRow checked={data.socialMedia.includes(s)} onChange={() => toggleArray('socialMedia', s)} label={s} />
+                {data.socialMedia.includes(s) && (
+                  <div className="ml-7 mt-1.5 mb-1">
+                    <Input
+                      type="url"
+                      value={data.socialMediaUrls?.[s] ?? ''}
+                      onChange={e => update({ socialMediaUrls: { ...data.socialMediaUrls, [s]: e.target.value } })}
+                      placeholder={`Your ${s} profile URL`}
+                    />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </Field>
