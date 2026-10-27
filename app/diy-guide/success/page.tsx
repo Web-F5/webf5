@@ -43,7 +43,7 @@ export default async function DiyGuideSuccessPage({
     <main className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center">
       <div className="max-w-md mx-auto text-center">
         <div className="text-5xl mb-6">🎉</div>
-        <h1 className="text-3xl font-bold tracking-tight mb-4">Thank you for your payment — you&apos;re in!</h1>
+        <h1 className="text-3xl font-bold tracking-tight mb-4">Thank you for your payment - you&apos;re in!</h1>
         <p className="text-foreground/60 mb-2">
           Your guide is ready right now.
         </p>

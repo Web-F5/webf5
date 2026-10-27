@@ -22,6 +22,7 @@ const RESOURCES = [
   { label: 'Free Website Audit', href: '/audit', desc: 'Instant report: speed, SEO, contact & more' },
   { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs' },
   { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers. Google, Facebook & more.' },
+  { label: 'DIY Website Brief', href: '/diy-guide/brief', desc: 'Build your brief and get a personalised Claude prompt' },
 ]
 
 export function Navigation() {
