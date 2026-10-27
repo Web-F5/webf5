@@ -84,17 +84,16 @@ export function HeroSection() {
           </div>
 
           <h1 className="text-3xl md:text-4xl lg:text-5xl tracking-tight mb-5 text-balance leading-[1.1]" style={{ fontFamily: 'var(--font-syne)', fontWeight: 700 }}>
-            A website built around{' '}
+            Small business web design{' '}
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              your business.
+              built around yours.
             </span>
           </h1>
 
           <p className="text-base md:text-lg text-foreground/80 mb-3 max-w-lg leading-relaxed">
-            We build websites
-            for trades, local businesses, and ecommerce brands across Victoria.
-            Our discovery process means we understand your business before we
-            write a line of code.
+            We build websites for trades, local businesses, and ecommerce brands
+            across Victoria. Our website design services start with discovery -
+            we understand your business before we write a line of code.
           </p>
 
           <p className="text-sm text-foreground/45 mb-8 max-w-md">

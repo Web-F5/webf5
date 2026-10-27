@@ -106,7 +106,9 @@ const posts: BlogPost[] = [
 
 <p>DIY builders like Wix and Squarespace are fast to launch and workable for simple informational sites, but they have real structural limits for local SEO and custom conversion optimisation. Freelancers offer more flexibility, though quality varies considerably depending on the individual. A small agency typically covers project management, SEO foundations, custom design, and launch support, and for a tradie who needs a website that ranks locally and generates real enquiry calls, that level of support usually justifies the investment.</p>
 
-<p>For a tradie who needs web design services that deliver actual results, a DIY template rarely cuts it. The structural limitations, the generic design, and the weak local SEO foundations all work against the goal. The question isn't which option is cheapest to build. It's which option generates enough work to justify itself.</p>
+<p>For a tradie who needs website design services that deliver actual results, a DIY template rarely cuts it. The structural limitations, the generic design, and the weak local SEO foundations all work against the goal. The question isn't which option is cheapest to build. It's which option generates enough work to justify itself.</p>
+
+<p>Web design for small business is a different discipline from building a corporate site or an ecommerce store. The goal is local visibility, phone calls, and enquiry forms - not brand storytelling or global reach. That difference shapes every decision: the page structure, the copy, the keywords, and the conversion path.</p>
 
 <h2>Build it with a purpose, not just a presence</h2>
 
@@ -238,7 +240,9 @@ const posts: BlogPost[] = [
 
 <p>DIY works when the site is simple, when you have the time to do it properly, and when the stakes are low. Bring in a professional when the site is the primary lead source, when local SEO matters for the business, or when you need to look distinctly different from competitors in your area.</p>
 
-<p>For Victoria-based service businesses, the important thing is finding a web designer who builds for conversions and local search, not just visual presentation. Web F5's fixed-quote model means the scope is agreed before work begins — you know what you're getting and what it costs before anyone writes a line of code.</p>
+<p>For Victoria-based service businesses, the important thing is finding a web designer who builds for conversions and local search, not just visual presentation. Web F5's fixed-quote model means the scope is agreed before work begins - you know what you're getting and what it costs before anyone writes a line of code.</p>
+
+<p>Website design services vary enormously in quality and approach. For a local tradie, the right choice is a team that understands web design for small business specifically - one that won't sell you an enterprise solution when a well-built five-page site would do the job better.</p>
 
 <h2>Stop spending on ads before fixing the page</h2>
 
