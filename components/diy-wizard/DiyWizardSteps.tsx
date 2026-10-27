@@ -26,13 +26,13 @@ export function DiyStep1() {
         description="Tell us your current situation so we can tailor your brief."
       />
       <div className="flex flex-col gap-3">
-        <OptionCard
+        <OptionCard green
           selected={data.startType === 'fresh'}
           onClick={() => update({ startType: 'fresh' })}
           icon="✦" title="Starting fresh"
           subtitle="I don't have a website yet"
         />
-        <OptionCard
+        <OptionCard green
           selected={data.startType === 'rebuild'}
           onClick={() => update({ startType: 'rebuild' })}
           icon="⟳" title="Rebuilding or refreshing an existing site"
@@ -69,13 +69,13 @@ export function DiyStep2() {
     <div>
       <StepHeader step={currentStep} total={totalSteps} title="Domain name" description="Your domain is your address on the internet." />
       <div className="flex flex-col gap-3">
-        <OptionCard
+        <OptionCard green
           selected={data.domainStatus === 'have'}
           onClick={() => update({ domainStatus: 'have' })}
           icon="✔" title="I already have a domain"
           subtitle="I'll provide my existing domain details"
         />
-        <OptionCard
+        <OptionCard green
           selected={data.domainStatus === 'new'}
           onClick={() => update({ domainStatus: 'new' })}
           icon="+" title="I need a new domain"
@@ -319,9 +319,9 @@ export function DiyStep4() {
 
         <Field label="Service reach">
           <div className="flex flex-col gap-2">
-            <OptionCard selected={data.serviceReach === 'local'}         onClick={() => { update({ serviceReach: 'local' }); clearError('bizAddress') }}         title="Local / regional" subtitle="Serving a specific area or city" />
-            <OptionCard selected={data.serviceReach === 'national'}      onClick={() => update({ serviceReach: 'national' })}      title="National"     subtitle="Serving across the country" />
-            <OptionCard selected={data.serviceReach === 'international'} onClick={() => update({ serviceReach: 'international' })} title="International" subtitle="Serving customers globally" />
+            <OptionCard green selected={data.serviceReach === 'local'}         onClick={() => { update({ serviceReach: 'local' }); clearError('bizAddress') }}         title="Local / regional" subtitle="Serving a specific area or city" />
+            <OptionCard green selected={data.serviceReach === 'national'}      onClick={() => update({ serviceReach: 'national' })}      title="National"     subtitle="Serving across the country" />
+            <OptionCard green selected={data.serviceReach === 'international'} onClick={() => update({ serviceReach: 'international' })} title="International" subtitle="Serving customers globally" />
           </div>
         </Field>
 
@@ -394,7 +394,7 @@ export function DiyStep5() {
           <div className="flex flex-col gap-2">
             {SOCIAL_OPTIONS.map(s => (
               <div key={s}>
-                <CheckRow checked={data.socialMedia.includes(s)} onChange={() => toggleArray('socialMedia', s)} label={s} />
+                <CheckRow green checked={data.socialMedia.includes(s)} onChange={() => toggleArray('socialMedia', s)} label={s} />
                 {data.socialMedia.includes(s) && (
                   <div className="ml-7 mt-1.5 mb-1">
                     <Input

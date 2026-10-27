@@ -91,30 +91,35 @@ interface OptionCardProps {
   title: string
   subtitle?: string
   className?: string
+  green?: boolean
 }
 
-export function OptionCard({ selected, onClick, icon, title, subtitle, className }: OptionCardProps) {
+export function OptionCard({ selected, onClick, icon, title, subtitle, className, green }: OptionCardProps) {
+  const sel = green
+    ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/30'
+    : 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500/30'
+  const iconSel   = green ? 'text-emerald-400' : 'text-indigo-400'
+  const titleSel  = green ? 'text-emerald-200' : 'text-indigo-200'
+  const subtitleSel = green ? 'text-emerald-400' : 'text-indigo-400'
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
         'flex items-start gap-3 rounded-xl border p-4 text-left transition-all duration-150',
-        selected
-          ? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500/30'
-          : 'border-slate-700 bg-slate-800/40 hover:border-slate-500 hover:bg-slate-800/80',
+        selected ? sel : 'border-slate-700 bg-slate-800/40 hover:border-slate-500 hover:bg-slate-800/80',
         className
       )}
     >
       {icon && (
-        <span className={cn('mt-0.5 text-base leading-none', selected ? 'text-indigo-400' : 'text-slate-400')}>
+        <span className={cn('mt-0.5 text-base leading-none', selected ? iconSel : 'text-slate-400')}>
           {icon}
         </span>
       )}
       <div>
-        <p className={cn('text-sm font-medium', selected ? 'text-indigo-200' : 'text-white')}>{title}</p>
+        <p className={cn('text-sm font-medium', selected ? titleSel : 'text-white')}>{title}</p>
         {subtitle && (
-          <p className={cn('mt-0.5 text-xs', selected ? 'text-indigo-400' : 'text-slate-400')}>{subtitle}</p>
+          <p className={cn('mt-0.5 text-xs', selected ? subtitleSel : 'text-slate-400')}>{subtitle}</p>
         )}
       </div>
     </button>
@@ -128,30 +133,32 @@ interface CheckRowProps {
   onChange: () => void
   label: string
   sublabel?: string
+  green?: boolean
 }
 
-export function CheckRow({ checked, onChange, label, sublabel }: CheckRowProps) {
+export function CheckRow({ checked, onChange, label, sublabel, green }: CheckRowProps) {
+  const row  = green ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/30' : 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500/30'
+  const box  = green ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-indigo-500 bg-indigo-500 text-white'
+  const text = green ? 'text-emerald-200' : 'text-indigo-200'
   return (
     <button
       type="button"
       onClick={onChange}
       className={cn(
         'flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all duration-150',
-        checked
-          ? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500/30'
-          : 'border-slate-700 bg-slate-800/40 hover:border-slate-500'
+        checked ? row : 'border-slate-700 bg-slate-800/40 hover:border-slate-500'
       )}
     >
       <span
         className={cn(
           'flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border text-xs transition-colors',
-          checked ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-600 bg-transparent text-transparent'
+          checked ? box : 'border-slate-600 bg-transparent text-transparent'
         )}
       >
         ✓
       </span>
       <div>
-        <span className={cn('text-sm', checked ? 'text-indigo-200' : 'text-white')}>{label}</span>
+        <span className={cn('text-sm', checked ? text : 'text-white')}>{label}</span>
         {sublabel && <p className="mt-0.5 text-xs text-slate-400">{sublabel}</p>}
       </div>
     </button>
