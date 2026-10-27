@@ -103,7 +103,7 @@ export function DiyStep2() {
           <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-5 flex flex-col gap-3">
             <p className="text-sm text-slate-300 font-medium">Purchase a .com.au domain through Web F5</p>
             <p className="text-xs text-slate-400 leading-relaxed">
-              We recommend getting your domain before you start building. A .com.au typically costs $25–$35/year.
+              We recommend getting your domain before you start building. A .com.au typically costs $16–$25/year.
               Once purchased, come back here and enter it above.
             </p>
             <a
