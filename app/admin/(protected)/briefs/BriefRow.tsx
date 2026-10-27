@@ -83,7 +83,9 @@ function formatAsText(draft: BriefRowProps['draft']): string {
 
   lines.push('WEB F5 — CLIENT BRIEF')
   lines.push(`Generated: ${new Date().toLocaleString('en-AU')}`)
-  lines.push(`Status: ${draft.status === 'in_progress' ? 'In progress' : 'Submitted'} (step ${draft.currentStep}/11)`)
+  const isDiy = (d as D).source === 'diy'
+  const totalSteps = isDiy ? 8 : 11
+  lines.push(`Status: ${draft.status === 'in_progress' ? 'In progress' : 'Submitted'} (step ${draft.currentStep}/${totalSteps})`)
   lines.push('')
 
   lines.push('── CONTACT ──────────────────────────')
@@ -253,11 +255,11 @@ export function BriefRow({ draft, timeAgo, createdLabel }: BriefRowProps) {
             <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">
               <div
                 className="h-full bg-indigo-500 rounded-full"
-                style={{ width: `${(draft.currentStep / 11) * 100}%` }}
+                style={{ width: `${(draft.currentStep / ((d as D).source === 'diy' ? 8 : 11)) * 100}%` }}
               />
             </div>
             <span className="text-slate-400 text-xs whitespace-nowrap">
-              {draft.currentStep} / 11
+              {draft.currentStep} / {(d as D).source === 'diy' ? 8 : 11}
             </span>
           </div>
         </td>
