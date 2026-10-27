@@ -4,20 +4,20 @@ export async function GET(req: NextRequest) {
   const name = req.nextUrl.searchParams.get('name')?.trim()
   if (!name || name.length < 3) return NextResponse.json({ results: [] })
 
-  const guid = process.env.ABN_LOOKUP_GUID
-  if (!guid) return NextResponse.json({ results: [] })
+  const guid = process.env.ABR_GUID
+  if (!guid) return NextResponse.json({ results: [] }, { status: 503 })
 
-  const url = `https://abr.business.gov.au/json/MatchingNames.aspx?name=${encodeURIComponent(name)}&maxResults=5&guid=${guid}`
+  const url = `https://abr.business.gov.au/json/MatchingNames.aspx?name=${encodeURIComponent(name)}&guid=${guid}`
 
   try {
     const res = await fetch(url, { next: { revalidate: 300 } })
     const text = await res.text()
-    // Response is JSONP: callback({"Names":[...]})  — strip wrapper
-    const json = JSON.parse(text.replace(/^\w+\(/, '').replace(/\);?\s*$/, ''))
-    const results = (json.Names ?? []).map((n: { Abn: string; Name: string; State: string }) => ({
+    const json = JSON.parse(text.replace(/^\w+\(/, '').replace(/\)$/, ''))
+    const results = (json.Names ?? []).slice(0, 8).map((n: { Abn: string; Name: string; State: string; Postcode: string }) => ({
       abn: n.Abn,
       name: n.Name,
       state: n.State,
+      postcode: n.Postcode,
     }))
     return NextResponse.json({ results })
   } catch {

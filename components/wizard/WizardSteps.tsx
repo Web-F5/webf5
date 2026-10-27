@@ -1919,7 +1919,7 @@ interface AbnLookupFieldProps {
 }
 
 function AbnLookupField({ bizName, bizReg, error, onNameChange, onRegChange }: AbnLookupFieldProps) {
-  const [suggestions, setSuggestions] = useState<{ abn: string; name: string; state: string }[]>([])
+  const [suggestions, setSuggestions] = useState<{ abn: string; name: string; state: string; postcode: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -1991,7 +1991,7 @@ function AbnLookupField({ bizName, bizReg, error, onNameChange, onRegChange }: A
               >
                 <span style={{ display: 'block', fontSize: '0.85rem', color: '#e2e8f0', fontWeight: 500 }}>{s.name}</span>
                 <span style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>
-                  ABN {s.abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')} · {s.state}
+                  ABN {s.abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')} · {s.state} {s.postcode}
                 </span>
               </button>
             ))}
