@@ -49,7 +49,7 @@ export default function DiyGuidePage() {
 
         {/* Header */}
         <div className="mb-12">
-          <p className="text-primary text-sm font-medium tracking-widest uppercase mb-3">DIY Guide · $19</p>
+          <p className="text-primary text-sm font-medium tracking-widest uppercase mb-3">DIY Guide · $27</p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-5 leading-tight text-balance">
             Build Your Trade Website in a Weekend
           </h1>
@@ -74,12 +74,12 @@ export default function DiyGuidePage() {
         {/* Pricing card */}
         <div className="border border-border rounded-2xl p-6 bg-card/30 mb-6">
           <div className="flex flex-col gap-0.5 mb-1">
-            <span className="text-sm text-red-400">Was <span className="line-through">$39</span></span>
+            <span className="text-sm text-red-400">Was <span className="line-through">$54</span></span>
             <div className="flex items-end gap-2">
-              <span className="text-4xl font-bold">$19</span>
+              <span className="text-4xl font-bold">$27</span>
               <span className="text-foreground/40 mb-1">AUD · one-time</span>
             </div>
-            <span className="text-sm font-semibold text-red-400">(save 51%)</span>
+            <span className="text-sm font-semibold text-red-400">(save 50%)</span>
           </div>
           <p className="text-foreground/50 text-sm mb-6 mt-2">Lifetime access. No subscription.</p>
 
@@ -88,7 +88,7 @@ export default function DiyGuidePage() {
             disabled={loading}
             className="w-full bg-primary text-white font-semibold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-base"
           >
-            {loading ? 'Redirecting to checkout…' : 'Get the guide - $19'}
+            {loading ? 'Redirecting to checkout…' : 'Get the guide - $27'}
           </button>
 
           {error && <p className="text-red-400 text-sm mt-3 text-center">{error}</p>}

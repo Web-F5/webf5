@@ -25,7 +25,7 @@ const RESOURCES = [
 ]
 
 const GUIDES = [
-  { label: 'DIY Website Guide', href: '/diy-guide', desc: 'Build your trade website in a weekend - $19', badge: '$19' },
+  { label: 'DIY Website Guide', href: '/diy-guide', desc: 'Build your trade website in a weekend - $27', badge: '$27' },
   { label: 'Set Up Your Google Business Profile', href: '/guides/gbp-setup', desc: 'Create and verify your GBP from scratch - $19', badge: '$19' },
   { label: 'Optimise Your Google Business Profile', href: '/guides/gbp-optimise', desc: 'Categories, photos, posts, reviews - $19', badge: '$19' },
 ]

@@ -5,7 +5,7 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const COURSE_ID = 'diy-guide'
-const PRICE_CENTS = 1900 // $19.00 AUD
+const PRICE_CENTS = 2700 // $27.00 AUD
 
 export async function POST() {
   const { userId } = await auth()
