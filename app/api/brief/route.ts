@@ -3,23 +3,14 @@ import { Resend } from 'resend'
 import { auth } from '@clerk/nextjs/server'
 import type { WizardData } from '@/components/wizard'
 import { buildBriefSummary, buildFileLinks } from '@/INTEGRATION'
-import { db, courseEntitlements, briefDrafts } from '@/lib/db'
-import { eq, and, isNull } from 'drizzle-orm'
+import { db, briefDrafts } from '@/lib/db'
+import { eq, and } from 'drizzle-orm'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const FROM_ADDRESS = 'contact@webf5.au'
 const NOTIFY_TO = process.env.NOTIFY_EMAIL!
 
-async function hasActiveCourseEntitlement(userId: string): Promise<boolean> {
-  const row = await db.query.courseEntitlements.findFirst({
-    where: and(
-      eq(courseEntitlements.userId, userId),
-      isNull(courseEntitlements.refundedAt),
-    ),
-  })
-  return !!row
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,19 +32,28 @@ export async function POST(req: NextRequest) {
     const summary = buildBriefSummary(data)
     const fileLinks = buildFileLinks(data)
 
-    // ── Notify you ────────────────────────────────────────────────────────
+    // ── Notify Josh (with brief as .md attachment) ────────────────────────
+    const briefFilename = `brief-${data.bizName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`
+    const briefContent = `${summary}\n\n── Uploaded files ───────────────────────────────────────\n${fileLinks}`
+    const briefBase64 = Buffer.from(briefContent, 'utf-8').toString('base64')
+
     await resend.emails.send({
       from: FROM_ADDRESS,
       to: NOTIFY_TO,
       subject: `New brief — ${data.bizName.trim()}`,
-      text: `${summary}\n\n── Uploaded files ───────────────────────────────────────\n${fileLinks}`
+      text: `New brief received from ${data.bizName.trim()} (${data.bizEmail.trim()}).\n\nSee attached .md file for the full brief.`,
+      attachments: [
+        {
+          filename: briefFilename,
+          content: briefBase64,
+        },
+      ],
     })
 
-    // ── Confirm to client ─────────────────────────────────────────────────
-    const entitled = userId ? await hasActiveCourseEntitlement(userId) : false
-
-    const clientEmailLines = [
-      `Hi ${data.contactName?.trim() || data.bizName.trim()},`,
+    // ── Confirm to client (no brief content) ─────────────────────────────
+    const clientName = data.contactName?.trim() || data.bizName.trim()
+    const clientEmailText = [
+      `Hi ${clientName},`,
       '',
       `Thank you for completing your discovery brief. We've received everything and will review it shortly.`,
       '',
@@ -61,35 +61,18 @@ export async function POST(req: NextRequest) {
       '',
       `If you have any questions in the meantime, just reply to this email or reach us at contact@webf5.au`,
       '',
-      `── Your brief summary ────────────────────────────────────────`,
-      '',
-      summary,
-      '',
-    ]
-
-    // Course-entitlement users get file links appended as well
-    if (entitled) {
-      clientEmailLines.push(
-        `── Uploaded files ────────────────────────────────────────────`,
-        '',
-        fileLinks,
-        '',
-      )
-    }
-
-    clientEmailLines.push(
       `Talk soon,`,
       `Josh`,
       `Web F5`,
       `contact@webf5.au`,
-    )
+    ].join('\n')
 
     await resend.emails.send({
       from: FROM_ADDRESS,
       to: data.bizEmail.trim(),
       replyTo: 'contact@webf5.au',
       subject: `We've received your brief — ${data.bizName.trim()}`,
-      text: clientEmailLines.join('\n'),
+      text: clientEmailText,
     })
 
     // Mark the draft as submitted so we stop sending reminders
