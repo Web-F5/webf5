@@ -117,7 +117,7 @@ export function DiyStep2() {
             <p className="text-xs text-slate-400 mt-1">
               Already have an idea? Enter it in the field above after purchase.
             </p>
-            <Field label="Domain ideas (optional — jot them down)">
+            <Field label="Domain ideas (optional - jot them down)">
               <Input value={data.domainIdeas} onChange={e => update({ domainIdeas: e.target.value })} placeholder="e.g. smithelectrical, bendigoplumber…" />
             </Field>
           </div>
@@ -327,7 +327,7 @@ export function DiyStep4() {
 
         {isLocal && (
           <div className="rounded-xl border border-slate-700 bg-slate-800/30 p-4 flex flex-col gap-4">
-            {!data.bizAddressLat && <InfoBox>Enter your business address above first — we need it to calculate which towns fall within your service radius.</InfoBox>}
+            {!data.bizAddressLat && <InfoBox>Enter your business address above first - we need it to calculate which towns fall within your service radius.</InfoBox>}
             {data.bizAddressLat && <p className="text-sm text-slate-300">How far from <strong className="text-white">{town}</strong> does your business service?</p>}
 
             <Field label="Service radius (km)">
@@ -350,7 +350,7 @@ export function DiyStep4() {
             </Field>
 
             <Field label="Service area">
-              <Textarea value={data.serviceRadiusTowns} onChange={e => update({ serviceRadiusTowns: e.target.value })} rows={4} placeholder="Click 'Find towns' to auto-populate, or type manually — e.g. Seymour, Kilmore, Broadford…" />
+              <Textarea value={data.serviceRadiusTowns} onChange={e => update({ serviceRadiusTowns: e.target.value })} rows={4} placeholder="Click 'Find towns' to auto-populate, or type manually - e.g. Seymour, Kilmore, Broadford…" />
               <p className="text-xs text-slate-400 mt-1">Edit down to the 20 most relevant areas for your business.</p>
             </Field>
           </div>
@@ -390,7 +390,7 @@ export function DiyStep5() {
           </Select>
         </Field>
 
-        <Field label="Social media accounts" hint="(select all that apply — add your profile URL)">
+        <Field label="Social media accounts" hint="(select all that apply - add your profile URL)">
           <div className="flex flex-col gap-2">
             {SOCIAL_OPTIONS.map(s => (
               <div key={s}>
@@ -480,14 +480,14 @@ export function DiyStep6() {
           <Select value={data.designStyle} onChange={e => update({ designStyle: e.target.value })}>
             <option value="">Select…</option>
             {Object.keys(FONT_SUGGESTIONS).map(s => <option key={s}>{s}</option>)}
-            <option>Not sure — I'd like suggestions</option>
+            <option>Not sure - I'd like suggestions</option>
           </Select>
         </Field>
 
         {STYLE_PALETTES[data.designStyle] && (
           <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col gap-3">
             <p className="text-xs font-medium uppercase tracking-widest text-indigo-400">Suggested palettes</p>
-            <p className="text-xs text-slate-400 -mt-1">Choose a starting point — fine-tune any colour below.</p>
+            <p className="text-xs text-slate-400 -mt-1">Choose a starting point - fine-tune any colour below.</p>
             {STYLE_PALETTES[data.designStyle].map(palette => {
               const isApplied = data.brandPrimary === palette.brandPrimary && data.brandDarkBg === palette.brandDarkBg
               const swatches = [
@@ -522,8 +522,8 @@ export function DiyStep6() {
           <p className="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-1">Brand colours</p>
           <p className="text-xs text-slate-400 mb-4">Click any colour dot to open the picker, or type a hex code directly.</p>
           <div className="flex flex-col gap-0 divide-y divide-slate-800/60">
-            <ColourSwatch label="Primary colour"    hint="Main brand colour — headings, highlights"       value={data.brandPrimary}    onChange={hex => update({ brandPrimary: hex })} />
-            <ColourSwatch label="Light background"  hint="Light page background — secondary sections"    value={data.brandLightBg}    onChange={hex => update({ brandLightBg: hex })} />
+            <ColourSwatch label="Primary colour"    hint="Main brand colour - headings, highlights"       value={data.brandPrimary}    onChange={hex => update({ brandPrimary: hex })} />
+            <ColourSwatch label="Light background"  hint="Light page background - secondary sections"    value={data.brandLightBg}    onChange={hex => update({ brandLightBg: hex })} />
             <ColourSwatch label="Dark background"   hint="Dark page sections, footer background"         value={data.brandDarkBg}     onChange={hex => update({ brandDarkBg: hex })} />
             <ColourSwatch label="Dark text"         hint="Body text on light backgrounds"                value={data.brandDarkText}   onChange={hex => update({ brandDarkText: hex })} />
           </div>
@@ -533,9 +533,9 @@ export function DiyStep6() {
           <p className="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-1">Button colours</p>
           <div className="flex flex-col gap-0 divide-y divide-slate-800/60">
             <ColourSwatch label="Primary button"       hint="CTA button background"          value={data.brandBtnPrimary}  onChange={hex => update({ brandBtnPrimary: hex, brandBtnHover: lightenHex(hex, 15) })} />
-            <ColourSwatch label="Primary button hover" hint="Auto-suggested — 15% lighter"  value={data.brandBtnHover}    onChange={hex => update({ brandBtnHover: hex })} autoNote="Auto-suggested from primary button" />
+            <ColourSwatch label="Primary button hover" hint="Auto-suggested - 15% lighter"  value={data.brandBtnHover}    onChange={hex => update({ brandBtnHover: hex })} autoNote="Auto-suggested from primary button" />
             <ColourSwatch label="Accent colour"        hint="Secondary CTA button"           value={data.brandAccent}      onChange={hex => update({ brandAccent: hex, brandAccentHover: lightenHex(hex, 15) })} />
-            <ColourSwatch label="Accent hover"         hint="Auto-suggested — 15% lighter"  value={data.brandAccentHover} onChange={hex => update({ brandAccentHover: hex })} autoNote="Auto-suggested from accent colour" />
+            <ColourSwatch label="Accent hover"         hint="Auto-suggested - 15% lighter"  value={data.brandAccentHover} onChange={hex => update({ brandAccentHover: hex })} autoNote="Auto-suggested from accent colour" />
           </div>
         </div>
 
@@ -557,7 +557,7 @@ export function DiyStep6() {
         <Divider />
 
         <Field label="Websites you love" hint="(and why)">
-          <Textarea value={data.sitesLove} onChange={e => update({ sitesLove: e.target.value })} placeholder="URL — what you like about it…" />
+          <Textarea value={data.sitesLove} onChange={e => update({ sitesLove: e.target.value })} placeholder="URL - what you like about it…" />
         </Field>
 
       </div>
@@ -633,7 +633,7 @@ export function DiyStep7() {
             {data.pageGallery.map((item, idx) => (
               <ItemCard key={idx} label={`Item ${idx + 1}`} onRemove={() => update({ pageGallery: delItem(data.pageGallery, idx) })}>
                 <Field label="Project name">
-                  <Input value={item.name} onChange={e => update({ pageGallery: updItem(data.pageGallery, idx, { name: e.target.value }) })} placeholder="e.g. Office Fitout — Bendigo" />
+                  <Input value={item.name} onChange={e => update({ pageGallery: updItem(data.pageGallery, idx, { name: e.target.value }) })} placeholder="e.g. Office Fitout - Bendigo" />
                 </Field>
               </ItemCard>
             ))}
@@ -774,8 +774,8 @@ export function DiyStep8() {
         <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col gap-2">
           <p className="text-sm font-semibold text-indigo-300">How to use this prompt</p>
           <ol className="text-xs text-slate-400 leading-relaxed list-decimal ml-4 flex flex-col gap-1">
-            <li>Open <strong className="text-slate-300">claude.ai</strong> and start a new <strong className="text-slate-300">Claude Code</strong> conversation — click the <strong className="text-slate-300">&lt;/&gt;</strong> symbol at the top left of the page.</li>
-            <li>Click the <strong className="text-slate-300">+</strong> symbol (bottom left of the chat box) to attach your logo and any photos. Label them clearly — e.g. <em>logo.png</em>, <em>hero-1.jpg</em>, <em>gallery-job-1.jpg</em>.</li>
+            <li>Open <strong className="text-slate-300">claude.ai</strong> and start a new <strong className="text-slate-300">Claude Code</strong> conversation - click the <strong className="text-slate-300">&lt;/&gt;</strong> symbol at the top left of the page.</li>
+            <li>Click the <strong className="text-slate-300">+</strong> symbol (bottom left of the chat box) to attach your logo and any photos. Label them clearly - e.g. <em>logo.png</em>, <em>hero-1.jpg</em>, <em>gallery-job-1.jpg</em>.</li>
             <li>Copy the prompt below and paste it into the chat box. Fill in your Formspree URL where indicated.</li>
             <li>Send it and Claude will write your complete site.</li>
           </ol>
@@ -862,7 +862,7 @@ function AbnLookupField({ bizName, bizReg: _bizReg, error, onNameChange, onRegCh
             ))}
             <button type="button" onMouseDown={() => setOpen(false)}
               style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 14px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: '#64748b' }}>
-              None of these — I&apos;ll type it manually
+              None of these - I&apos;ll type it manually
             </button>
           </div>
         )}
