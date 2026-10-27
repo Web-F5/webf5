@@ -333,17 +333,20 @@ export function Step3() {
 
         <Divider />
 
-        <Field label="Business name" required>
-          <Input value={data.bizName} onChange={e => { update({ bizName: e.target.value }); clearError('bizName') }} placeholder="e.g. Acme Solutions" error={stepErrors['bizName']} />
-          {stepErrors['bizName'] && <p className="mt-1 text-xs text-red-400">{stepErrors['bizName']}</p>}
-        </Field>
+        <AbnLookupField
+          bizName={data.bizName}
+          bizReg={data.bizReg}
+          error={stepErrors['bizName']}
+          onNameChange={v => { update({ bizName: v }); clearError('bizName') }}
+          onRegChange={v => update({ bizReg: v })}
+        />
 
         <Field label="Tagline or slogan" hint="(optional)">
           <Input value={data.bizTagline} onChange={e => update({ bizTagline: e.target.value })} placeholder="e.g. Building tomorrow, today" />
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Business registration" hint="(optional)">
+          <Field label="Business registration" hint="(optional — auto-filled from ABN lookup)">
             <Input value={data.bizReg} onChange={e => update({ bizReg: e.target.value })} placeholder="ABN, ACN…" />
           </Field>
           <Field label="Year established">
@@ -501,7 +504,7 @@ export function Step4() {
       if (!res.ok) throw new Error(`Server error ${res.status}`)
       const towns = await res.json() as string[]
       if (towns.length === 0) {
-        setTownsMsg({ type: 'empty', text: `No places found within ${data.serviceRadiusKm} km. Try a larger radius, or enter your service area manually below.` })
+        setTownsMsg({ type: 'empty', text: `No places found using ${data.serviceRadiusKm} km. Try a smaller or larger radius, or enter your service area manually below.` })
       } else {
         update({ serviceRadiusTowns: towns.join(', ') })
         setTownsMsg({ type: 'ok', text: `✓ ${towns.length} place${towns.length === 1 ? '' : 's'} found` })
@@ -1902,5 +1905,110 @@ export function Step11() {
         </p>
       </div>
     </div>
+  )
+}
+
+// ── ABN Lookup Field ──────────────────────────────────────────────────────────
+
+interface AbnLookupFieldProps {
+  bizName: string
+  bizReg: string
+  error?: string
+  onNameChange: (v: string) => void
+  onRegChange: (v: string) => void
+}
+
+function AbnLookupField({ bizName, bizReg, error, onNameChange, onRegChange }: AbnLookupFieldProps) {
+  const [suggestions, setSuggestions] = useState<{ abn: string; name: string; state: string }[]>([])
+  const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleChange(v: string) {
+    onNameChange(v)
+    setSuggestions([])
+    setOpen(false)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (v.trim().length < 3) return
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true)
+      try {
+        const res = await fetch(`/api/abn-lookup?name=${encodeURIComponent(v.trim())}`)
+        const data = await res.json()
+        if (data.results?.length > 0) {
+          setSuggestions(data.results)
+          setOpen(true)
+        }
+      } catch { /* silent */ } finally {
+        setLoading(false)
+      }
+    }, 600)
+  }
+
+  function select(s: { abn: string; name: string }) {
+    onNameChange(s.name)
+    onRegChange(s.abn)
+    setSuggestions([])
+    setOpen(false)
+  }
+
+  return (
+    <Field label="Business name" required>
+      <div style={{ position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Input
+            value={bizName}
+            onChange={e => handleChange(e.target.value)}
+            onBlur={() => setTimeout(() => setOpen(false), 200)}
+            placeholder="e.g. Acme Electrical"
+            error={error}
+          />
+          {loading && (
+            <span style={{ fontSize: '0.72rem', color: '#6366f1', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              Looking up ABN…
+            </span>
+          )}
+        </div>
+        {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+        {open && suggestions.length > 0 && (
+          <div style={{
+            position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+            background: '#1e293b', border: '1px solid #334155', borderRadius: 10,
+            marginTop: 4, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          }}>
+            {suggestions.map(s => (
+              <button
+                key={s.abn}
+                type="button"
+                onMouseDown={() => select(s)}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'left',
+                  padding: '10px 14px', background: 'transparent', border: 'none',
+                  cursor: 'pointer', borderBottom: '1px solid #334155',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#334155')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                <span style={{ display: 'block', fontSize: '0.85rem', color: '#e2e8f0', fontWeight: 500 }}>{s.name}</span>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>
+                  ABN {s.abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')} · {s.state}
+                </span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onMouseDown={() => setOpen(false)}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left', padding: '8px 14px',
+                background: 'transparent', border: 'none', cursor: 'pointer',
+                fontSize: '0.75rem', color: '#64748b',
+              }}
+            >
+              None of these — I&apos;ll type it manually
+            </button>
+          </div>
+        )}
+      </div>
+    </Field>
   )
 }
