@@ -22,6 +22,7 @@ const RESOURCES = [
   { label: 'Free Website Audit', href: '/audit', desc: 'Instant report: speed, SEO, contact & more', badge: 'Free!' },
   { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs', badge: 'Free!' },
   { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers. Google, Facebook & more.', badge: 'Free!' },
+  { label: 'DIY Website Brief', href: '/diy-guide/brief', desc: 'Build your brief with the step-by-step wizard', badge: 'Free!' },
 ]
 
 const GUIDES = [
