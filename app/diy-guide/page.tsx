@@ -4,15 +4,15 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const included = [
-  'Module 1 — Run the Web F5 discovery wizard and build a brief that drives every decision',
-  'Module 2 — Set up GitHub, Vercel, Cloudflare, and Formspree (all free)',
-  'Module 3 — The Web F5 Claude prompt template: paste your brief, get a complete site',
-  'Module 4 — Purchase and connect your .com.au domain',
-  'Module 5 — Set up email routing with no mail server needed',
-  'Module 6 — Google Search Console, Analytics, and Business Profile',
-  'Module 7 — Go-live checklist (interactive, saves progress)',
-  'Module 8 — How to make updates after launch, and when to upgrade',
-  'Subject to Change reference — up-to-date notes on every third-party service used',
+  'Module 1 - Run the Web F5 discovery wizard and build a brief that drives every decision',
+  'Module 2 - Set up GitHub, Vercel, Cloudflare, and Formspree (all free)',
+  'Module 3 - The Web F5 Claude prompt template: paste your brief, get a complete site',
+  'Module 4 - Purchase and connect your .com.au domain',
+  'Module 5 - Set up email routing with no mail server needed',
+  'Module 6 - Google Search Console, Analytics, and Business Profile',
+  'Module 7 - Go-live checklist (interactive, saves progress)',
+  'Module 8 - How to make updates after launch, and when to upgrade',
+  'Subject to Change reference - up-to-date notes on every third-party service used',
 ]
 
 export default function DiyGuidePage() {
@@ -73,11 +73,15 @@ export default function DiyGuidePage() {
 
         {/* Pricing card */}
         <div className="border border-border rounded-2xl p-6 bg-card/30 mb-6">
-          <div className="flex items-end gap-2 mb-1">
-            <span className="text-4xl font-bold">$19</span>
-            <span className="text-foreground/40 mb-1">AUD · one-time</span>
+          <div className="flex flex-col gap-0.5 mb-1">
+            <span className="text-sm text-red-400">Was <span className="line-through">$39</span></span>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-bold">$19</span>
+              <span className="text-foreground/40 mb-1">AUD · one-time</span>
+            </div>
+            <span className="text-sm font-semibold text-red-400">(save 51%)</span>
           </div>
-          <p className="text-foreground/50 text-sm mb-6">Lifetime access. No subscription.</p>
+          <p className="text-foreground/50 text-sm mb-6 mt-2">Lifetime access. No subscription.</p>
 
           <button
             onClick={handleBuy}
