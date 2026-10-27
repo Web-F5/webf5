@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import type { WizardData } from '@/types'
-import { buildDiyPrompt } from '@/components/diy-wizard/DiyWizardSteps'
+import { buildDiyPrompt } from '@/components/diy-wizard/buildDiyPrompt'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
