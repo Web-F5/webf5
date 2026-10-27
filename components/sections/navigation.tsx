@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronDown } from 'lucide-react'
@@ -19,9 +19,9 @@ const PRICING_ITEMS = [
 ]
 
 const RESOURCES = [
-  { label: 'Free Website Audit', href: '/audit', desc: 'Instant report: speed, SEO, contact & more' },
-  { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs' },
-  { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers. Google, Facebook & more.' },
+  { label: 'Free Website Audit', href: '/audit', desc: 'Instant report: speed, SEO, contact & more', badge: 'Free!' },
+  { label: 'Website Checklist', href: '/resources/website-checklist', desc: '12 checks every small business site needs', badge: 'Free!' },
+  { label: 'Review Request Sender', href: '/resources/review-sender', desc: 'Email review requests to customers. Google, Facebook & more.', badge: 'Free!' },
 ]
 
 const GUIDES = [
@@ -35,6 +35,10 @@ export function Navigation() {
   const [resourcesOpen, setResourcesOpen] = useState(false)
   const [pricingOpen, setPricingOpen] = useState(false)
   const [guidesOpen, setGuidesOpen] = useState(false)
+  const [mobilePricingOpen, setMobilePricingOpen] = useState(false)
+  const [mobileGuidesOpen, setMobileGuidesOpen] = useState(false)
+  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false)
+  const closeMobile = useCallback(() => setIsOpen(false), [])
   const pricingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
   const isHome = pathname === '/'
@@ -190,10 +194,13 @@ export function Navigation() {
                     <a
                       key={r.href}
                       href={r.href}
-                      className="flex flex-col gap-0.5 px-4 py-3.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                      className="flex items-start justify-between gap-3 px-4 py-3.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
                     >
-                      <span className="text-sm font-semibold text-white">{r.label}</span>
-                      <span className="text-xs text-slate-400">{r.desc}</span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-semibold text-white">{r.label}</span>
+                        <span className="text-xs text-slate-400">{r.desc}</span>
+                      </div>
+                      {r.badge && <span className="flex-shrink-0 rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-400">{r.badge}</span>}
                     </a>
                   ))}
                 </motion.div>
@@ -260,49 +267,80 @@ export function Navigation() {
               ))}
 
               {/* Pricing section in mobile */}
-              <div className="pt-1 border-t border-border/50">
-                <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider py-2">Pricing</p>
-                {PRICING_ITEMS.map(p => (
-                  <a
-                    key={p.href}
-                    href={isHome ? p.href : `/${p.href}`}
-                    className="block text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {p.label}
-                  </a>
-                ))}
+              <div className="border-t border-border/50">
+                <button
+                  className="flex items-center justify-between w-full text-xs font-semibold text-indigo-400 uppercase tracking-wider py-3"
+                  onClick={() => setMobilePricingOpen(v => !v)}
+                >
+                  Pricing
+                  <ChevronDown size={13} className={`transition-transform duration-200 ${mobilePricingOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {mobilePricingOpen && (
+                  <div className="pb-2 flex flex-col gap-0.5">
+                    {PRICING_ITEMS.map(p => (
+                      <a
+                        key={p.href}
+                        href={isHome ? p.href : `/${p.href}`}
+                        className="block text-sm font-medium text-foreground/70 hover:text-foreground py-1.5 pl-3 transition-colors"
+                        onClick={closeMobile}
+                      >
+                        {p.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Guides section in mobile */}
-              <div className="pt-1 border-t border-border/50">
-                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider py-2">Guides</p>
-                {GUIDES.map(g => (
-                  <a
-                    key={g.href}
-                    href={g.href}
-                    className="flex items-center justify-between text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {g.label}
-                    {g.badge && <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">{g.badge}</span>}
-                  </a>
-                ))}
+              <div className="border-t border-border/50">
+                <button
+                  className="flex items-center justify-between w-full text-xs font-semibold text-emerald-400 uppercase tracking-wider py-3"
+                  onClick={() => setMobileGuidesOpen(v => !v)}
+                >
+                  Guides
+                  <ChevronDown size={13} className={`transition-transform duration-200 ${mobileGuidesOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileGuidesOpen && (
+                  <div className="pb-2 flex flex-col gap-0.5">
+                    {GUIDES.map(g => (
+                      <a
+                        key={g.href}
+                        href={g.href}
+                        className="flex items-center justify-between text-sm font-medium text-foreground/70 hover:text-foreground py-1.5 pl-3 transition-colors"
+                        onClick={closeMobile}
+                      >
+                        {g.label}
+                        {g.badge && <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">{g.badge}</span>}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Resources section in mobile */}
-              <div className="pt-1 border-t border-border/50">
-                <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider py-2">Resources</p>
-                {RESOURCES.map(r => (
-                  <a
-                    key={r.href}
-                    href={r.href}
-                    className="block text-sm font-medium text-foreground/70 hover:text-foreground py-2 transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {r.label}
-                  </a>
-                ))}
+              <div className="border-t border-border/50">
+                <button
+                  className="flex items-center justify-between w-full text-xs font-semibold text-amber-400 uppercase tracking-wider py-3"
+                  onClick={() => setMobileResourcesOpen(v => !v)}
+                >
+                  Resources
+                  <ChevronDown size={13} className={`transition-transform duration-200 ${mobileResourcesOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileResourcesOpen && (
+                  <div className="pb-2 flex flex-col gap-0.5">
+                    {RESOURCES.map(r => (
+                      <a
+                        key={r.href}
+                        href={r.href}
+                        className="flex items-center justify-between text-sm font-medium text-foreground/70 hover:text-foreground py-1.5 pl-3 transition-colors"
+                        onClick={closeMobile}
+                      >
+                        {r.label}
+                        {r.badge && <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-400">{r.badge}</span>}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <a
