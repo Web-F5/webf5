@@ -311,7 +311,7 @@ export function DiyStep4() {
       <StepHeader step={currentStep} total={totalSteps} title="Location & service area" description="Where do you operate? This drives your local SEO." />
       <div className="flex flex-col gap-4">
 
-        <Field label="Business address" hint={isLocal ? undefined : '(leave blank if home-based or virtual)'} required={isLocal}>
+        <Field label="Business address" hint="(town only required)" required={isLocal}>
           <AddressAutocomplete />
           {data.bizAddressTown && <p className="text-xs text-emerald-400 mt-1">✓ Suburb/town identified: <strong>{data.bizAddressTown}</strong></p>}
           {stepErrors['bizAddress'] && <p className="mt-1 text-xs text-red-400">{stepErrors['bizAddress']}</p>}
