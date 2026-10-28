@@ -116,7 +116,7 @@ export default function DiyGuidePage() {
             </div>
             <span className="text-sm font-semibold text-red-400">(save 50%)</span>
           </div>
-          <p className="text-foreground/50 text-sm mb-6 mt-2">Lifetime access. No subscription.</p>
+          <p className="text-foreground/50 text-sm mb-6 mt-2">12 months access. One-time payment. No subscription.</p>
 
           <button
             onClick={handleBuy}
