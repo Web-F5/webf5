@@ -71,6 +71,20 @@ export default function DiyGuidePage() {
           </ul>
         </div>
 
+        {/* Video overview */}
+        <div className="mb-10">
+          <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
+            <iframe
+              src="https://player.vimeo.com/video/1240077712?badge=0&autopause=0&player_id=0&app_id=58479"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              title="DIY Website Guide - What's included"
+            />
+          </div>
+        </div>
+
         {/* Pricing card */}
         <div className="border border-border rounded-2xl p-6 bg-card/30 mb-6">
           <div className="flex flex-col gap-0.5 mb-1">
