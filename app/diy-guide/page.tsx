@@ -75,7 +75,8 @@ export default function DiyGuidePage() {
         <div className="mb-10">
           <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
             <iframe
-              src="https://player.vimeo.com/video/1240077712?badge=0&autopause=0&player_id=0&app_id=58479"
+              id="diy-guide-video"
+              src="https://player.vimeo.com/video/1240077712?badge=0&autopause=0&player_id=diy-guide-video&app_id=58479"
               frameBorder="0"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -83,6 +84,26 @@ export default function DiyGuidePage() {
               title="DIY Website Guide - What's included"
             />
           </div>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                var _vimeoSpeedSet = false;
+                window.addEventListener('message', function(e) {
+                  if (_vimeoSpeedSet || !e.data || typeof e.data !== 'string') return;
+                  try {
+                    var d = JSON.parse(e.data);
+                    if (d.event === 'ready') {
+                      var iframe = document.getElementById('diy-guide-video');
+                      if (iframe) {
+                        iframe.contentWindow.postMessage(JSON.stringify({method:'setPlaybackRate',value:1.25}), 'https://player.vimeo.com');
+                        _vimeoSpeedSet = true;
+                      }
+                    }
+                  } catch(_) {}
+                });
+              `,
+            }}
+          />
         </div>
 
         {/* Pricing card */}
