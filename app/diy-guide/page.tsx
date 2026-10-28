@@ -37,7 +37,7 @@ export default function DiyGuidePage() {
         playerVars: { rel: 0 },
         events: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          onReady: (e: any) => e.target.setPlaybackRate(1.25),
+          onReady: (e: any) => e.target.setPlaybackRate(1.1),
         },
       })
     }
