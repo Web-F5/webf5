@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from 'react'
 
 declare global {
   interface Window {
-    YT: typeof YT
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    YT: any
     onYouTubeIframeAPIReady: () => void
   }
 }
@@ -35,7 +36,8 @@ export default function DiyGuidePage() {
         videoId: 'mHeJ_tZjJnY',
         playerVars: { rel: 0 },
         events: {
-          onReady: (e: YT.PlayerEvent) => e.target.setPlaybackRate(1.25),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onReady: (e: any) => e.target.setPlaybackRate(1.25),
         },
       })
     }
