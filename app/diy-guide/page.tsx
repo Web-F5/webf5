@@ -1,7 +1,14 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
+declare global {
+  interface Window {
+    YT: typeof YT
+    onYouTubeIframeAPIReady: () => void
+  }
+}
 
 const included = [
   'Module 1 - Run the Web F5 discovery wizard and build a brief that drives every decision',
@@ -19,6 +26,29 @@ export default function DiyGuidePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const playerDivRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const initPlayer = () => {
+      if (!playerDivRef.current) return
+      new window.YT.Player(playerDivRef.current, {
+        videoId: 'mHeJ_tZjJnY',
+        playerVars: { rel: 0 },
+        events: {
+          onReady: (e: YT.PlayerEvent) => e.target.setPlaybackRate(1.25),
+        },
+      })
+    }
+
+    if (window.YT?.Player) {
+      initPlayer()
+    } else {
+      window.onYouTubeIframeAPIReady = initPlayer
+      const script = document.createElement('script')
+      script.src = 'https://www.youtube.com/iframe_api'
+      document.head.appendChild(script)
+    }
+  }, [])
 
   async function handleBuy() {
     setLoading(true)
@@ -61,14 +91,9 @@ export default function DiyGuidePage() {
         {/* Video overview */}
         <div className="mb-10">
           <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
-            <iframe
-              src="https://www.youtube.com/embed/mHeJ_tZjJnY"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              referrerPolicy="strict-origin-when-cross-origin"
+            <div
+              ref={playerDivRef}
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-              title="DIY Website Guide - What's included"
             />
           </div>
         </div>
