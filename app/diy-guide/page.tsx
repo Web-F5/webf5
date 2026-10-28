@@ -58,19 +58,6 @@ export default function DiyGuidePage() {
           </p>
         </div>
 
-        {/* What's included */}
-        <div className="mb-10">
-          <h2 className="text-sm font-semibold tracking-widest uppercase text-foreground/40 mb-5">What's included</h2>
-          <ul className="flex flex-col gap-3">
-            {included.map((item) => (
-              <li key={item} className="flex gap-3 items-start">
-                <span className="text-primary mt-0.5 flex-shrink-0">✓</span>
-                <span className="text-foreground/80 text-sm leading-relaxed">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* Video overview */}
         <div className="mb-10">
           <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
@@ -104,6 +91,19 @@ export default function DiyGuidePage() {
               `,
             }}
           />
+        </div>
+
+        {/* What's included */}
+        <div className="mb-10">
+          <h2 className="text-sm font-semibold tracking-widest uppercase text-foreground/40 mb-5">What's included</h2>
+          <ul className="flex flex-col gap-3">
+            {included.map((item) => (
+              <li key={item} className="flex gap-3 items-start">
+                <span className="text-primary mt-0.5 flex-shrink-0">✓</span>
+                <span className="text-foreground/80 text-sm leading-relaxed">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Pricing card */}
