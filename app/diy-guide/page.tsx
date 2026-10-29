@@ -33,7 +33,7 @@ export default function DiyGuidePage() {
     const initPlayer = () => {
       if (!playerDivRef.current) return
       new window.YT.Player(playerDivRef.current, {
-        videoId: 'pXPnw9ipJCI',
+        videoId: '2ZvURkc2HrU',
         playerVars: { rel: 0 },
         events: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,10 +83,10 @@ export default function DiyGuidePage() {
         <div className="mb-12">
           <p className="text-primary text-sm font-medium tracking-widest uppercase mb-3">DIY Guide · $27</p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-5 leading-tight text-balance">
-            Build Your Trade Website in a Weekend
+            Build Your Business Website in a Day.
           </h1>
           <p className="text-foreground/60 text-lg leading-relaxed">
-            A step-by-step guide for Victorian tradies and local service businesses. No coding experience needed. You get to create your own live website using your new brief, connect your domain, set up an email form, setup email routing, and Google visibility; all done by yourself.
+            A step-by-step guide for Australian tradies and local service businesses. No coding experience needed. You get to create your own live website using your new brief, connect your domain, set up an email form, setup email routing, and Google visibility; all done by yourself.
           </p>
         </div>
 
