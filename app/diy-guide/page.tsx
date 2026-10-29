@@ -33,7 +33,7 @@ export default function DiyGuidePage() {
     const initPlayer = () => {
       if (!playerDivRef.current) return
       new window.YT.Player(playerDivRef.current, {
-        videoId: 'XXRa6fUM17E',
+        videoId: 'pXPnw9ipJCI',
         playerVars: { rel: 0 },
         events: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
