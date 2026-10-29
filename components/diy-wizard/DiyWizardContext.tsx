@@ -1,7 +1,31 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 import { WizardData, defaultWizardData } from '../../types'
+
+const STORAGE_KEY = 'diy-wizard-draft'
+
+function loadDraft(): { data: WizardData; step: number } | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+function saveDraft(data: WizardData, step: number) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, step }))
+  } catch {}
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {}
+}
 
 export type StepErrors = Record<string, string>
 
@@ -35,13 +59,19 @@ interface DiyWizardContextType {
 const DiyWizardContext = createContext<DiyWizardContextType | null>(null)
 
 export function DiyWizardProvider({ children }: { children: ReactNode }) {
-  const [data, setData]               = useState<WizardData>(defaultWizardData)
-  const [currentStep, setCurrentStep] = useState(1)
+  const draft = typeof window !== 'undefined' ? loadDraft() : null
+  const [data, setData]               = useState<WizardData>(draft?.data ?? defaultWizardData)
+  const [currentStep, setCurrentStep] = useState(draft?.step ?? 1)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [stepErrors, setStepErrors]   = useState<StepErrors>({})
   const [partialSent, setPartialSent] = useState(false)
   const [briefSaved, setBriefSaved]   = useState(false)
   const totalSteps = 8
+
+  // Auto-save on every data or step change
+  useEffect(() => {
+    if (!isSubmitted) saveDraft(data, currentStep)
+  }, [data, currentStep, isSubmitted])
 
   const update = useCallback((partial: Partial<WizardData>) => {
     setData(prev => ({ ...prev, ...partial }))
@@ -109,6 +139,7 @@ export function DiyWizardProvider({ children }: { children: ReactNode }) {
     // Step 7 → save to briefDrafts DB + email briefs@webf5.au (once)
     if (currentStep === 7 && !briefSaved) {
       setBriefSaved(true)
+      clearDraft()
       fetch('/api/diy-brief/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
