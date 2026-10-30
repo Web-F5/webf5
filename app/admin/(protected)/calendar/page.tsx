@@ -232,101 +232,123 @@ function TouchCard({
 // ── Week time-grid touch block ─────────────────────────────────────────────
 
 function WeekTouchBlock({
-  touch, slotH, isPast, isOpen, onToggle, markStatus, onDelete, onDragStart,
+  touch, slotH, isPast, isOpen, onOpen, onDragStart,
 }: {
   touch: Touch
   slotH: number
   isPast: boolean
   isOpen: boolean
-  onToggle: (id: string) => void
-  markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
-  onDelete: (id: string) => void
+  onOpen: (id: string, rect: DOMRect) => void
   onDragStart: (id: string) => void
 }) {
-  const crmAccountId = parseCrmAccountId(touch.prospectNotes)
-  const touchData    = findTouch(touch.sequenceName, touch.touchNumber)
-  const colourBase   = touch.channel === 'email' ? 'bg-indigo-500/25 border-indigo-500/50'
+  const colourBase = touch.channel === 'email' ? 'bg-indigo-500/25 border-indigo-500/50'
     : touch.channel === 'phone'    ? 'bg-emerald-500/25 border-emerald-500/50'
     : touch.channel === 'linkedin' ? 'bg-sky-500/25 border-sky-500/50'
     : touch.channel === 'video'    ? 'bg-purple-500/25 border-purple-500/50'
     : 'bg-amber-500/25 border-amber-500/50'
 
   return (
-    <>
-      {isOpen && (
-        <div className="fixed inset-0 z-40" onClick={() => onToggle(touch.id)} />
-      )}
-      <div
-        draggable
-        onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', touch.id); onDragStart(touch.id) }}
-        className={`relative border rounded-md px-1.5 py-1 text-[10px] leading-tight cursor-grab active:cursor-grabbing select-none transition-colors
-          ${colourBase}
-          ${isPast && touch.status === 'pending' ? 'ring-1 ring-red-500/50' : ''}
-          ${touch.status === 'completed' ? 'opacity-50' : ''}
-          ${touch.status === 'skipped' ? 'opacity-30' : ''}`}
-        style={{ minHeight: slotH, zIndex: isOpen ? 50 : undefined }}
-        onClick={() => onToggle(touch.id)}
-      >
-        <div className="flex items-center gap-1 min-w-0">
-          <span>{CHANNEL_ICON[touch.channel] ?? '📋'}</span>
-          <span className="font-semibold text-white truncate">{touch.prospectCompany}</span>
-        </div>
-        <div className="text-slate-400 truncate">{touch.touchName}</div>
+    <div
+      draggable
+      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', touch.id); onDragStart(touch.id) }}
+      className={`relative border rounded-md px-1.5 py-1 text-[10px] leading-tight cursor-grab active:cursor-grabbing select-none transition-colors
+        ${colourBase}
+        ${isPast && touch.status === 'pending' ? 'ring-1 ring-red-500/50' : ''}
+        ${touch.status === 'completed' ? 'opacity-50' : ''}
+        ${touch.status === 'skipped' ? 'opacity-30' : ''}
+        ${isOpen ? 'ring-2 ring-white/30' : ''}`}
+      style={{ minHeight: slotH }}
+      onClick={e => onOpen(touch.id, (e.currentTarget as HTMLElement).getBoundingClientRect())}
+    >
+      <div className="flex items-center gap-1 min-w-0">
+        <span>{CHANNEL_ICON[touch.channel] ?? '📋'}</span>
+        <span className="font-semibold text-white truncate">{touch.prospectCompany}</span>
+      </div>
+      <div className="text-slate-400 truncate">{touch.touchName}</div>
+    </div>
+  )
+}
 
-        {isOpen && (
-          <div
-            className="absolute left-0 top-full z-50 w-72 bg-[#1E293B] border border-white/20 rounded-xl shadow-2xl p-3 mt-1 text-xs"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <div className="font-semibold text-white leading-snug">{touchTitle(touch)}</div>
-              <button onClick={() => onToggle(touch.id)}
-                className="text-slate-400 hover:text-white transition-colors text-base leading-none flex-shrink-0 -mt-0.5">×</button>
-            </div>
-            <div className="text-slate-400 mb-2">{touch.prospectName} · {touch.sequenceName}</div>
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {touch.status === 'pending' && (
-                <>
-                  <button onClick={() => { markStatus(touch.id, 'completed'); onToggle(touch.id) }}
-                    className="px-2 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-lg">
-                    Done
-                  </button>
-                  <button onClick={() => { markStatus(touch.id, 'skipped'); onToggle(touch.id) }}
-                    className="px-2 py-1 bg-white/5 border border-white/10 text-slate-400 rounded-lg">
-                    Skip
-                  </button>
-                  <a href={googleCalLink(touch)} target="_blank" rel="noreferrer"
-                    className="px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-slate-300">
-                    Google Cal ↗
-                  </a>
-                </>
-              )}
-              {(touch.status === 'completed' || touch.status === 'skipped') && (
-                <button onClick={() => { markStatus(touch.id, 'pending'); onToggle(touch.id) }}
-                  className="px-2 py-1 bg-white/5 border border-white/10 text-slate-400 rounded-lg">
-                  Undo
-                </button>
-              )}
-              {crmAccountId && (
-                <a href={`/admin/crm/${crmAccountId}`}
-                  className="px-2 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-lg">
-                  CRM →
-                </a>
-              )}
-              <button onClick={() => { if (confirm('Delete this touch?')) onDelete(touch.id) }}
-                className="px-2 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg ml-auto">
-                Delete
+// ── Touch popup (rendered fixed at page level) ─────────────────────────────
+
+const POPUP_W = 288 // px, matches w-72
+const POPUP_ESTIMATE_H = 220 // px, rough popup height for positioning
+
+function TouchPopup({
+  touch, anchorRect, onClose, markStatus, onDelete,
+}: {
+  touch: Touch
+  anchorRect: DOMRect
+  onClose: () => void
+  markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+  onDelete: (id: string) => void
+}) {
+  const crmAccountId = parseCrmAccountId(touch.prospectNotes)
+  const touchData    = findTouch(touch.sequenceName, touch.touchNumber)
+
+  // Decide: open above if near bottom of viewport
+  const openAbove = anchorRect.bottom + POPUP_ESTIMATE_H > window.innerHeight - 24
+  // Decide: open to left if near right edge
+  const openLeft  = anchorRect.right + POPUP_W > window.innerWidth - 16
+
+  const left = openLeft  ? Math.max(8, anchorRect.right  - POPUP_W) : anchorRect.left
+  const top  = openAbove ? Math.max(8, anchorRect.top    - POPUP_ESTIMATE_H - 4) : anchorRect.bottom + 4
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div
+        className="fixed z-50 w-72 rounded-xl border border-white/20 shadow-2xl p-3 text-xs"
+        style={{ left, top, backgroundColor: '#1E293B' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <div className="font-semibold text-white leading-snug">{touchTitle(touch)}</div>
+          <button onClick={onClose}
+            className="text-slate-400 hover:text-white transition-colors text-base leading-none flex-shrink-0 -mt-0.5">×</button>
+        </div>
+        <div className="text-slate-400 mb-2">{touch.prospectName} · {touch.sequenceName}</div>
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {touch.status === 'pending' && (
+            <>
+              <button onClick={() => { markStatus(touch.id, 'completed'); onClose() }}
+                className="px-2 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-lg">
+                Done
               </button>
-            </div>
-            {touchData && (
-              <details className="text-slate-400">
-                <summary className="cursor-pointer hover:text-slate-200 transition-colors">Show script</summary>
-                <pre className="mt-1 text-[10px] text-slate-300 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto">
-                  {touchData.body.replace(/\[FIRST NAME\]/gi, touch.prospectName)}
-                </pre>
-              </details>
-            )}
-          </div>
+              <button onClick={() => { markStatus(touch.id, 'skipped'); onClose() }}
+                className="px-2 py-1 bg-white/5 border border-white/10 text-slate-400 rounded-lg">
+                Skip
+              </button>
+              <a href={googleCalLink(touch)} target="_blank" rel="noreferrer"
+                className="px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-slate-300">
+                Google Cal ↗
+              </a>
+            </>
+          )}
+          {(touch.status === 'completed' || touch.status === 'skipped') && (
+            <button onClick={() => { markStatus(touch.id, 'pending'); onClose() }}
+              className="px-2 py-1 bg-white/5 border border-white/10 text-slate-400 rounded-lg">
+              Undo
+            </button>
+          )}
+          {crmAccountId && (
+            <a href={`/admin/crm/${crmAccountId}`}
+              className="px-2 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-lg">
+              CRM →
+            </a>
+          )}
+          <button onClick={() => { if (confirm('Delete this touch?')) { onDelete(touch.id); onClose() } }}
+            className="px-2 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg ml-auto">
+            Delete
+          </button>
+        </div>
+        {touchData && (
+          <details className="text-slate-400">
+            <summary className="cursor-pointer hover:text-slate-200 transition-colors">Show script</summary>
+            <pre className="mt-1 text-[10px] text-slate-300 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto">
+              {touchData.body.replace(/\[FIRST NAME\]/gi, touch.prospectName)}
+            </pre>
+          </details>
         )}
       </div>
     </>
@@ -413,11 +435,13 @@ function WeekGrid({
   reschedule: (id: string, newDate: Date) => Promise<void>
 }) {
   const [dragOverSlot, setDragOverSlot] = useState<{ di: number; si: number } | null>(null)
-  const [openTouchId, setOpenTouchId] = useState<string | null>(null)
+  const [openPopup, setOpenPopup] = useState<{ touch: Touch; rect: DOMRect } | null>(null)
   const draggingId = useRef<string | null>(null)
 
-  function toggleTouch(id: string) {
-    setOpenTouchId(prev => prev === id ? null : id)
+  function handleOpen(id: string, rect: DOMRect) {
+    const touch = touches.find(t => t.id === id) ?? null
+    if (!touch) return
+    setOpenPopup(prev => prev?.touch.id === id ? null : { touch, rect })
   }
 
   const days = Array.from({ length: settings.weekDays }, (_, i) => addDays(weekAnchor, i))
@@ -454,6 +478,16 @@ function WeekGrid({
   const totalH = slotCount * SLOT_H
 
   return (
+    <>
+    {openPopup && (
+      <TouchPopup
+        touch={openPopup.touch}
+        anchorRect={openPopup.rect}
+        onClose={() => setOpenPopup(null)}
+        markStatus={markStatus}
+        onDelete={onDelete}
+      />
+    )}
     <div className="overflow-x-auto">
       {/* Header row */}
       <div className="flex" style={{ paddingLeft: LABEL_W }}>
@@ -545,10 +579,8 @@ function WeekGrid({
                       touch={touch}
                       slotH={SLOT_H - 2}
                       isPast={isPast}
-                      isOpen={openTouchId === touch.id}
-                      onToggle={toggleTouch}
-                      markStatus={markStatus}
-                      onDelete={onDelete}
+                      isOpen={openPopup?.touch.id === touch.id}
+                      onOpen={handleOpen}
                       onDragStart={id => { draggingId.current = id }}
                     />
                   </div>
@@ -559,6 +591,7 @@ function WeekGrid({
         })}
       </div>
     </div>
+    </>
   )
 }
 
