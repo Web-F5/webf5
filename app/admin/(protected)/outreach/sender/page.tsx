@@ -145,6 +145,7 @@ export default function OutreachSenderPage() {
   // Search filters
   const [filterMinReviews, setFilterMinReviews] = useState('')
   const [filterMaxReviews, setFilterMaxReviews] = useState('')
+  const [filterNoWebsite, setFilterNoWebsite]   = useState(false)
 
   // Research
   const [researching, setResearching]         = useState<string | null>(null)
@@ -183,6 +184,7 @@ export default function OutreachSenderPage() {
     const params = new URLSearchParams({ q: searchQuery.trim() })
     if (filterMinReviews) params.set('minReviews', filterMinReviews)
     if (filterMaxReviews) params.set('maxReviews', filterMaxReviews)
+    if (filterNoWebsite)  params.set('website', 'without')
     if (pagetoken) params.set('pagetoken', pagetoken)
     return params
   }
@@ -482,9 +484,22 @@ webf5.com.au`)
                   className="w-24 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500"
                 />
               </div>
-              {(filterMinReviews || filterMaxReviews) && (
+              <div className="self-end">
                 <button
-                  onClick={() => { setFilterMinReviews(''); setFilterMaxReviews('') }}
+                  type="button"
+                  onClick={() => setFilterNoWebsite(v => !v)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    filterNoWebsite
+                      ? 'bg-indigo-600 border-indigo-600 text-white'
+                      : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  No website only
+                </button>
+              </div>
+              {(filterMinReviews || filterMaxReviews || filterNoWebsite) && (
+                <button
+                  onClick={() => { setFilterMinReviews(''); setFilterMaxReviews(''); setFilterNoWebsite(false) }}
                   className="self-end pb-1.5 text-xs text-slate-400 hover:text-white underline underline-offset-2 transition-colors"
                 >
                   Clear filters
@@ -493,7 +508,7 @@ webf5.com.au`)
             </div>
 
             {/* Active filter banner */}
-            {(filterMinReviews || filterMaxReviews) && (
+            {(filterMinReviews || filterMaxReviews || filterNoWebsite) && (
               <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-xs text-amber-400 font-medium">Active filters:</span>
                 {filterMinReviews && (
@@ -504,6 +519,11 @@ webf5.com.au`)
                 {filterMaxReviews && (
                   <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
                     Max reviews: {filterMaxReviews}
+                  </span>
+                )}
+                {filterNoWebsite && (
+                  <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">
+                    No website only
                   </span>
                 )}
               </div>
