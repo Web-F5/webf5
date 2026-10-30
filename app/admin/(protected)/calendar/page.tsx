@@ -286,7 +286,7 @@ function TouchPopup({
   const touchData    = findTouch(touch.sequenceName, touch.touchNumber)
 
   // Decide: open above if near bottom of viewport
-  const openAbove = anchorRect.bottom + POPUP_ESTIMATE_H > window.innerHeight - 24
+  const openAbove = anchorRect.bottom + 220 > window.innerHeight - 24
   // Decide: open to left if near right edge
   const openLeft  = anchorRect.right + POPUP_W > window.innerWidth - 16
 
