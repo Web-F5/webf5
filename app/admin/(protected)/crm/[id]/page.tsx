@@ -46,6 +46,7 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
   const [emailSubject, setEmailSubject] = useState('')
   const [emailBody, setEmailBody]       = useState('')
   const [sendEmailNow, setSendEmailNow] = useState(true)
+  const [previewing2, setPreviewing2]   = useState(false)
 
   // Pre-fill from account + contacts
   const firstContact = contacts[0]
@@ -108,7 +109,18 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
       })
       const data = await res.json()
       if (res.ok) {
-        setResult({ ok: true, msg: type === 'audit' ? `Audit sent! Grade ${data.grade} (${data.overallScore}%)` : type === 'review' ? 'Review invite sent!' : 'Checklist sent!' })
+        const toolLabel = type === 'audit' ? 'Website Audit' : type === 'review' ? 'Review Request' : '12-Point Checklist'
+        const msg = type === 'audit' ? `Audit sent! Grade ${data.grade} (${data.overallScore}%)` : type === 'review' ? 'Review invite sent!' : 'Checklist sent!'
+        setResult({ ok: true, msg })
+        // If a sequence is active, schedule remaining touches with this tool as touch 1
+        if (parsed.sequenceName) {
+          await fetch('/api/admin/crm/start-sequence', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accountId: account.id, touch1Label: toolLabel }),
+          }).catch(() => {})
+          onRefresh()
+        }
       } else {
         setResult({ ok: false, msg: data.error ?? 'Something went wrong.' })
       }
@@ -149,6 +161,24 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
     } finally {
       setPreviewing(false)
     }
+  }
+
+  function previewOutreachEmail() {
+    if (!emailSubject.trim() && !emailBody.trim()) {
+      setResult({ ok: false, msg: 'Add subject and body first.' })
+      return
+    }
+    setPreviewing2(true)
+    const firstName = contacts[0]?.name || parsed.ownerName || '[FIRST NAME]'
+    const displayBody = emailBody.replace(/\[FIRST NAME\]/gi, firstName)
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>body{font-family:sans-serif;max-width:600px;margin:40px auto;padding:0 20px;color:#111}
+h3{color:#333;border-bottom:1px solid #eee;padding-bottom:8px}
+pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head>
+<body><h3>Subject: ${emailSubject || '(no subject)'}</h3><pre>${displayBody}</pre></body></html>`
+    const win = window.open('', '_blank')
+    if (win) { win.document.write(html); win.document.close() }
+    setPreviewing2(false)
   }
 
   return (
@@ -219,7 +249,7 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
             <div className="space-y-3">
               {parsed.sequenceName ? (
                 <div className="text-xs text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-3 py-2 flex items-center justify-between">
-                  <span>Sequence: <strong>{parsed.sequenceName}</strong> - Touch 1{parsed.sequenceProspectId ? ' (sequence already running)' : ''}</span>
+                  <span>Sequence: <strong>{parsed.sequenceName}</strong>{parsed.sequenceProspectId ? ' — already running' : ' — touch 1'}</span>
                   <a href="/admin/outreach/sequences" target="_blank" rel="noopener noreferrer"
                     className="text-indigo-400 hover:text-indigo-300 ml-3 whitespace-nowrap">View templates →</a>
                 </div>
@@ -235,7 +265,12 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
                   placeholder="quick idea for [COMPANY]" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Body *</label>
+                <label className="block text-xs text-slate-400 mb-1">
+                  Body *
+                  <span className="ml-2 font-normal text-slate-500">
+                    [FIRST NAME] will show as &ldquo;{contacts[0]?.name || parsed.ownerName || '[FIRST NAME]'}&rdquo; in preview
+                  </span>
+                </label>
                 <textarea value={emailBody} onChange={e => setEmailBody(e.target.value)} rows={8}
                   className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 resize-y font-mono"
                   placeholder="Paste and customise the template from the sequences page..." />
@@ -248,12 +283,17 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
             </div>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <button type="submit" disabled={sending || previewing}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors">
               {sending ? 'Sending…' : type === 'audit' ? 'Send audit' : type === 'review' ? 'Send review invite' : type === 'email' ? 'Send + schedule sequence' : 'Send checklist'}
             </button>
-            {type !== 'email' && (
+            {type === 'email' ? (
+              <button type="button" onClick={previewOutreachEmail} disabled={previewing2}
+                className="px-4 py-2 bg-white/5 text-slate-300 text-sm font-semibold rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-50 transition-colors">
+                Preview email
+              </button>
+            ) : (
               <button type="button" onClick={preview} disabled={sending || previewing}
                 className="px-4 py-2 bg-white/5 text-slate-300 text-sm font-semibold rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-50 transition-colors">
                 {previewing ? 'Loading…' : 'Preview email'}
@@ -265,6 +305,55 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
           </div>
         </form>
       )}
+    </div>
+  )
+}
+
+// ── Contact log ───────────────────────────────────────────────────────────────
+const ORDINALS = ['', 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth']
+
+function ContactLog({ prospectId }: { prospectId: string }) {
+  const [touches, setTouches] = useState<{
+    id: string; touchNumber: number; touchName: string; channel: string
+    scheduledFor: string; status: string; completedAt: string | null
+  }[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(`/api/admin/outreach/touches?prospectId=${prospectId}`)
+      .then(r => r.json())
+      .then(d => { setTouches(d.touches ?? []); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [prospectId])
+
+  if (loading) return <p className="text-xs text-slate-500">Loading contact log…</p>
+  if (touches.length === 0) return <p className="text-xs text-slate-500">No activity yet.</p>
+
+  return (
+    <div className="space-y-1.5">
+      {touches.map(t => {
+        const ordinal = ORDINALS[t.touchNumber] ?? `#${t.touchNumber}`
+        const date = t.completedAt
+          ? new Date(t.completedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+          : new Date(t.scheduledFor).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+        const label = t.status === 'completed'
+          ? `${ordinal} contact - ${t.touchName} - sent ${date}`
+          : t.status === 'skipped'
+          ? `${ordinal} contact - ${t.touchName} - skipped`
+          : `${ordinal} contact - ${t.touchName} - due ${date}`
+        return (
+          <div key={t.id} className={`flex items-center gap-2 text-xs ${
+            t.status === 'completed' ? 'text-emerald-400' :
+            t.status === 'skipped'   ? 'text-slate-500 line-through' :
+            'text-slate-400'
+          }`}>
+            <span className="w-2 h-2 rounded-full flex-shrink-0 mt-px" style={{
+              background: t.status === 'completed' ? '#34d399' : t.status === 'skipped' ? '#64748b' : '#6366f1'
+            }} />
+            {label}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -860,6 +949,18 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
 
       {/* Outreach Sequence */}
       <SequencePanel account={account} onRefresh={loadAll} />
+
+      {/* Contact log */}
+      {(() => {
+        const np = parseNotes(account.notes)
+        if (!np.sequenceProspectId) return null
+        return (
+          <div className="mb-6 bg-[#111827] border border-white/10 rounded-xl p-4">
+            <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-3">Contact Log</p>
+            <ContactLog prospectId={np.sequenceProspectId} />
+          </div>
+        )
+      })()}
 
       {/* New deal form */}
       {showNewDeal && (

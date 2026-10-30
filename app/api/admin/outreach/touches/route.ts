@@ -12,12 +12,14 @@ async function isAdmin(): Promise<boolean> {
 export async function GET(req: NextRequest) {
   if (!await isAdmin()) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const from = req.nextUrl.searchParams.get('from')
-  const to   = req.nextUrl.searchParams.get('to')
+  const from       = req.nextUrl.searchParams.get('from')
+  const to         = req.nextUrl.searchParams.get('to')
+  const prospectId = req.nextUrl.searchParams.get('prospectId')
 
   const conditions = []
-  if (from) conditions.push(gte(outreachTouches.scheduledFor, new Date(from)))
-  if (to)   conditions.push(lte(outreachTouches.scheduledFor, new Date(to)))
+  if (from)       conditions.push(gte(outreachTouches.scheduledFor, new Date(from)))
+  if (to)         conditions.push(lte(outreachTouches.scheduledFor, new Date(to)))
+  if (prospectId) conditions.push(eq(outreachTouches.prospectId, prospectId))
 
   const touches = await db
     .select({

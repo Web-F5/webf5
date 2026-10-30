@@ -37,16 +37,17 @@ function parseAccountNotes(notes: string | null) {
 export async function POST(req: NextRequest) {
   if (!await isAdmin()) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const { accountId, subject, body, bodyHtml, sendEmail } = await req.json() as {
-    accountId: string
-    subject: string
-    body: string
-    bodyHtml?: string
-    sendEmail?: boolean
+  const { accountId, subject, body, bodyHtml, sendEmail, touch1Label } = await req.json() as {
+    accountId:   string
+    subject?:    string
+    body?:       string
+    bodyHtml?:   string
+    sendEmail?:  boolean
+    touch1Label?: string   // override touch 1 name, e.g. "12-Point Checklist"
   }
 
-  if (!accountId || !subject || !body) {
-    return NextResponse.json({ error: 'accountId, subject and body are required' }, { status: 400 })
+  if (!accountId) {
+    return NextResponse.json({ error: 'accountId is required' }, { status: 400 })
   }
 
   const [account] = await db.select().from(crmAccounts).where(eq(crmAccounts.id, accountId))
@@ -77,25 +78,31 @@ export async function POST(req: NextRequest) {
       .where(eq(crmAccounts.id, accountId))
   }
 
-  // Create send record for touch 1
-  const touch1 = sequence.touches[0]
-  const [send] = await db.insert(outreachSends).values({
-    prospectId,
-    subject,
-    body,
-    bodyHtml: bodyHtml || body,
-    sequenceName: sequence.name,
-    touchType:    touch1.name,
-    status:       'sent',
-  }).returning({ id: outreachSends.id })
+  // Create send record for touch 1 (only when there is email content)
+  const touch1     = sequence.touches[0]
+  const touch1Name = touch1Label || touch1.name
+  const today      = new Date()
+  let sendId: string | null = null
+
+  if (subject && body) {
+    const [send] = await db.insert(outreachSends).values({
+      prospectId,
+      subject:      subject,
+      body:         body,
+      bodyHtml:     bodyHtml || body,
+      sequenceName: sequence.name,
+      touchType:    touch1Name,
+      status:       'sent',
+    }).returning({ id: outreachSends.id })
+    sendId = send.id
+  }
 
   // Create touch 1 as completed (sent now)
-  const today = new Date()
   await db.insert(outreachTouches).values({
     prospectId,
-    sendId:       send.id,
+    sendId:       sendId ?? undefined,
     sequenceName: sequence.name,
-    touchName:    touch1.name,
+    touchName:    touch1Name,
     touchNumber:  1,
     channel:      touch1.channel,
     scheduledFor: today,
@@ -120,14 +127,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Optionally send the email
-  if (sendEmail && np.email && np.email !== 'unknown@unknown.com') {
+  if (sendEmail && subject && body && np.email && np.email !== 'unknown@unknown.com') {
     await resend.emails.send({
       from:    'josh@webf5.au',
       to:      np.email,
-      subject,
+      subject: subject,
       html:    bodyHtml || `<p style="font-family:sans-serif;white-space:pre-wrap">${body}</p>`,
     }).catch(err => console.error('[start-sequence] email send failed:', err))
   }
 
-  return NextResponse.json({ ok: true, prospectId, sendId: send.id })
+  return NextResponse.json({ ok: true, prospectId, sendId })
 }

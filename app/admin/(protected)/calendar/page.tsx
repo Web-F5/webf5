@@ -24,6 +24,13 @@ function parseCrmAccountId(notes: string | null): string | null {
   return notes?.match(/^CrmAccountId:\s*(.+)/im)?.[1]?.trim() ?? null
 }
 
+const ORDINALS = ['', 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth']
+
+function touchTitle(touch: Touch): string {
+  const ordinal = ORDINALS[touch.touchNumber] ?? `#${touch.touchNumber}`
+  return `${ordinal} contact - ${touch.touchName} for ${touch.prospectCompany}`
+}
+
 const CHANNEL_ICON: Record<string, string> = {
   email: '📧', phone: '📞', linkedin: '💼', video: '🎥', note: '📝',
 }
@@ -41,8 +48,10 @@ function googleCalLink(touch: Touch): string {
   start.setHours(9, 0, 0, 0)
   const end = new Date(start.getTime() + 30 * 60000)
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z'
-  const title = encodeURIComponent(`${touch.touchName} — ${touch.prospectCompany}`)
-  const details = encodeURIComponent(`Sequence: ${touch.sequenceName}\nContact: ${touch.prospectName} (${touch.prospectEmail})\nChannel: ${touch.channel}`)
+  const title   = encodeURIComponent(touchTitle(touch))
+  const crmId   = parseCrmAccountId(touch.prospectNotes)
+  const crmLine = crmId ? `\nCRM: https://www.webf5.com.au/admin/crm/${crmId}` : ''
+  const details = encodeURIComponent(`Sequence: ${touch.sequenceName}\nContact: ${touch.prospectName} (${touch.prospectEmail})\nChannel: ${touch.channel}${crmLine}`)
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${details}`
 }
 
@@ -51,8 +60,10 @@ function outlookLink(touch: Touch): string {
   start.setHours(9, 0, 0, 0)
   const end = new Date(start.getTime() + 30 * 60000)
   const fmt = (d: Date) => d.toISOString().slice(0, 19)
-  const subject = encodeURIComponent(`${touch.touchName} — ${touch.prospectCompany}`)
-  const body = encodeURIComponent(`Sequence: ${touch.sequenceName}\nContact: ${touch.prospectName} (${touch.prospectEmail})\nChannel: ${touch.channel}`)
+  const crmId   = parseCrmAccountId(touch.prospectNotes)
+  const crmLine = crmId ? `\nCRM: https://www.webf5.com.au/admin/crm/${crmId}` : ''
+  const subject = encodeURIComponent(touchTitle(touch))
+  const body    = encodeURIComponent(`Sequence: ${touch.sequenceName}\nContact: ${touch.prospectName} (${touch.prospectEmail})\nChannel: ${touch.channel}${crmLine}`)
   return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${subject}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${body}`
 }
 
@@ -83,7 +94,7 @@ function TouchCard({
           <div className="text-lg shrink-0 mt-0.5">{CHANNEL_ICON[touch.channel] ?? '📋'}</div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium text-white">{touch.touchName}</span>
+              <span className="text-sm font-medium text-white">{touchTitle(touch)}</span>
               <span className={`text-xs px-2 py-0.5 rounded-full border ${CHANNEL_COLOUR[touch.channel] ?? 'bg-white/10 border-white/20 text-slate-300'}`}>
                 {touch.channel}
               </span>
@@ -99,7 +110,7 @@ function TouchCard({
             </div>
             <div className="flex items-center gap-3 flex-wrap mt-0.5">
               <span className="text-xs text-slate-400">
-                {touch.prospectCompany} · {touch.prospectName} · {touch.sequenceName}
+                {touch.prospectName} · {touch.sequenceName}
               </span>
               {crmAccountId && (
                 <a href={`/admin/crm/${crmAccountId}`}
@@ -122,9 +133,15 @@ function TouchCard({
             {scriptOpen && touchData && (
               <div className="mt-2 bg-[#0A0F1E] border border-white/10 rounded-lg p-3 max-w-xl">
                 {touchData.subject && (
-                  <div className="text-xs text-slate-400 mb-1">Subject: <span className="text-slate-200 italic">{touchData.subject}</span></div>
+                  <div className="text-xs text-slate-400 mb-1">
+                    Subject: <span className="text-slate-200 italic">
+                      {touchData.subject.replace(/\[FIRST NAME\]/gi, touch.prospectName)}
+                    </span>
+                  </div>
                 )}
-                <pre className="text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed">{touchData.body}</pre>
+                <pre className="text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed">
+                  {touchData.body.replace(/\[FIRST NAME\]/gi, touch.prospectName)}
+                </pre>
                 {touchData.note && (
                   <p className="text-xs text-amber-400/80 mt-2 italic">{touchData.note}</p>
                 )}
