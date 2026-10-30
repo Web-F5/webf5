@@ -669,12 +669,14 @@ export default function CalendarPage() {
 
   async function reschedule(touchId: string, newDate: Date) {
     const d = new Date(newDate)
-    await fetch('/api/admin/outreach/touches', {
+    const prev = touches
+    setTouches(ts => ts.map(t => t.id === touchId ? { ...t, scheduledFor: d.toISOString() } : t))
+    const res = await fetch('/api/admin/outreach/touches', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: touchId, scheduledFor: d.toISOString() }),
     })
-    await load()
+    if (!res.ok) setTouches(prev)
   }
 
   // Month grid
