@@ -65,7 +65,7 @@ const CHANNEL_COLOUR: Record<string, string> = {
 
 function googleCalLink(touch: Touch): string {
   const start = new Date(touch.scheduledFor)
-  start.setHours(9, 0, 0, 0)
+  if (start.getHours() === 0 && start.getMinutes() === 0) start.setHours(9, 0, 0, 0)
   const end = new Date(start.getTime() + 30 * 60000)
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z'
   const title   = encodeURIComponent(touchTitle(touch))
@@ -77,7 +77,7 @@ function googleCalLink(touch: Touch): string {
 
 function outlookLink(touch: Touch): string {
   const start = new Date(touch.scheduledFor)
-  start.setHours(9, 0, 0, 0)
+  if (start.getHours() === 0 && start.getMinutes() === 0) start.setHours(9, 0, 0, 0)
   const end = new Date(start.getTime() + 30 * 60000)
   const fmt = (d: Date) => d.toISOString().slice(0, 19)
   const crmId   = parseCrmAccountId(touch.prospectNotes)
@@ -373,7 +373,7 @@ function WeekGrid({
   markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
   reschedule: (id: string, newDate: Date) => Promise<void>
 }) {
-  const [dragOverDay, setDragOverDay] = useState<number | null>(null)
+  const [dragOverSlot, setDragOverSlot] = useState<{ di: number; si: number } | null>(null)
   const draggingId = useRef<string | null>(null)
 
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekAnchor, i))
@@ -395,6 +395,16 @@ function WeekGrid({
     const k = dayKey(t.scheduledFor)
     if (!byDay[k]) byDay[k] = []
     byDay[k].push(t)
+  }
+
+  // Position a touch in the grid: returns top offset in px based on its time
+  function touchTop(touch: Touch): number {
+    const d = new Date(touch.scheduledFor)
+    const h = d.getHours()
+    const m = d.getMinutes()
+    const totalMin = (h - settings.dayStart) * 60 + m
+    const clampedMin = Math.max(0, Math.min(totalMinutes - settings.slotMinutes, totalMin))
+    return Math.round((clampedMin / settings.slotMinutes) * SLOT_H)
   }
 
   const totalH = slotCount * SLOT_H
@@ -448,44 +458,55 @@ function WeekGrid({
           return (
             <div
               key={di}
-              className={`flex-1 min-w-[120px] relative border-l border-white/10 transition-colors
-                ${isToday ? 'bg-indigo-500/[0.03]' : ''}
-                ${dragOverDay === di ? 'bg-indigo-500/10 ring-1 ring-inset ring-indigo-500/30' : ''}`}
+              className={`flex-1 min-w-[120px] relative border-l border-white/10 ${isToday ? 'bg-indigo-500/[0.03]' : ''}`}
               style={{ height: totalH }}
-              onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverDay(di) }}
-              onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverDay(null) }}
-              onDrop={e => {
-                e.preventDefault()
-                setDragOverDay(null)
-                const id = e.dataTransfer.getData('text/plain') || draggingId.current
-                if (id) reschedule(id, day)
-              }}
             >
-              {/* Slot lines */}
-              {timeSlots.map((slot, i) => (
-                <div
-                  key={i}
-                  className={`absolute left-0 right-0 border-t ${slot.min === 0 ? 'border-white/10' : 'border-white/[0.04]'}`}
-                  style={{ top: i * SLOT_H }}
-                />
-              ))}
+              {/* Slot drop zones */}
+              {timeSlots.map((slot, si) => {
+                const isOver = dragOverSlot?.di === di && dragOverSlot?.si === si
+                return (
+                  <div
+                    key={si}
+                    className={`absolute left-0 right-0 border-t transition-colors
+                      ${slot.min === 0 ? 'border-white/10' : 'border-white/[0.04]'}
+                      ${isOver ? 'bg-indigo-500/20' : ''}`}
+                    style={{ top: si * SLOT_H, height: SLOT_H }}
+                    onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverSlot({ di, si }) }}
+                    onDragLeave={e => {
+                      if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverSlot(null)
+                    }}
+                    onDrop={e => {
+                      e.preventDefault()
+                      setDragOverSlot(null)
+                      const id = e.dataTransfer.getData('text/plain') || draggingId.current
+                      if (!id) return
+                      const target = new Date(day)
+                      target.setHours(slot.hour, slot.min, 0, 0)
+                      reschedule(id, target)
+                    }}
+                  />
+                )
+              })}
 
-              {/* Touch blocks - stacked from top of day (9am = slot 0) */}
-              <div className="absolute inset-x-1 top-1 flex flex-col gap-0.5">
-                {dayTouches.map(touch => {
-                  const isPast = new Date(touch.scheduledFor) < today && touch.status === 'pending'
-                  return (
+              {/* Touch blocks positioned by time */}
+              {dayTouches.map(touch => {
+                const isPast = new Date(touch.scheduledFor) < today && touch.status === 'pending'
+                return (
+                  <div
+                    key={touch.id}
+                    className="absolute left-1 right-1 z-10"
+                    style={{ top: touchTop(touch) }}
+                  >
                     <WeekTouchBlock
-                      key={touch.id}
                       touch={touch}
                       slotH={SLOT_H - 2}
                       isPast={isPast}
                       markStatus={markStatus}
                       onDragStart={id => { draggingId.current = id }}
                     />
-                  )
-                })}
-              </div>
+                  </div>
+                )
+              })}
             </div>
           )
         })}
@@ -562,7 +583,6 @@ export default function CalendarPage() {
 
   async function reschedule(touchId: string, newDate: Date) {
     const d = new Date(newDate)
-    d.setHours(9, 0, 0, 0)
     await fetch('/api/admin/outreach/touches', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
