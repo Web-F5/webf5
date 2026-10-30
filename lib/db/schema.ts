@@ -106,6 +106,8 @@ export const crmContacts = pgTable('crm_contacts', {
   name:      text('name').notNull(),
   title:     text('title'),
   linkedIn:  text('linked_in'),
+  email:     text('email'),
+  phone:     text('phone'),
   // role: economic_buyer | champion | user | blocker | coach
   role:      text('role').notNull(),
   notes:     text('notes'),

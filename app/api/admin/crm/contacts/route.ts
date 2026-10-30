@@ -10,18 +10,38 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { accountId, name, title, linkedIn, role, notes } = await req.json()
+  const { accountId, name, title, linkedIn, email, phone, role, notes } = await req.json()
   if (!accountId || !name?.trim() || !role) {
     return NextResponse.json({ error: 'accountId, name and role required' }, { status: 400 })
   }
   const [contact] = await db.insert(crmContacts).values({
     accountId,
     name:     name.trim(),
-    title:    title?.trim() || null,
+    title:    title?.trim()    || null,
     linkedIn: linkedIn?.trim() || null,
+    email:    email?.trim()    || null,
+    phone:    phone?.trim()    || null,
     role,
-    notes:    notes?.trim() || null,
+    notes:    notes?.trim()    || null,
   }).returning()
+  return NextResponse.json(contact)
+}
+
+export async function PATCH(req: NextRequest) {
+  const { id, name, title, linkedIn, email, phone, role, notes } = await req.json()
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+  const [contact] = await db.update(crmContacts)
+    .set({
+      name:     name?.trim()     || undefined,
+      title:    title?.trim()    || null,
+      linkedIn: linkedIn?.trim() || null,
+      email:    email?.trim()    || null,
+      phone:    phone?.trim()    || null,
+      role:     role              || undefined,
+      notes:    notes?.trim()    || null,
+    })
+    .where(eq(crmContacts.id, id))
+    .returning()
   return NextResponse.json(contact)
 }
 

@@ -35,6 +35,7 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
 
   const [open, setOpen]           = useState(false)
   const [type, setType]           = useState<'checklist' | 'audit' | 'review' | 'email'>('checklist')
+  const [selectedContactId, setSelectedContactId] = useState('')
   const [name, setName]           = useState('')
   const [email, setEmail]         = useState('')
   const [bizName, setBizName]     = useState('')
@@ -48,16 +49,33 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
   const [sendEmailNow, setSendEmailNow] = useState(true)
   const [previewing2, setPreviewing2]   = useState(false)
 
-  // Pre-fill from account + contacts
-  const firstContact = contacts[0]
-  useEffect(() => {
-    // Prefer business owner from notes, fall back to first CRM contact
-    const preferred = parsed.ownerName || firstContact?.name || ''
-    if (preferred && !name) setName(preferred)
-  }, [parsed.ownerName, firstContact, name])
-  useEffect(() => { if (parsed.email  && !email)   setEmail(parsed.email)     }, [parsed.email,   email])
+  // Pre-fill from account notes (only if no contact selected)
   useEffect(() => { if (parsed.website && !url)    setUrl(parsed.website)     }, [parsed.website,  url])
   useEffect(() => { if (account.name   && !bizName) setBizName(account.name)  }, [account.name, bizName])
+
+  // Initial pre-fill: first contact if exists, else account owner
+  useEffect(() => {
+    if (contacts.length > 0 && !selectedContactId) {
+      const c = contacts[0]
+      setSelectedContactId(c.id)
+      setName(c.name)
+      setEmail(c.email ?? parsed.email ?? '')
+    } else if (!name) {
+      setName(parsed.ownerName ?? '')
+      setEmail(parsed.email ?? '')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contacts.length])
+
+  function selectContact(id: string) {
+    setSelectedContactId(id)
+    if (!id) {
+      setName(''); setEmail('')
+      return
+    }
+    const c = contacts.find(x => x.id === id)
+    if (c) { setName(c.name); setEmail(c.email ?? '') }
+  }
 
   function buildBody(extra?: Record<string, unknown>) {
     const body: Record<string, unknown> = { type, name, email }
@@ -194,6 +212,24 @@ pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head>
       </div>
       {open && (
         <form onSubmit={send} className="mt-4 space-y-3">
+          {/* Contact selector */}
+          {contacts.length > 0 && (
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Send to</label>
+              <select
+                value={selectedContactId}
+                onChange={e => selectContact(e.target.value)}
+                className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+              >
+                {contacts.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}{c.email ? ` — ${c.email}` : ''}
+                    {c.phone ? ` · ${c.phone}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           {/* Type selector */}
           <div className="flex gap-2 flex-wrap">
             {([
@@ -434,7 +470,8 @@ interface Account {
 }
 interface Contact {
   id: string; accountId: string; name: string; title: string | null
-  linkedIn: string | null; role: string; notes: string | null
+  linkedIn: string | null; email: string | null; phone: string | null
+  role: string; notes: string | null
 }
 interface Deal {
   id: string; accountId: string; name: string; stage: number; status: string
@@ -468,7 +505,9 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
     ownerName: '', secondContact: '', website: '', phone: '', address: '', email: '', facebook: '', description: '',
   })
   const [showNewContact, setShowNewContact] = useState(false)
-  const [contactForm, setContactForm] = useState({ name: '', title: '', linkedIn: '', role: 'champion', notes: '' })
+  const [contactForm, setContactForm] = useState({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
+  const [editingContactId, setEditingContactId] = useState<string | null>(null)
+  const [contactEditForm, setContactEditForm] = useState({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
   const [showNewDeal, setShowNewDeal] = useState(false)
   const [dealName, setDealName] = useState('')
   const [saving, setSaving] = useState(false)
@@ -593,7 +632,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accountId: id, ...contactForm }),
     })
-    setContactForm({ name: '', title: '', linkedIn: '', role: 'champion', notes: '' })
+    setContactForm({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
     setShowNewContact(false)
     setSaving(false)
     loadAll()
@@ -601,6 +640,25 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
 
   async function deleteContact(contactId: string) {
     await fetch(`/api/admin/crm/contacts?id=${contactId}`, { method: 'DELETE' })
+    loadAll()
+  }
+
+  function startEditContact(c: Contact) {
+    setEditingContactId(c.id)
+    setContactEditForm({ name: c.name, title: c.title ?? '', linkedIn: c.linkedIn ?? '', email: c.email ?? '', phone: c.phone ?? '', role: c.role, notes: c.notes ?? '' })
+  }
+
+  async function saveContactEdit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!editingContactId) return
+    setSaving(true)
+    await fetch('/api/admin/crm/contacts', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: editingContactId, ...contactEditForm }),
+    })
+    setEditingContactId(null)
+    setSaving(false)
     loadAll()
   }
 
@@ -907,6 +965,14 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
                 placeholder="LinkedIn URL"
                 className="bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <input type="email" value={contactForm.email} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))}
+                placeholder="Email"
+                className="bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+              <input value={contactForm.phone} onChange={e => setContactForm(f => ({ ...f, phone: e.target.value }))}
+                placeholder="Phone"
+                className="bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+            </div>
             <input value={contactForm.notes} onChange={e => setContactForm(f => ({ ...f, notes: e.target.value }))}
               placeholder="One line on what they personally care about"
               className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
@@ -925,19 +991,66 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {contacts.map(c => (
-              <div key={c.id} className="flex items-start gap-2 p-2 rounded-lg bg-[#0A0F1E]">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-white truncate">{c.name}</span>
-                    {c.linkedIn && (
-                      <a href={c.linkedIn} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 text-xs flex-shrink-0">↗</a>
-                    )}
+              <div key={c.id} className="rounded-lg bg-[#0A0F1E] overflow-hidden">
+                {editingContactId === c.id ? (
+                  <form onSubmit={saveContactEdit} className="p-3 space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <input value={contactEditForm.name} onChange={e => setContactEditForm(f => ({ ...f, name: e.target.value }))}
+                        placeholder="Full name *" required
+                        className="bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                      <input value={contactEditForm.title} onChange={e => setContactEditForm(f => ({ ...f, title: e.target.value }))}
+                        placeholder="Job title"
+                        className="bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select value={contactEditForm.role} onChange={e => setContactEditForm(f => ({ ...f, role: e.target.value }))}
+                        className="bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                        {ROLES.map(r => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+                      </select>
+                      <input value={contactEditForm.linkedIn} onChange={e => setContactEditForm(f => ({ ...f, linkedIn: e.target.value }))}
+                        placeholder="LinkedIn URL"
+                        className="bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="email" value={contactEditForm.email} onChange={e => setContactEditForm(f => ({ ...f, email: e.target.value }))}
+                        placeholder="Email"
+                        className="bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                      <input value={contactEditForm.phone} onChange={e => setContactEditForm(f => ({ ...f, phone: e.target.value }))}
+                        placeholder="Phone"
+                        className="bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                    </div>
+                    <input value={contactEditForm.notes} onChange={e => setContactEditForm(f => ({ ...f, notes: e.target.value }))}
+                      placeholder="What they personally care about"
+                      className="w-full bg-[#111827] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                    <div className="flex gap-2 pt-1">
+                      <button type="submit" disabled={saving}
+                        className="px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50">
+                        {saving ? 'Saving…' : 'Save'}
+                      </button>
+                      <button type="button" onClick={() => setEditingContactId(null)} className="px-3 py-1 text-slate-400 hover:text-white text-xs">Cancel</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex items-start gap-2 p-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-white truncate">{c.name}</span>
+                        {c.linkedIn && (
+                          <a href={c.linkedIn} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 text-xs flex-shrink-0">↗</a>
+                        )}
+                      </div>
+                      {c.title && <div className="text-xs text-slate-500 truncate">{c.title}</div>}
+                      <div className="text-xs text-indigo-400 mt-0.5">{ROLE_LABELS[c.role] ?? c.role}</div>
+                      {c.email && <div className="text-xs text-slate-400 mt-0.5 truncate">{c.email}</div>}
+                      {c.phone && <div className="text-xs text-slate-400 truncate">{c.phone}</div>}
+                      {c.notes && <div className="text-xs text-slate-500 mt-0.5 italic truncate">{c.notes}</div>}
+                    </div>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <button onClick={() => startEditContact(c)} className="text-slate-500 hover:text-indigo-400 text-xs transition-colors px-1">Edit</button>
+                      <button onClick={() => deleteContact(c.id)} className="text-slate-600 hover:text-red-400 text-xs transition-colors">✕</button>
+                    </div>
                   </div>
-                  {c.title && <div className="text-xs text-slate-500 truncate">{c.title}</div>}
-                  <div className="text-xs text-indigo-400 mt-0.5">{ROLE_LABELS[c.role] ?? c.role}</div>
-                  {c.notes && <div className="text-xs text-slate-500 mt-0.5 italic truncate">{c.notes}</div>}
-                </div>
-                <button onClick={() => deleteContact(c.id)} className="text-slate-600 hover:text-red-400 text-xs flex-shrink-0 transition-colors">✕</button>
+                )}
               </div>
             ))}
           </div>

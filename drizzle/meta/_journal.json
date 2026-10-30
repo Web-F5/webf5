@@ -8,13 +8,19 @@
       "when": 1792126089760,
       "tag": "0000_worried_zzzax",
       "breakpoints": true
-    }
-  ],
+    },
     {
       "idx": 1,
       "version": "7",
       "when": 1761091200000,
       "tag": "0001_app_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761177600000,
+      "tag": "0002_contact_email_phone",
       "breakpoints": true
     }
   ]
