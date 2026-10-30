@@ -506,6 +506,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   })
   const [showNewContact, setShowNewContact] = useState(false)
   const [contactForm, setContactForm] = useState({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
+  const [contactSaveError, setContactSaveError] = useState<string | null>(null)
   const [editingContactId, setEditingContactId] = useState<string | null>(null)
   const [contactEditForm, setContactEditForm] = useState({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
   const [showNewDeal, setShowNewDeal] = useState(false)
@@ -627,15 +628,28 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   async function saveContact(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
-    await fetch('/api/admin/crm/contacts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accountId: id, ...contactForm }),
-    })
-    setContactForm({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
-    setShowNewContact(false)
-    setSaving(false)
-    loadAll()
+    setContactSaveError(null)
+    try {
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId: id, ...contactForm }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setContactSaveError(data.error ?? `Server error ${res.status}`)
+        setSaving(false)
+        return
+      }
+      setContactForm({ name: '', title: '', linkedIn: '', email: '', phone: '', role: 'champion', notes: '' })
+      setShowNewContact(false)
+      loadAll()
+    } catch (err) {
+      setContactSaveError('Network error - check console')
+      console.error(err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function deleteContact(contactId: string) {
@@ -976,12 +990,13 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
             <input value={contactForm.notes} onChange={e => setContactForm(f => ({ ...f, notes: e.target.value }))}
               placeholder="One line on what they personally care about"
               className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center flex-wrap">
               <button type="submit" disabled={saving}
                 className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50">
                 {saving ? 'Saving…' : 'Add contact'}
               </button>
-              <button type="button" onClick={() => setShowNewContact(false)} className="px-3 py-1.5 text-slate-400 hover:text-white text-xs">Cancel</button>
+              <button type="button" onClick={() => { setShowNewContact(false); setContactSaveError(null) }} className="px-3 py-1.5 text-slate-400 hover:text-white text-xs">Cancel</button>
+              {contactSaveError && <span className="text-xs text-red-400">{contactSaveError}</span>}
             </div>
           </form>
         )}
