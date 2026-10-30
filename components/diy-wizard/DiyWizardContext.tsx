@@ -64,8 +64,9 @@ export function DiyWizardProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState(draft?.step ?? 1)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [stepErrors, setStepErrors]   = useState<StepErrors>({})
-  const [partialSent, setPartialSent] = useState(false)
-  const [briefSaved, setBriefSaved]   = useState(false)
+  const [partialSent, setPartialSent]   = useState(false)
+  const [partial6Sent, setPartial6Sent] = useState(false)
+  const [briefSaved, setBriefSaved]     = useState(false)
   const totalSteps = 8
 
   // Auto-save on every data or step change
@@ -136,6 +137,16 @@ export function DiyWizardProvider({ children }: { children: ReactNode }) {
       }).catch(() => {})
     }
 
+    // Step 6 → partial progress email (once)
+    if (currentStep === 6 && !partial6Sent) {
+      setPartial6Sent(true)
+      fetch('/api/brief/partial-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: 6, source: 'diy', data }),
+      }).catch(() => {})
+    }
+
     // Step 7 → save to briefDrafts DB + email briefs@webf5.au (once)
     if (currentStep === 7 && !briefSaved) {
       setBriefSaved(true)
@@ -148,7 +159,7 @@ export function DiyWizardProvider({ children }: { children: ReactNode }) {
     }
 
     setCurrentStep(s => Math.min(s + 1, totalSteps))
-  }, [currentStep, data, totalSteps, validateStep, partialSent, briefSaved])
+  }, [currentStep, data, totalSteps, validateStep, partialSent, partial6Sent, briefSaved])
 
   const goBack = useCallback(() => {
     setStepErrors({})

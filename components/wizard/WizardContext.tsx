@@ -110,7 +110,9 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [stepErrors, setStepErrors]   = useState<StepErrors>({})
-  const [partialSent, setPartialSent] = useState(false)
+  const [partialSent, setPartialSent]       = useState(false)
+  const [partial6Sent, setPartial6Sent]     = useState(false)
+  const [partial9Sent, setPartial9Sent]     = useState(false)
   const [guestToken, setGuestToken]   = useState('')
   const totalSteps = 11
 
@@ -247,6 +249,24 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       firePartialCapture(data)
     }
 
+    if (currentStep === 6 && !partial6Sent) {
+      setPartial6Sent(true)
+      fetch('/api/brief/partial-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: 6, source: 'brief', data }),
+      }).catch(() => {})
+    }
+
+    if (currentStep === 9 && !partial9Sent) {
+      setPartial9Sent(true)
+      fetch('/api/brief/partial-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: 9, source: 'brief', data }),
+      }).catch(() => {})
+    }
+
     const nextStep = Math.min(currentStep + 1, totalSteps)
 
     // Autosave after each step advance (if we have a token)
@@ -257,7 +277,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
 
     pendingScroll.current = 'start'
     setCurrentStep(nextStep)
-  }, [currentStep, data, totalSteps, validateStep, getErrorScrollPosition, partialSent, guestToken, userId, resetInactivityTimer])
+  }, [currentStep, data, totalSteps, validateStep, getErrorScrollPosition, partialSent, partial6Sent, partial9Sent, guestToken, userId, resetInactivityTimer])
 
   const goBack = useCallback(() => {
     setStepErrors({})
