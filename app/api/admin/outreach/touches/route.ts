@@ -47,20 +47,31 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ touches })
 }
 
-// PATCH — mark a touch complete or skipped
+// PATCH — update status and/or reschedule a touch
 export async function PATCH(req: NextRequest) {
   if (!await isAdmin()) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const { id, status } = await req.json()
-  if (!id || !['completed', 'skipped', 'pending'].includes(status)) {
-    return NextResponse.json({ error: 'id and valid status required' }, { status: 400 })
+  const { id, status, scheduledFor } = await req.json()
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+  if (status === undefined && scheduledFor === undefined) {
+    return NextResponse.json({ error: 'nothing to update' }, { status: 400 })
   }
 
+  if (status !== undefined && !['completed', 'skipped', 'pending'].includes(status)) {
+    return NextResponse.json({ error: 'invalid status' }, { status: 400 })
+  }
+
+  const setData: {
+    status?: string
+    completedAt?: Date | null
+    scheduledFor?: Date
+  } = {}
+  if (status      !== undefined) { setData.status = status; setData.completedAt = status === 'completed' ? new Date() : null }
+  if (scheduledFor !== undefined) { setData.scheduledFor = new Date(scheduledFor) }
+
   const [updated] = await db.update(outreachTouches)
-    .set({
-      status,
-      completedAt: status === 'completed' ? new Date() : null,
-    })
+    .set(setData)
     .where(eq(outreachTouches.id, id))
     .returning()
 

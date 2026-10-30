@@ -221,12 +221,13 @@ function TouchCard({
 // ── Week time-grid touch block ─────────────────────────────────────────────
 
 function WeekTouchBlock({
-  touch, slotH, isPast, markStatus,
+  touch, slotH, isPast, markStatus, onDragStart,
 }: {
   touch: Touch
   slotH: number
   isPast: boolean
   markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+  onDragStart: (id: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const crmAccountId = parseCrmAccountId(touch.prospectNotes)
@@ -239,7 +240,9 @@ function WeekTouchBlock({
 
   return (
     <div
-      className={`relative border rounded-md px-1.5 py-1 text-[10px] leading-tight cursor-pointer select-none transition-colors
+      draggable
+      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', touch.id); onDragStart(touch.id) }}
+      className={`relative border rounded-md px-1.5 py-1 text-[10px] leading-tight cursor-grab active:cursor-grabbing select-none transition-colors
         ${colourBase}
         ${isPast && touch.status === 'pending' ? 'ring-1 ring-red-500/50' : ''}
         ${touch.status === 'completed' ? 'opacity-50' : ''}
@@ -361,14 +364,18 @@ function SettingsPanel({
 // ── Week grid ──────────────────────────────────────────────────────────────
 
 function WeekGrid({
-  weekAnchor, touches, today, settings, markStatus,
+  weekAnchor, touches, today, settings, markStatus, reschedule,
 }: {
   weekAnchor: Date
   touches: Touch[]
   today: Date
   settings: CalSettings
   markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+  reschedule: (id: string, newDate: Date) => Promise<void>
 }) {
+  const [dragOverDay, setDragOverDay] = useState<number | null>(null)
+  const draggingId = useRef<string | null>(null)
+
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekAnchor, i))
   const todayKey = dayKey(today.toISOString())
 
@@ -441,14 +448,24 @@ function WeekGrid({
           return (
             <div
               key={di}
-              className={`flex-1 min-w-[120px] relative border-l border-white/10 ${isToday ? 'bg-indigo-500/3' : ''}`}
+              className={`flex-1 min-w-[120px] relative border-l border-white/10 transition-colors
+                ${isToday ? 'bg-indigo-500/[0.03]' : ''}
+                ${dragOverDay === di ? 'bg-indigo-500/10 ring-1 ring-inset ring-indigo-500/30' : ''}`}
               style={{ height: totalH }}
+              onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverDay(di) }}
+              onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverDay(null) }}
+              onDrop={e => {
+                e.preventDefault()
+                setDragOverDay(null)
+                const id = e.dataTransfer.getData('text/plain') || draggingId.current
+                if (id) reschedule(id, day)
+              }}
             >
               {/* Slot lines */}
               {timeSlots.map((slot, i) => (
                 <div
                   key={i}
-                  className={`absolute left-0 right-0 border-t ${slot.min === 0 ? 'border-white/10' : 'border-white/4'}`}
+                  className={`absolute left-0 right-0 border-t ${slot.min === 0 ? 'border-white/10' : 'border-white/[0.04]'}`}
                   style={{ top: i * SLOT_H }}
                 />
               ))}
@@ -464,6 +481,7 @@ function WeekGrid({
                       slotH={SLOT_H - 2}
                       isPast={isPast}
                       markStatus={markStatus}
+                      onDragStart={id => { draggingId.current = id }}
                     />
                   )
                 })}
@@ -538,6 +556,17 @@ export default function CalendarPage() {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status }),
+    })
+    await load()
+  }
+
+  async function reschedule(touchId: string, newDate: Date) {
+    const d = new Date(newDate)
+    d.setHours(9, 0, 0, 0)
+    await fetch('/api/admin/outreach/touches', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: touchId, scheduledFor: d.toISOString() }),
     })
     await load()
   }
@@ -705,6 +734,7 @@ export default function CalendarPage() {
                 today={today}
                 settings={settings}
                 markStatus={markStatus}
+                reschedule={reschedule}
               />
             )}
           </div>
