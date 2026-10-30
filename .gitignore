@@ -11,6 +11,9 @@ next.user-config.*
 # Environment variables
 .env*.local
 
+# Review folder (PDFs, exports, working files not for the repo)
+_review/
+
 # Common ignores
 node_modules/
 .next/

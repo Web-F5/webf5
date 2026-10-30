@@ -382,6 +382,7 @@ function ContactLog({ prospectId }: { prospectId: string }) {
   const [touches, setTouches] = useState<{
     id: string; touchNumber: number; touchName: string; channel: string
     scheduledFor: string; status: string; completedAt: string | null
+    prospectName: string; prospectEmail: string
   }[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -408,15 +409,22 @@ function ContactLog({ prospectId }: { prospectId: string }) {
           ? `${ordinal} contact - ${t.touchName} - skipped`
           : `${ordinal} contact - ${t.touchName} - due ${date}`
         return (
-          <div key={t.id} className={`flex items-center gap-2 text-xs ${
+          <div key={t.id} className={`flex gap-2 text-xs ${
             t.status === 'completed' ? 'text-emerald-400' :
             t.status === 'skipped'   ? 'text-slate-500 line-through' :
             'text-slate-400'
           }`}>
-            <span className="w-2 h-2 rounded-full flex-shrink-0 mt-px" style={{
+            <span className="w-2 h-2 rounded-full flex-shrink-0 mt-[3px]" style={{
               background: t.status === 'completed' ? '#34d399' : t.status === 'skipped' ? '#64748b' : '#6366f1'
             }} />
-            {label}
+            <div>
+              <div>{label}</div>
+              {t.prospectName && (
+                <div className="text-slate-500 mt-0.5">
+                  {t.prospectName}{t.prospectEmail ? ` · ${t.prospectEmail}` : ''}
+                </div>
+              )}
+            </div>
           </div>
         )
       })}
