@@ -6,6 +6,15 @@ import { TRIPLE, STAGE_NAMES, STAGE_COLORS, TIER_COLORS, ROLE_LABELS } from '@/l
 import type { Block, Task } from '@/lib/triple-seed'
 import { FULL_SEQUENCES } from '@/lib/outreach-sequences-full'
 
+// ── Golden Rules ──────────────────────────────────────────────────────────────
+const GOLDEN_RULES = [
+  { num: '01', rule: 'Subject lines under 5 words.', detail: 'Lowercase outperforms Title Case — they look human, not marketed.' },
+  { num: '02', rule: 'First emails under 75 words.', detail: 'Every word over 75 reduces reply rate.' },
+  { num: '03', rule: 'One CTA per touch.', detail: 'Two CTAs equals zero CTAs.' },
+  { num: '04', rule: 'Mobile preview every email.', detail: '70% of B2B email opens are on phones.' },
+  { num: '05', rule: 'Multi-channel beats single channel by 3×.', detail: 'Never run an email-only sequence.' },
+]
+
 // ── Send Tools panel ──────────────────────────────────────────────────────────
 function parseNotes(notes: string | null) {
   const get = (key: string) => notes?.match(new RegExp(`^${key}:\\s*(.+)`, 'im'))?.[1]?.trim() ?? ''
@@ -34,6 +43,7 @@ function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[];
   const parsed = parseNotes(account.notes)
 
   const [open, setOpen]           = useState(false)
+  const [rulesOpen, setRulesOpen] = useState(false)
   const [type, setType]           = useState<'checklist' | 'audit' | 'review' | 'email'>('checklist')
   const [selectedContactId, setSelectedContactId] = useState('')
   const [name, setName]           = useState('')
@@ -204,12 +214,32 @@ pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head>
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Send Tools</p>
         <div className="flex items-center gap-3">
+          <button onClick={() => setRulesOpen(o => !o)}
+            className="text-xs text-amber-400 hover:text-amber-300 transition-colors">
+            {rulesOpen ? '▲ Golden Rules' : '▼ Golden Rules'}
+          </button>
           <button onClick={() => setOpen(o => !o)}
             className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
             {open ? 'Close' : 'Send tool →'}
           </button>
         </div>
       </div>
+      {rulesOpen && (
+        <div className="mt-3 border border-amber-500/20 rounded-lg p-3 bg-amber-500/5">
+          <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">Golden Rules Before You Send Anything</p>
+          <div className="space-y-2">
+            {GOLDEN_RULES.map(r => (
+              <div key={r.num} className="flex gap-3">
+                <span className="text-xs font-bold text-amber-500 shrink-0">{r.num}</span>
+                <div>
+                  <p className="text-xs font-semibold text-white">{r.rule}</p>
+                  <p className="text-xs text-slate-400">{r.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {open && (
         <form onSubmit={send} className="mt-4 space-y-3">
           {/* Contact selector */}
@@ -1072,11 +1102,11 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
         )}
       </div>
 
-      {/* Send Tools */}
-      <SendToolsPanel contacts={contacts} account={account} onRefresh={loadAll} />
-
       {/* Outreach Sequence */}
       <SequencePanel account={account} onRefresh={loadAll} />
+
+      {/* Send Tools */}
+      <SendToolsPanel contacts={contacts} account={account} onRefresh={loadAll} />
 
       {/* Contact log */}
       {(() => {
