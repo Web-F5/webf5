@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { findTouch } from '@/lib/outreach-sequences-full'
 
 interface Touch {
   id: string
@@ -16,6 +17,11 @@ interface Touch {
   prospectName: string
   prospectCompany: string
   prospectEmail: string
+  prospectNotes: string | null
+}
+
+function parseCrmAccountId(notes: string | null): string | null {
+  return notes?.match(/^CrmAccountId:\s*(.+)/im)?.[1]?.trim() ?? null
 }
 
 const CHANNEL_ICON: Record<string, string> = {
@@ -56,6 +62,108 @@ function dayKey(iso: string): string {
 
 function addDays(d: Date, n: number): Date {
   const r = new Date(d); r.setDate(r.getDate() + n); return r
+}
+
+function TouchCard({
+  touch, date, isPast, crmAccountId, touchData, markStatus,
+}: {
+  touch: Touch
+  date: Date
+  isPast: boolean
+  crmAccountId: string | null
+  touchData: ReturnType<typeof findTouch>
+  markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+}) {
+  const [scriptOpen, setScriptOpen] = useState(false)
+
+  return (
+    <div className={`px-5 py-4 ${isPast ? 'bg-red-500/5' : ''}`}>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="text-lg shrink-0 mt-0.5">{CHANNEL_ICON[touch.channel] ?? '📋'}</div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium text-white">{touch.touchName}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full border ${CHANNEL_COLOUR[touch.channel] ?? 'bg-white/10 border-white/20 text-slate-300'}`}>
+                {touch.channel}
+              </span>
+              {isPast && (
+                <span className="text-xs bg-red-500/20 border border-red-500/30 text-red-300 px-2 py-0.5 rounded-full">overdue</span>
+              )}
+              {touch.status === 'completed' && (
+                <span className="text-xs bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded-full">done</span>
+              )}
+              {touch.status === 'skipped' && (
+                <span className="text-xs bg-slate-500/20 border border-slate-500/30 text-slate-400 px-2 py-0.5 rounded-full">skipped</span>
+              )}
+            </div>
+            <div className="flex items-center gap-3 flex-wrap mt-0.5">
+              <span className="text-xs text-slate-400">
+                {touch.prospectCompany} · {touch.prospectName} · {touch.sequenceName}
+              </span>
+              {crmAccountId && (
+                <a href={`/admin/crm/${crmAccountId}`}
+                  className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+                  View in CRM →
+                </a>
+              )}
+            </div>
+            <div className="text-xs text-slate-500 mt-0.5">
+              {date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+            </div>
+            {touchData && (
+              <button
+                onClick={() => setScriptOpen(o => !o)}
+                className="text-xs text-slate-500 hover:text-slate-300 mt-1 transition-colors"
+              >
+                {scriptOpen ? '- Hide script' : '+ Show script'}
+              </button>
+            )}
+            {scriptOpen && touchData && (
+              <div className="mt-2 bg-[#0A0F1E] border border-white/10 rounded-lg p-3 max-w-xl">
+                {touchData.subject && (
+                  <div className="text-xs text-slate-400 mb-1">Subject: <span className="text-slate-200 italic">{touchData.subject}</span></div>
+                )}
+                <pre className="text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed">{touchData.body}</pre>
+                {touchData.note && (
+                  <p className="text-xs text-amber-400/80 mt-2 italic">{touchData.note}</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
+          {touch.status === 'pending' && (
+            <>
+              <a href={googleCalLink(touch)} target="_blank" rel="noreferrer"
+                className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors whitespace-nowrap">
+                Google Cal ↗
+              </a>
+              <a href={outlookLink(touch)} target="_blank" rel="noreferrer"
+                className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors whitespace-nowrap">
+                Outlook ↗
+              </a>
+              <button onClick={() => markStatus(touch.id, 'completed')}
+                className="text-xs px-2 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-lg transition-colors">
+                Done
+              </button>
+              <button onClick={() => markStatus(touch.id, 'skipped')}
+                className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-lg transition-colors">
+                Skip
+              </button>
+            </>
+          )}
+          {(touch.status === 'completed' || touch.status === 'skipped') && (
+            <button onClick={() => markStatus(touch.id, 'pending')}
+              className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-lg transition-colors">
+              Undo
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function CalendarPage() {
@@ -226,81 +334,18 @@ export default function CalendarPage() {
             {filteredTouches.map(touch => {
               const date = new Date(touch.scheduledFor)
               const isPast = date < today && touch.status === 'pending'
+              const crmAccountId = parseCrmAccountId(touch.prospectNotes)
+              const touchData = findTouch(touch.sequenceName, touch.touchNumber)
               return (
-                <div key={touch.id} className={`px-5 py-4 ${isPast ? 'bg-red-500/5' : ''}`}>
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="flex items-start gap-3 min-w-0">
-                      {/* Channel badge */}
-                      <div className={`text-lg shrink-0 mt-0.5`}>
-                        {CHANNEL_ICON[touch.channel] ?? '📋'}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-white">{touch.touchName}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full border ${CHANNEL_COLOUR[touch.channel] ?? 'bg-white/10 border-white/20 text-slate-300'}`}>
-                            {touch.channel}
-                          </span>
-                          {isPast && (
-                            <span className="text-xs bg-red-500/20 border border-red-500/30 text-red-300 px-2 py-0.5 rounded-full">overdue</span>
-                          )}
-                          {touch.status === 'completed' && (
-                            <span className="text-xs bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded-full">✓ done</span>
-                          )}
-                          {touch.status === 'skipped' && (
-                            <span className="text-xs bg-slate-500/20 border border-slate-500/30 text-slate-400 px-2 py-0.5 rounded-full">skipped</span>
-                          )}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-0.5">
-                          {touch.prospectCompany} · {touch.prospectName} · {touch.sequenceName}
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          {date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-wrap shrink-0">
-                      {touch.status === 'pending' && (
-                        <>
-                          <a
-                            href={googleCalLink(touch)}
-                            target="_blank" rel="noreferrer"
-                            className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors whitespace-nowrap"
-                          >
-                            Google Cal ↗
-                          </a>
-                          <a
-                            href={outlookLink(touch)}
-                            target="_blank" rel="noreferrer"
-                            className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors whitespace-nowrap"
-                          >
-                            Outlook ↗
-                          </a>
-                          <button
-                            onClick={() => markStatus(touch.id, 'completed')}
-                            className="text-xs px-2 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-lg transition-colors"
-                          >
-                            ✓ Done
-                          </button>
-                          <button
-                            onClick={() => markStatus(touch.id, 'skipped')}
-                            className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-lg transition-colors"
-                          >
-                            Skip
-                          </button>
-                        </>
-                      )}
-                      {(touch.status === 'completed' || touch.status === 'skipped') && (
-                        <button
-                          onClick={() => markStatus(touch.id, 'pending')}
-                          className="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-lg transition-colors"
-                        >
-                          Undo
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <TouchCard
+                  key={touch.id}
+                  touch={touch}
+                  date={date}
+                  isPast={isPast}
+                  crmAccountId={crmAccountId}
+                  touchData={touchData}
+                  markStatus={markStatus}
+                />
               )
             })}
           </div>

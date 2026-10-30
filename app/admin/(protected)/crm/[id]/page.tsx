@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, use } from 'react'
 import Link from 'next/link'
 import { TRIPLE, STAGE_NAMES, STAGE_COLORS, TIER_COLORS, ROLE_LABELS } from '@/lib/triple-seed'
 import type { Block, Task } from '@/lib/triple-seed'
+import { FULL_SEQUENCES } from '@/lib/outreach-sequences-full'
 
 // ── Send Tools panel ──────────────────────────────────────────────────────────
 function parseNotes(notes: string | null) {
@@ -21,17 +22,19 @@ function parseNotes(notes: string | null) {
     gbpUrl:        get('Google Maps'),
     ownerName:     get('Owner'),
     secondContact: get('Second contact'),
-    reviewCount: reviewMatch ? parseInt(reviewMatch[1]) : null,
-    rating:      ratingMatch ? parseFloat(ratingMatch[1]) : null,
-    description: descMatch || null,
+    reviewCount:        reviewMatch ? parseInt(reviewMatch[1]) : null,
+    rating:             ratingMatch ? parseFloat(ratingMatch[1]) : null,
+    description:        descMatch || null,
+    sequenceName:       get('SequenceName'),
+    sequenceProspectId: get('SequenceProspectId'),
   }
 }
 
-function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: Account }) {
+function SendToolsPanel({ contacts, account, onRefresh }: { contacts: Contact[]; account: Account; onRefresh: () => void }) {
   const parsed = parseNotes(account.notes)
 
   const [open, setOpen]           = useState(false)
-  const [type, setType]           = useState<'checklist' | 'audit' | 'review'>('checklist')
+  const [type, setType]           = useState<'checklist' | 'audit' | 'review' | 'email'>('checklist')
   const [name, setName]           = useState('')
   const [email, setEmail]         = useState('')
   const [bizName, setBizName]     = useState('')
@@ -39,6 +42,10 @@ function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: A
   const [sending, setSending]     = useState(false)
   const [previewing, setPreviewing] = useState(false)
   const [result, setResult]       = useState<{ ok: boolean; msg: string } | null>(null)
+  // Outreach email fields
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailBody, setEmailBody]       = useState('')
+  const [sendEmailNow, setSendEmailNow] = useState(true)
 
   // Pre-fill from account + contacts
   const firstContact = contacts[0]
@@ -64,6 +71,36 @@ function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: A
     setSending(true)
     setResult(null)
     try {
+      if (type === 'email') {
+        if (!emailSubject.trim() || !emailBody.trim()) {
+          setResult({ ok: false, msg: 'Subject and body are required.' })
+          setSending(false)
+          return
+        }
+        if (!parsed.sequenceName) {
+          setResult({ ok: false, msg: 'Set an active sequence first (below).' })
+          setSending(false)
+          return
+        }
+        const res = await fetch('/api/admin/crm/start-sequence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accountId: account.id,
+            subject: emailSubject,
+            body: emailBody,
+            sendEmail: sendEmailNow,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok) {
+          setResult({ ok: true, msg: `Touch 1 sent! Sequence "${parsed.sequenceName}" scheduled in calendar.` })
+          onRefresh()
+        } else {
+          setResult({ ok: false, msg: data.error ?? 'Something went wrong.' })
+        }
+        return
+      }
       const res = await fetch('/api/admin/crm/send-tools', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,6 +170,7 @@ function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: A
               ['checklist', '12-Point Checklist'],
               ['audit',     'Website Audit'],
               ['review',    'Review Request Sender'],
+              ['email',     'Outreach Email'],
             ] as const).map(([t, label]) => (
               <button key={t} type="button" onClick={() => setType(t)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
@@ -176,21 +214,127 @@ function SendToolsPanel({ contacts, account }: { contacts: Contact[]; account: A
               </div>
             </div>
           )}
+
+          {type === 'email' && (
+            <div className="space-y-3">
+              {parsed.sequenceName ? (
+                <div className="text-xs text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-3 py-2 flex items-center justify-between">
+                  <span>Sequence: <strong>{parsed.sequenceName}</strong> - Touch 1{parsed.sequenceProspectId ? ' (sequence already running)' : ''}</span>
+                  <a href="/admin/outreach/sequences" target="_blank" rel="noopener noreferrer"
+                    className="text-indigo-400 hover:text-indigo-300 ml-3 whitespace-nowrap">View templates →</a>
+                </div>
+              ) : (
+                <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+                  No active sequence - set one in the Sequence panel below before sending.
+                </div>
+              )}
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Subject *</label>
+                <input value={emailSubject} onChange={e => setEmailSubject(e.target.value)}
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="quick idea for [COMPANY]" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Body *</label>
+                <textarea value={emailBody} onChange={e => setEmailBody(e.target.value)} rows={8}
+                  className="w-full bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 resize-y font-mono"
+                  placeholder="Paste and customise the template from the sequences page..." />
+              </div>
+              <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+                <input type="checkbox" checked={sendEmailNow} onChange={e => setSendEmailNow(e.target.checked)}
+                  className="rounded" />
+                Send this email now via Resend (to {parsed.email || 'account email'})
+              </label>
+            </div>
+          )}
+
           <div className="flex items-center gap-3">
             <button type="submit" disabled={sending || previewing}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors">
-              {sending ? (type === 'audit' ? 'Running audit…' : 'Sending…') : `Send ${type === 'audit' ? 'audit' : type === 'review' ? 'review invite' : 'checklist'}`}
+              {sending ? 'Sending…' : type === 'audit' ? 'Send audit' : type === 'review' ? 'Send review invite' : type === 'email' ? 'Send + schedule sequence' : 'Send checklist'}
             </button>
-            <button type="button" onClick={preview} disabled={sending || previewing}
-              className="px-4 py-2 bg-white/5 text-slate-300 text-sm font-semibold rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-50 transition-colors">
-              {previewing ? 'Loading…' : 'Preview email'}
-            </button>
+            {type !== 'email' && (
+              <button type="button" onClick={preview} disabled={sending || previewing}
+                className="px-4 py-2 bg-white/5 text-slate-300 text-sm font-semibold rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-50 transition-colors">
+                {previewing ? 'Loading…' : 'Preview email'}
+              </button>
+            )}
             {result && (
               <span className={`text-xs ${result.ok ? 'text-green-400' : 'text-red-400'}`}>{result.msg}</span>
             )}
           </div>
         </form>
       )}
+    </div>
+  )
+}
+
+// ── Sequence panel ────────────────────────────────────────────────────────────
+function SequencePanel({ account, onRefresh }: { account: Account; onRefresh: () => void }) {
+  const parsed    = parseNotes(account.notes)
+  const [selected, setSelected] = useState(parsed.sequenceName || '')
+  const [saving, setSaving]     = useState(false)
+  const [msg, setMsg]           = useState('')
+
+  async function setSequence() {
+    if (!selected) return
+    setSaving(true)
+    setMsg('')
+    // Remove existing SequenceName line and add new one
+    const base = (account.notes || '')
+      .replace(/^SequenceName:.*$/im, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+    const newNotes = base + `\nSequenceName: ${selected}`
+    const res = await fetch(`/api/admin/crm/accounts/${account.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: newNotes }),
+    })
+    if (res.ok) { setMsg('Saved'); onRefresh() }
+    else setMsg('Error saving')
+    setSaving(false)
+    setTimeout(() => setMsg(''), 2000)
+  }
+
+  const seqData = FULL_SEQUENCES.find(s => s.name === parsed.sequenceName)
+
+  return (
+    <div className="mb-6 bg-[#111827] border border-white/10 rounded-xl p-4">
+      <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-3">Outreach Sequence</p>
+      {parsed.sequenceName ? (
+        <div className="mb-3">
+          <div className="text-sm text-slate-200">
+            Active: <span className="text-indigo-300 font-medium">{parsed.sequenceName}</span>
+            {parsed.sequenceProspectId
+              ? <span className="ml-2 text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">running</span>
+              : <span className="ml-2 text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">not started</span>
+            }
+          </div>
+          {seqData && (
+            <p className="text-xs text-slate-500 mt-1">{seqData.tagline}</p>
+          )}
+          {parsed.sequenceProspectId && (
+            <a href="/admin/calendar" className="text-xs text-indigo-400 hover:text-indigo-300 mt-1 inline-block">
+              View calendar schedule →
+            </a>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-slate-500 mb-3">No sequence active.</p>
+      )}
+      <div className="flex gap-2">
+        <select value={selected} onChange={e => setSelected(e.target.value)}
+          className="flex-1 bg-[#0A0F1E] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+          <option value="">-- Select sequence --</option>
+          {FULL_SEQUENCES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
+        </select>
+        <button onClick={setSequence} disabled={!selected || saving}
+          className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors">
+          {saving ? 'Saving…' : 'Set'}
+        </button>
+      </div>
+      {msg && <p className={`text-xs mt-2 ${msg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{msg}</p>}
     </div>
   )
 }
@@ -332,11 +476,15 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
     if (accountForm.facebook)      noteParts.push(`Facebook: ${accountForm.facebook.trim()}`)
     if (accountForm.ownerName)     noteParts.push(`Owner: ${accountForm.ownerName.trim()}`)
     if (accountForm.secondContact) noteParts.push(`Second contact: ${accountForm.secondContact.trim()}`)
-    // Preserve rating / Google Maps lines from existing notes (not editable here)
-    const ratingLine = account?.notes?.match(/^Rating:.+$/im)?.[0] ?? ''
-    const mapsLine   = account?.notes?.match(/^Google Maps:.+$/im)?.[0] ?? ''
-    if (ratingLine) noteParts.push(ratingLine)
-    if (mapsLine)   noteParts.push(mapsLine)
+    // Preserve rating / Google Maps / sequence lines from existing notes (not editable here)
+    const ratingLine    = account?.notes?.match(/^Rating:.+$/im)?.[0] ?? ''
+    const mapsLine      = account?.notes?.match(/^Google Maps:.+$/im)?.[0] ?? ''
+    const seqNameLine   = account?.notes?.match(/^SequenceName:.+$/im)?.[0] ?? ''
+    const seqPrspLine   = account?.notes?.match(/^SequenceProspectId:.+$/im)?.[0] ?? ''
+    if (ratingLine)  noteParts.push(ratingLine)
+    if (mapsLine)    noteParts.push(mapsLine)
+    if (seqNameLine) noteParts.push(seqNameLine)
+    if (seqPrspLine) noteParts.push(seqPrspLine)
     const notes = noteParts.join('\n') || null
     await fetch(`/api/admin/crm/accounts/${id}`, {
       method: 'PATCH',
@@ -708,7 +856,10 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Send Tools */}
-      <SendToolsPanel contacts={contacts} account={account} />
+      <SendToolsPanel contacts={contacts} account={account} onRefresh={loadAll} />
+
+      {/* Outreach Sequence */}
+      <SequencePanel account={account} onRefresh={loadAll} />
 
       {/* New deal form */}
       {showNewDeal && (

@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
       prospectName:    outreachProspects.name,
       prospectCompany: outreachProspects.company,
       prospectEmail:   outreachProspects.email,
+      prospectNotes:   outreachProspects.notes,
     })
     .from(outreachTouches)
     .innerJoin(outreachProspects, eq(outreachTouches.prospectId, outreachProspects.id))
