@@ -663,8 +663,10 @@ export default function CalendarPage() {
   }
 
   async function deleteTouch(id: string) {
-    await fetch(`/api/admin/outreach/touches?id=${id}`, { method: 'DELETE' })
-    await load()
+    const prev = touches
+    setTouches(ts => ts.filter(t => t.id !== id))
+    const res = await fetch(`/api/admin/outreach/touches?id=${id}`, { method: 'DELETE' })
+    if (!res.ok) setTouches(prev)
   }
 
   async function reschedule(touchId: string, newDate: Date) {
