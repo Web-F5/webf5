@@ -57,6 +57,10 @@ export async function POST(req: NextRequest) {
       })
 
       if (existing) {
+        // Don't overwrite a more complete draft with a fresh/empty session
+        if (currentStep < existing.currentStep) {
+          return NextResponse.json({ ok: true, draftId: existing.id, skipped: true })
+        }
         await db.update(briefDrafts).set({
           currentStep,
           data: serialized,
