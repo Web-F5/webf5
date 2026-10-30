@@ -153,6 +153,7 @@ export async function POST(req: NextRequest) {
         replyTo: 'contact@webf5.au',
         subject: 'Your 12-Point Website Checklist — Web F5',
         html:    emailHtml,
+        text:    `Hi ${firstName}, here's the 12-Point Website Checklist for Australian small business websites.\n\nThe checklist PDF is attached to this email.\n\nWeb F5 — webf5.com.au`,
         attachments: [{ filename: 'website-checklist-web-f5.pdf', content: pdfBuffer }],
       })
       return NextResponse.json({ success: true, type: 'checklist' })
