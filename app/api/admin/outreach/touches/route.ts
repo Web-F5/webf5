@@ -77,3 +77,12 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ touch: updated })
 }
+
+// DELETE — remove a touch entirely
+export async function DELETE(req: NextRequest) {
+  if (!await isAdmin()) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+  const id = req.nextUrl.searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+  await db.delete(outreachTouches).where(eq(outreachTouches.id, id))
+  return NextResponse.json({ ok: true })
+}

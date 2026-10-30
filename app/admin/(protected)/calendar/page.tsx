@@ -24,9 +24,10 @@ interface CalSettings {
   slotMinutes: 15 | 30 | 60
   dayStart: number
   dayEnd: number
+  weekDays: 5 | 6 | 7
 }
 
-const DEFAULT_SETTINGS: CalSettings = { slotMinutes: 30, dayStart: 9, dayEnd: 17 }
+const DEFAULT_SETTINGS: CalSettings = { slotMinutes: 30, dayStart: 9, dayEnd: 17, weekDays: 7 }
 
 function loadSettings(): CalSettings {
   try {
@@ -88,7 +89,12 @@ function outlookLink(touch: Touch): string {
 }
 
 function dayKey(iso: string): string {
-  return iso.slice(0, 10)
+  const d = new Date(iso)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function localDayKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function addDays(d: Date, n: number): Date {
@@ -111,7 +117,7 @@ function formatHour(h: number, m: number): string {
 // ── Touch card (list view) ─────────────────────────────────────────────────
 
 function TouchCard({
-  touch, date, isPast, crmAccountId, touchData, markStatus,
+  touch, date, isPast, crmAccountId, touchData, markStatus, onDelete,
 }: {
   touch: Touch
   date: Date
@@ -119,6 +125,7 @@ function TouchCard({
   crmAccountId: string | null
   touchData: ReturnType<typeof findTouch>
   markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+  onDelete: (id: string) => void
 }) {
   const [scriptOpen, setScriptOpen] = useState(false)
 
@@ -212,6 +219,10 @@ function TouchCard({
               Undo
             </button>
           )}
+          <button onClick={() => { if (confirm('Delete this touch?')) onDelete(touch.id) }}
+            className="text-xs px-2 py-1 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg transition-colors">
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -221,12 +232,13 @@ function TouchCard({
 // ── Week time-grid touch block ─────────────────────────────────────────────
 
 function WeekTouchBlock({
-  touch, slotH, isPast, markStatus, onDragStart,
+  touch, slotH, isPast, markStatus, onDelete, onDragStart,
 }: {
   touch: Touch
   slotH: number
   isPast: boolean
   markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+  onDelete: (id: string) => void
   onDragStart: (id: string) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -292,6 +304,10 @@ function WeekTouchBlock({
                 CRM →
               </a>
             )}
+            <button onClick={() => { if (confirm('Delete this touch?')) onDelete(touch.id) }}
+              className="px-2 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg ml-auto">
+              Delete
+            </button>
           </div>
           {touchData && (
             <details className="text-slate-400">
@@ -322,6 +338,18 @@ function SettingsPanel({
       <div className="flex items-center justify-between mb-3">
         <span className="font-semibold text-white">Calendar settings</span>
         <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors text-lg leading-none">×</button>
+      </div>
+
+      <label className="block text-slate-400 text-xs mb-1">Days shown</label>
+      <div className="flex rounded-lg overflow-hidden border border-white/10 mb-3">
+        {([5, 6, 7] as const).map(d => (
+          <button key={d}
+            onClick={() => onChange({ ...settings, weekDays: d })}
+            className={`flex-1 py-1.5 text-xs transition-colors ${settings.weekDays === d ? 'bg-indigo-600 text-white' : 'bg-white/5 text-slate-400 hover:text-white'}`}
+          >
+            {d} day
+          </button>
+        ))}
       </div>
 
       <label className="block text-slate-400 text-xs mb-1">Slot interval</label>
@@ -364,20 +392,21 @@ function SettingsPanel({
 // ── Week grid ──────────────────────────────────────────────────────────────
 
 function WeekGrid({
-  weekAnchor, touches, today, settings, markStatus, reschedule,
+  weekAnchor, touches, today, settings, markStatus, onDelete, reschedule,
 }: {
   weekAnchor: Date
   touches: Touch[]
   today: Date
   settings: CalSettings
   markStatus: (id: string, status: 'completed' | 'skipped' | 'pending') => Promise<void>
+  onDelete: (id: string) => void
   reschedule: (id: string, newDate: Date) => Promise<void>
 }) {
   const [dragOverSlot, setDragOverSlot] = useState<{ di: number; si: number } | null>(null)
   const draggingId = useRef<string | null>(null)
 
-  const days = Array.from({ length: 7 }, (_, i) => addDays(weekAnchor, i))
-  const todayKey = dayKey(today.toISOString())
+  const days = Array.from({ length: settings.weekDays }, (_, i) => addDays(weekAnchor, i))
+  const todayKey = localDayKey(today)
 
   const totalMinutes  = (settings.dayEnd - settings.dayStart) * 60
   const slotCount     = totalMinutes / settings.slotMinutes
@@ -389,10 +418,10 @@ function WeekGrid({
     return { hour: Math.floor(mins / 60), min: mins % 60 }
   })
 
-  // Group touches by day key
+  // Group touches by local day key
   const byDay: Record<string, Touch[]> = {}
   for (const t of touches) {
-    const k = dayKey(t.scheduledFor)
+    const k = dayKey(t.scheduledFor)  // dayKey now uses local date
     if (!byDay[k]) byDay[k] = []
     byDay[k].push(t)
   }
@@ -414,7 +443,7 @@ function WeekGrid({
       {/* Header row */}
       <div className="flex" style={{ paddingLeft: LABEL_W }}>
         {days.map((day, i) => {
-          const k = dayKey(day.toISOString())
+          const k = localDayKey(day)
           const isToday = k === todayKey
           const dayTouches = byDay[k] ?? []
           const pending = dayTouches.filter(t => t.status === 'pending').length
@@ -451,7 +480,7 @@ function WeekGrid({
 
         {/* Day columns */}
         {days.map((day, di) => {
-          const k = dayKey(day.toISOString())
+          const k = localDayKey(day)
           const isToday = k === todayKey
           const dayTouches = byDay[k] ?? []
 
@@ -502,6 +531,7 @@ function WeekGrid({
                       slotH={SLOT_H - 2}
                       isPast={isPast}
                       markStatus={markStatus}
+                      onDelete={onDelete}
                       onDragStart={id => { draggingId.current = id }}
                     />
                   </div>
@@ -523,7 +553,7 @@ export default function CalendarPage() {
   const [today]                 = useState(() => new Date())
   const [viewDate, setViewDate] = useState(() => { const d = new Date(); d.setDate(1); return d })
   const [filter, setFilter]     = useState<'all' | 'pending' | 'completed'>('all')
-  const [calView, setCalView]   = useState<'month' | 'week'>('month')
+  const [calView, setCalView]   = useState<'month' | 'week'>('week')
   const [weekAnchor, setWeekAnchor] = useState(() => weekStart(new Date()))
   const [settings, setSettings] = useState<CalSettings>(DEFAULT_SETTINGS)
   const [showSettings, setShowSettings] = useState(false)
@@ -578,6 +608,11 @@ export default function CalendarPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status }),
     })
+    await load()
+  }
+
+  async function deleteTouch(id: string) {
+    await fetch(`/api/admin/outreach/touches?id=${id}`, { method: 'DELETE' })
     await load()
   }
 
@@ -754,6 +789,7 @@ export default function CalendarPage() {
                 today={today}
                 settings={settings}
                 markStatus={markStatus}
+                onDelete={deleteTouch}
                 reschedule={reschedule}
               />
             )}
@@ -793,7 +829,7 @@ export default function CalendarPage() {
                 const touchData = findTouch(touch.sequenceName, touch.touchNumber)
                 return (
                   <TouchCard key={touch.id} touch={touch} date={date} isPast={isPast}
-                    crmAccountId={crmAccountId} touchData={touchData} markStatus={markStatus} />
+                    crmAccountId={crmAccountId} touchData={touchData} markStatus={markStatus} onDelete={deleteTouch} />
                 )
               })}
             </div>
