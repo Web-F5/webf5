@@ -272,7 +272,6 @@ function WeekTouchBlock({
 // ── Touch popup (rendered fixed at page level) ─────────────────────────────
 
 const POPUP_W = 288 // px, matches w-72
-const POPUP_ESTIMATE_H = 220 // px, rough popup height for positioning
 
 function TouchPopup({
   touch, anchorRect, onClose, markStatus, onDelete,
@@ -291,15 +290,17 @@ function TouchPopup({
   // Decide: open to left if near right edge
   const openLeft  = anchorRect.right + POPUP_W > window.innerWidth - 16
 
-  const left = openLeft  ? Math.max(8, anchorRect.right  - POPUP_W) : anchorRect.left
-  const top  = openAbove ? Math.max(8, anchorRect.top    - POPUP_ESTIMATE_H - 4) : anchorRect.bottom + 4
+  const left = openLeft ? Math.max(8, anchorRect.right - POPUP_W) : anchorRect.left
+  const verticalStyle = openAbove
+    ? { bottom: window.innerHeight - anchorRect.top + 4 }
+    : { top: anchorRect.bottom + 4 }
 
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
         className="fixed z-50 w-72 rounded-xl border border-white/20 shadow-2xl p-3 text-xs"
-        style={{ left, top, backgroundColor: '#1E293B' }}
+        style={{ left, ...verticalStyle, backgroundColor: '#1E293B' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-2 mb-1">
